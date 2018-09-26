@@ -1,0 +1,62 @@
+{
+    "manifestVersion": 1,
+    "id": "openshift-vsts",
+    "publisher": "HardyFerentschik",
+    "version": "0.0.6",
+    "name": "OpenShift 3 Integration",
+    "description": "OpenShift tasks for Azure DevOps",
+    "public": false,
+    "categories": [
+        "Build and release"
+    ],
+    "tags": [
+        "utility",
+        "tasks",
+        "openshift"
+    ],
+    "links": {
+        "getstarted": {
+            "uri": "https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md"
+        },
+        "issues": {
+            "uri": "https://github.com/hferentschik/openshift-vsts/issues"
+        },
+        "repository": {
+            "uri": "https://github.com/hferentschik/openshift-vsts"
+        }
+	},
+    "content": {
+        "details": {
+            "path": "README.md"
+        }
+    },
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "openshift",
+            "type": "ms.vss-web.hub",
+            "targets": [
+                "ms.vss-code-web.code-hub-group"
+            ],
+            "properties": {
+                "name": "OpenShift",
+                "uri": "openshift-vsts.html"
+            }
+        }
+    ],
+    "files": [
+        {
+            "path": "openshift-vsts.html",
+            "addressable": true
+        },
+        {
+            "path": "node_modules/vss-web-extension-sdk/lib",
+            "addressable": true,
+            "packagePath": "lib"
+        }
+    ]
+}
