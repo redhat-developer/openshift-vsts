@@ -1,0 +1,11 @@
+language: node_js
+node_js: 
+  - "stable"
+
+before_script:
+  - npm -g tfx-cli
+  
+script: 
+  - npm run build
+  - npm test
+  - npm run vsix
