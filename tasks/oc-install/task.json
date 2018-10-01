@@ -1,0 +1,45 @@
+{
+    "id": "53335d84-011c-4006-88b4-dfc1d46c8567",
+    "name": "oc-install",
+    "friendlyName": "OpenShift CLI Installer",
+    "description": "Download and install the OpenShift CLI.",
+    "author": "Hardy Ferentschik",
+    "helpMarkDown": "See [oc-install](https://github.com/hferentschik/openshift-vsts/docs/oc-install.md)",
+    "category": "Utility",
+    "visibility": [
+      "Build",
+      "Release"
+    ],
+    "preview": true,
+    "demands": [],
+    "version": {
+      "Major": "1",
+      "Minor": "0",
+      "Patch": "7"
+    },
+    "minimumAgentVersion": "1.95.0",
+    "instanceNameFormat": "oc installer $(message)",
+    "inputs": [
+          {
+        "name": "k8sService",
+        "type": "connectedService:kubernetes",
+        "label": "k8s end point",
+        "required": true,
+        "helpMarkDown": "Select Kubernetes/OpenShift endpoint to use."
+      },
+      {
+        "name": "downloadVersion",
+        "type": "string",
+        "label": "oc version to install",
+        "defaultValue": "",
+        "required": false,
+        "helpMarkDown": "Select the oc version to install e.g. 'v3.10.0' (leave blank for latest)"
+      }
+    ],
+    "execution": {
+        "Node": {
+            "target": "oc-install.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+  }

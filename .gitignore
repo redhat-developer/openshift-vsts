@@ -1,6 +1,13 @@
 # Generated
 node_modules
+*.js
+*.js.map
+.taskkey
+*.vsix
+out
 
 # Artefacts
 *.vsix
 
+# IDE
+.vscode

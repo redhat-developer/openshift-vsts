@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "openshift-vsts",
     "publisher": "HardyFerentschik",
-    "version": "0.0.6",
+    "version": "0.0.21",
     "name": "OpenShift 3 Integration",
     "description": "OpenShift tasks for Azure DevOps",
     "public": false,
@@ -46,7 +46,16 @@
                 "name": "OpenShift",
                 "uri": "openshift-vsts.html"
             }
-        }
+        },
+        {
+            "id": "oc-install-task",
+            "description": "Task downloads oc and adds it to execution PATH.",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [ "ms.vss-distributed-task.tasks" ],
+            "properties": {
+              "name": "tasks/oc-install"
+            }
+          }       
     ],
     "files": [
         {
@@ -54,9 +63,7 @@
             "addressable": true
         },
         {
-            "path": "node_modules/vss-web-extension-sdk/lib",
-            "addressable": true,
-            "packagePath": "lib"
+            "path": "tasks/oc-install"
         }
     ]
 }
