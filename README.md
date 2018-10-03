@@ -1,8 +1,10 @@
-# OpenShift TFS/VSTS Marketplace Extension [![Build Status](https://travis-ci.org/hferentschik/openshift-vsts.svg?branch=master)](https://travis-ci.org/hferentschik/openshift-vsts)
+# OpenShift TFS/VSTS Marketplace Extension 
+
+[![Build Status](https://travis-ci.org/hferentschik/openshift-vsts.svg?branch=master)](https://travis-ci.org/hferentschik/openshift-vsts)
 
 <!-- TOC -->
 
-- [OpenShift TFS/VSTS Marketplace Extension [![Build Status](https://travis-ci.org/hferentschik/openshift-vsts.svg?branch=master)](https://travis-ci.org/hferentschik/openshift-vsts)](#openshift-tfsvsts-marketplace-extension-build-statushttpstravis-ciorghferentschikopenshift-vstssvgbranchmasterhttpstravis-ciorghferentschikopenshift-vsts)
+- [OpenShift TFS/VSTS Marketplace Extension](#openshift-tfsvsts-marketplace-extension)
 - [What is it?](#what-is-it)
 - [How to develop](#how-to-develop)
     - [Prerequisites](#prerequisites)
