@@ -8,7 +8,7 @@ import { ToolRunner } from 'vsts-task-lib/toolrunner';
 
 const octokit = require('@octokit/rest')()
 
-async function installOc(downloadVersion: string) {
+export async function installOc(downloadVersion: string) {
     try {
         if (!downloadVersion) {
             downloadVersion = await latestStable();
@@ -58,7 +58,7 @@ async function installOc(downloadVersion: string) {
  * 
  * @return the release/tag of the latest OpenShift CLI on GitHub.
  */
-async function latestStable(): Promise<string> {
+export async function latestStable(): Promise<string> {
     tl.debug("determinig latest oc version");
 
     let version = await octokit.repos.getLatestRelease({
@@ -171,5 +171,3 @@ export async function downloadAndExtract(url: string, downloadDir: string) {
         return ocBinary
     }
 }
-
-installOc(tl.getInput('version'));

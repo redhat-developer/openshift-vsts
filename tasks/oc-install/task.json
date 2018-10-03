@@ -15,7 +15,7 @@
     "version": {
       "Major": "1",
       "Minor": "0",
-      "Patch": "7"
+      "Patch": "8"
     },
     "minimumAgentVersion": "1.95.0",
     "instanceNameFormat": "oc installer $(message)",
@@ -38,7 +38,7 @@
     ],
     "execution": {
         "Node": {
-            "target": "oc-install.js",
+            "target": "task.js",
             "workingDirectory": "$(currentDirectory)"
         }
     }
