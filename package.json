@@ -4,11 +4,12 @@
   "description": "OpenShift TFS/VSTS Marketplace Extension",
   "main": "index.js",
   "scripts": {
+    "setup": "npm install -g tfx-cli",
     "clean": "rm -f *.vsix && for i in `ls tasks` ; do (cd tasks/$i; npm run clean); done",
     "build": "for i in `ls tasks` ; do cd `pwd`/tasks/$i; npm run build; done",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "for i in `ls tasks` ; do cd `pwd`/tasks/$i; npm run test; done",
     "vsix": "tfx extension create",
-    "prepublish": "npm run clean && npm run build",
+    "prepublishOnly": "npm run clean && npm run build",
     "publish": "tfx extension publish --share-with $SHARE_WITH --token $TOKEN --rev-version"
   },
   "repository": {
@@ -21,8 +22,5 @@
   "bugs": {
     "url": "https://github.com/hferentschik/openshift-vsts/issues"
   },
-  "homepage": "https://github.com/hferentschik/openshift-vsts#readme",
-  "dependencies": {
-    "vss-web-extension-sdk": "^5.140.0"
-  }
+  "homepage": "https://github.com/hferentschik/openshift-vsts#readme"
 }

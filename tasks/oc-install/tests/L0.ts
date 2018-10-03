@@ -3,7 +3,7 @@
 /// <reference path="../../../typings/globals/node/index.d.ts" />
 
 let expect = require('chai').expect;
-var task = require("../oc-install");
+let task = require("../oc-install");
 
 describe('#tarballURL', function() {
     it('should return null when the tag is empty', function() {
