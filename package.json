@@ -4,7 +4,7 @@
   "description": "OpenShift TFS/VSTS Marketplace Extension",
   "main": "index.js",
   "scripts": {
-    "setup": "npm install -g tfx-cli",
+    "setup": "npm install -g tfx-cli typescript",
     "clean": "rm -f *.vsix && for i in `ls tasks` ; do (cd tasks/$i; npm run clean); done",
     "build": "for i in `ls tasks` ; do cd `pwd`/tasks/$i; npm run build; done",
     "test": "for i in `ls tasks` ; do cd `pwd`/tasks/$i; npm run test; done",
