@@ -1,6 +1,6 @@
 {
   "name": "oc-install",
-  "description": "Download and installs OpenShift command CLI",
+  "description": "Runs OpenShift command using oc",
   "license": "Apache-2.0",
   "repository": "github:hferentschik/openshift-vsts",
   "main": "task.js",
@@ -14,7 +14,8 @@
     "clean": "rm -rf *.js *.map node_modules out"
   },
   "dependencies": {
-    "@octokit/rest": "^15.12.1",
+    "argv-split": "^2.0.1",
+    "fs-extra": "^7.0.0",
     "vsts-task-lib": "^2.1.0"
   },
   "devDependencies": {
