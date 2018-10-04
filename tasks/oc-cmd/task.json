@@ -1,0 +1,45 @@
+{
+  "id": "60911e85-ba6d-4333-9111-e1147b373617",
+  "name": "oc-cmd",
+  "friendlyName": "Execute OpenShift command",
+  "description": "OpenShift execute CLI command.",
+  "author": "Hardy Ferentschik",
+  "helpMarkDown": "See [getting started](https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md)",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "preview": true,
+  "demands": [],
+  "version": {
+    "Major": "1",
+    "Minor": "0",
+    "Patch": 18
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "oc-cmd $(message)",
+  "inputs": [
+    {
+      "name": "k8sService",
+      "type": "connectedService:kubernetes",
+      "label": "k8s end point",
+      "required": true,
+      "helpMarkDown": "Select Kubernetes/OpenShift endpoint to use."
+    },
+    {
+      "name": "cmd",
+      "type": "string",
+      "label": "oc command to run",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Specify the oc command to run."
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "task.js",
+      "workingDirectory": "$(currentDirectory)"
+    }
+  }
+}

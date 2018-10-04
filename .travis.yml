@@ -3,8 +3,7 @@ node_js:
   - "stable"
 
 before_script:
-  - npm install -g tfx-cli
-  - npm install -g typescript
+  - npm run setup
   
 script: 
   - npm run build

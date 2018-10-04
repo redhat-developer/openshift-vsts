@@ -25,6 +25,10 @@
 
     `> npm install -g typescript`
 
+* Install json CLI
+
+    `> npm install -g json`
+
 You can also run `npm run setup` to install `tfx-cli` and `typescript`
 
 ## Build tasks
@@ -100,13 +104,16 @@ Prerequisite is a [personal access token](https://docs.microsoft.com/en-us/azure
 ```
 > export TOKEN=<token>
 > export SHARE_WITH=<project-id>
-> npm run publish
+> npm run market
 ```
 
 ## References
 
-* [Develop a web extension for Azure DevOps Services](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=vsts)
-* [Tutorials for developing Azure DevOps Services extensions](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/tutorials?view=vsts)
-* [Publish from the command line](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts)
+* Microsoft's [Develop Extensions](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) guide
+    * [Getting Started](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=vsts)
+    * [Tutorials](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/tutorials?view=vsts)
+    * [Available pipeline environment variables](https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=vsts)
+    * [Publish from the command line](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts)
+* Microsoft's [Azure Pipelines tasks](https://github.com/Microsoft/vsts-tasks)
 * [Step by Step: Node Task with Typescript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/stepbystep.md)
 * [How to Use npm as a Build Tool](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool)

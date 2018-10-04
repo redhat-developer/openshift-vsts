@@ -17,26 +17,26 @@ export async function installOc(downloadVersion: string) {
         let mkdir: ToolRunner = tl.tool("mkdir");
 
         tl.debug("creating bin directory for the binaries");
-        let binDir = process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + '/bin';
+        let binDir = process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + '/.bin';
         mkdir.arg("-p").arg(binDir);
         await mkdir.exec();
 
         tl.debug("creating download directory for the tarballs");
-        let downloadDir = process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + '/download';
+        let downloadDir = process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + '/.download';
         mkdir.arg("-p").arg(downloadDir);
         await mkdir.exec();
 
         let url = await tarballURL(downloadVersion);
         if (url === null) {
             tl.setResult(tl.TaskResult.Failed, "Unable to determine oc download URL.");
-            return
+            return;
         }
         tl.debug(`downloading: ${url}`);
         
         let ocBinary = await downloadAndExtract(url, downloadDir);
         if (ocBinary === null) {
             tl.setResult(tl.TaskResult.Failed, "Unable to download or extract oc binary.");
-            return
+            return;
         }
 
         tl.debug("copy oc binary");
@@ -148,20 +148,9 @@ export async function downloadAndExtract(url: string, downloadDir: string) {
     if (!fs.existsSync(expandPath)) {
         tl.debug(`expanding ${targetFile}`);
 
-        let tarBinary = "tar"
-        // to make it easier to develop on macOS
-        if (os.platform() == "darwin") {
-            tarBinary = "gnutar"
-        }
-        // Note: -C option does not seem to work
-        // /usr/bin/tar: D\:\a\r1\a/download: Cannot open: No such file or directory
-        let tar: ToolRunner = tl.tool(tarBinary);
-        tar.arg("--force-local").arg("-xvf").arg(targetFile)
+        let tar: ToolRunner = tl.tool("tar");
+        tar.arg("-xvf").arg(targetFile).arg("-C").arg(downloadDir)
         await tar.exec();
-
-        let mv: ToolRunner = tl.tool("mv");
-        mv.arg(expandDir).arg(downloadDir)
-        await mv.exec();
     }
 
     let ocBinary = `${expandPath}/oc`

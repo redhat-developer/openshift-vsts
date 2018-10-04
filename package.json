@@ -4,13 +4,14 @@
   "description": "OpenShift TFS/VSTS Marketplace Extension",
   "main": "index.js",
   "scripts": {
-    "setup": "npm install -g tfx-cli typescript",
+    "setup": "npm install -g tfx-cli typescript json",
     "clean": "rm -f *.vsix && for i in `ls tasks` ; do (cd tasks/$i; npm run clean); done",
-    "build": "for i in `ls tasks` ; do cd `pwd`/tasks/$i; npm run build; done",
-    "test": "for i in `ls tasks` ; do cd `pwd`/tasks/$i; npm run test; done",
+    "build": "for i in `ls tasks` ; do (cd `pwd`/tasks/$i; npm run build); done",
+    "test": "for i in `ls tasks` ; do (cd ./tasks/$i; npm run test); done",
     "vsix": "tfx extension create",
-    "prepublishOnly": "npm run clean && npm run build",
-    "publish": "tfx extension publish --share-with $SHARE_WITH --token $TOKEN --rev-version"
+    "bump-task-version": "for i in `ls tasks` ; do TASK=$(cat tasks/$i/task.json | json -e 'this.version.Patch++'); echo \"$TASK\" > tasks/$i/task.json; done",
+    "premarket": "npm run clean && npm run build && npm run test && npm run bump-task-version",
+    "market": "tfx extension publish --share-with $SHARE_WITH --token $TOKEN --rev-version"
   },
   "repository": {
     "type": "git",
