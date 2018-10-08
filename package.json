@@ -23,5 +23,20 @@
   "bugs": {
     "url": "https://github.com/hferentschik/openshift-vsts/issues"
   },
-  "homepage": "https://github.com/hferentschik/openshift-vsts#readme"
+  "homepage": "https://github.com/hferentschik/openshift-vsts#readme",
+  "devDependencies": {
+    "commit-message-validator": "^0.1.6",
+    "husky": "^1.1.1"
+  },
+  "config": {
+    "commit-message-validator": {
+      "pattern": "Issue #[0-9]+ [a-zA-Z]+.*",
+      "errorMessage": "Invalid commit message"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commit-message-validator"
+    }
+  }
 }
