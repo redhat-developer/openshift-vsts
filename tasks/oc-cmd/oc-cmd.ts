@@ -43,7 +43,9 @@ export function setupPath() {
  */
 export function setupConfig(config: string) {
     let kubeConfigDir = process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + "/.kube";
-    fs.mkdirSync(kubeConfigDir)
+    if (!fs.existsSync(kubeConfigDir)) {
+        fs.mkdirSync(kubeConfigDir)
+    }
     let kubeConfig = kubeConfigDir + "/config"
     fs.writeFileSync(kubeConfig, config);
     tl.setVariable("KUBECONFIG", kubeConfig);
