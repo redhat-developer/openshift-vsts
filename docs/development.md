@@ -17,19 +17,9 @@
 ## Prerequisites
 
 * Install [Node.js](https://nodejs.org/en/)
-* Install the Azure DevOps CLI
+* Run npm setup script
         
-    `> npm install -g tfx-cli`
-
-* Install TypeScript
-
-    `> npm install -g typescript`
-
-* Install json CLI
-
-    `> npm install -g json`
-
-You can also run `npm run setup` to install `tfx-cli` and `typescript`
+    `> npm run setup`
 
 ## Build tasks
 
@@ -68,30 +58,33 @@ Assuming you are using Visual Studio Code, the following _launch.json_ will allo
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": [
+    "configurations": [       
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch oc install",
-            "program": "${workspaceFolder}/tasks/oc-install/task.ts",
-            "env": {"SYSTEM_DEFAULTWORKINGDIRECTORY":"${workspaceFolder}/tasks/oc-install/out"},
+            "name": "Launch oc cmd",
+            "program": "${workspaceFolder}/tasks/oc-cmd/src/task.ts",
+            "env": {"SYSTEM_DEFAULTWORKINGDIRECTORY":"${workspaceFolder}/tasks/oc-cmd/out"},
             "outFiles": [
-                "${workspaceFolder}/tasks/oc-install/*.js"
+                "${workspaceFolder}/tasks/oc-cmd/lib/*.js"
             ],
             "outputCapture": "std"
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Mocha Tests oc install",
-            "program": "${workspaceFolder}/tasks/oc-install/node_modules/mocha/bin/_mocha",
+            "name": "Mocha oc cmd",
+            "program": "${workspaceFolder}/tasks/oc-cmd/node_modules/.bin/ts-mocha",
             "args": [
-                "-u", "tdd",
-                "--timeout", "999999",
-                "--colors", "--recursive",
-                "${workspaceFolder}/tasks/oc-install/tests/**/*.ts"
+                "-p",
+                "${workspaceFolder}/tasks/oc-cmd/tsconfig.json",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceFolder}/tasks/oc-cmd/src/tests/*.ts",
             ],
-            "internalConsoleOptions": "openOnSessionStart"
+            "internalConsoleOptions": "neverOpen",
+            "protocol": "inspector"
         }
     ]
 }
@@ -114,6 +107,7 @@ Prerequisite is a [personal access token](https://docs.microsoft.com/en-us/azure
     * [Tutorials](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/tutorials?view=vsts)
     * [Available pipeline environment variables](https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=vsts)
     * [Publish from the command line](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts)
+* [vsts-task-lib TypeScript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/vsts-task-lib.md#toolrunnerToolRunnerargIf)
 * Microsoft's [Azure Pipelines tasks](https://github.com/Microsoft/vsts-tasks)
 * [Step by Step: Node Task with Typescript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/stepbystep.md)
 * [How to Use npm as a Build Tool](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool)

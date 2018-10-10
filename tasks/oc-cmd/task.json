@@ -15,7 +15,7 @@
   "version": {
     "Major": "1",
     "Minor": "0",
-    "Patch": 20
+    "Patch": 23
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "oc-cmd $(message)",
@@ -25,7 +25,15 @@
       "type": "connectedService:kubernetes",
       "label": "k8s end point",
       "required": true,
-      "helpMarkDown": "Select Kubernetes/OpenShift endpoint to use."
+      "helpMarkDown": "Select OpenShift endpoint to use."
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "label": "oc version to use for command execution",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest)"
     },
     {
       "name": "cmd",
@@ -38,7 +46,7 @@
   ],
   "execution": {
     "Node": {
-      "target": "task.js",
+      "target": "lib/task.js",
       "workingDirectory": "$(currentDirectory)"
     }
   }
