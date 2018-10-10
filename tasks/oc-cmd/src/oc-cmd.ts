@@ -1,38 +1,27 @@
-/// <reference path="../../typings/globals/node/index.d.ts" />
 "use strict"
 
 import fs = require('fs');
 import tl = require('vsts-task-lib/task');
-import split = require('argv-split')
 import { ToolRunner } from 'vsts-task-lib/toolrunner';
+
+const split = require('argv-split')
 
 /**
  * Prepares oc for execution and runs the specified command.
  * 
- * @param kubeConfig The kubeconfig for authentication to the cluster
+ * @param kubeConfig the kubeconfig for authentication to the cluster
+ * @param ocPath absolute path to the oc binary
  * @param argLine the command to run
  */
-export async function execOc(kubeConfig: string, argLine: string) {
+export async function execOc(kubeConfig: string, ocPath: string, argLine: string): Promise<void> {
     setupConfig(kubeConfig);
-    setupPath();
    
-    let oc: ToolRunner = tl.tool("oc");
+    let oc: ToolRunner = tl.tool(ocPath);
     let args = split(argLine);
     for (var arg of args) {
         oc.arg(arg)
     }
     await oc.exec();
-}
-
-/**
- * Makes sure the oc binary is on the PATH.
- */
-export function setupPath() {
-    let binDir = `${process.env['SYSTEM_DEFAULTWORKINGDIRECTORY']}/.bin`
-    if (!fs.existsSync(`${binDir}/oc`)) {
-        throw new Error(`Unable to find oc in ${binDir}. Have you run the oc install task?`)
-    }
-    tl.setVariable("PATH", binDir + ':' + tl.getVariable("PATH"));
     return;
 }
 

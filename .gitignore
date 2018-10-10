@@ -1,10 +1,11 @@
 # Generated
 node_modules
+lib
+out
 *.js
 *.js.map
 .taskkey
 *.vsix
-out
 
 # Artefacts
 *.vsix

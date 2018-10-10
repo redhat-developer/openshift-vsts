@@ -48,15 +48,6 @@
             }
         },
         {
-            "id": "oc-install-task",
-            "description": "Task to download oc and to add it to the PATH environment variable.",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [ "ms.vss-distributed-task.tasks" ],
-            "properties": {
-              "name": "tasks/oc-install"
-            }
-        }, 
-        {
             "id": "oc-cmd-task",
             "description": "Task to run oc command.",
             "type": "ms.vss-distributed-task.task",
@@ -73,9 +64,6 @@
         {
             "path": "openshift-vsts.html",
             "addressable": true
-        },
-        {
-            "path": "tasks/oc-install"
         },
         {
             "path": "tasks/oc-cmd"
