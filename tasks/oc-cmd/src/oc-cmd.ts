@@ -1,6 +1,5 @@
 "use strict"
 
-import fs = require('fs');
 import tl = require('vsts-task-lib/task');
 import { ToolRunner } from 'vsts-task-lib/toolrunner';
 
@@ -14,7 +13,7 @@ const split = require('argv-split')
  * @param argLine the command to run
  */
 export async function execOc(kubeConfig: string, ocPath: string, argLine: string): Promise<void> {
-    setupConfig(kubeConfig);
+    await setupConfig(kubeConfig);
    
     let oc: ToolRunner = tl.tool(ocPath);
     let args = split(argLine);
@@ -30,12 +29,14 @@ export async function execOc(kubeConfig: string, ocPath: string, argLine: string
  * 
  * @param config The cluster auth config to write to disk
  */
-export function setupConfig(config: string) {
+export async function setupConfig(config: string) {
     let kubeConfigDir = process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + "/.kube";
-    if (!fs.existsSync(kubeConfigDir)) {
-        fs.mkdirSync(kubeConfigDir)
+    if (!tl.exist(kubeConfigDir)) {
+        let mkdir: ToolRunner = tl.tool("mkdir");
+        mkdir.arg("-p").arg(kubeConfigDir);
+        await mkdir.exec();
     }
     let kubeConfig = kubeConfigDir + "/config"
-    fs.writeFileSync(kubeConfig, config);
+    tl.writeFile(kubeConfig, config);
     tl.setVariable("KUBECONFIG", kubeConfig);
 }

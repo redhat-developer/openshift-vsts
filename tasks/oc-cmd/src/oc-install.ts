@@ -66,7 +66,7 @@ export async function latestStable(): Promise<string> {
  * if no matching URL can be determined for the given tag.
  */
 export async function tarballURL(tag: string): Promise<string | null> {
-    tl.debug("determinig tarbal URL");
+    tl.debug(`determinig tarball URL for tag ${tag}`);
 
     if (!tag) {
         return null;
@@ -112,7 +112,7 @@ export async function downloadAndExtract(url: string, downloadDir: string): Prom
         return null;
     }
 
-    if (!fs.existsSync(downloadDir)) {
+    if (!tl.exist(downloadDir)) {
         throw `${downloadDir} does not exist.`;
     }
 
@@ -120,7 +120,7 @@ export async function downloadAndExtract(url: string, downloadDir: string): Prom
     let tarball = parts[parts.length - 1]
     let targetFile = downloadDir + `/${tarball}`
 
-    if (!fs.existsSync(targetFile)) {
+    if (!tl.exist(targetFile)) {
         let curl: ToolRunner = tl.tool("curl");
         curl.arg("-L").arg("-o").arg(targetFile).arg(url);
         await curl.exec();
@@ -128,7 +128,7 @@ export async function downloadAndExtract(url: string, downloadDir: string): Prom
 
     let expandDir = tarball.replace('.tar.gz', '')
     let expandPath = downloadDir + `/${expandDir}`
-    if (!fs.existsSync(expandPath)) {
+    if (!tl.exist(expandPath)) {
         tl.debug(`expanding ${targetFile}`);
 
         let tar: ToolRunner = tl.tool("tar");
@@ -137,7 +137,7 @@ export async function downloadAndExtract(url: string, downloadDir: string): Prom
     }
 
     let ocBinary = `${expandPath}/oc`
-    if (!fs.existsSync(ocBinary)) {
+    if (!tl.exist(ocBinary)) {
         return null
     } else {
         return ocBinary
