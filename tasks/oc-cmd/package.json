@@ -11,7 +11,10 @@
     "watch": "tsc -w -p .",
     "test": "ts-mocha -p tsconfig.json src/tests/**/*.ts",
     "test:report": "ts-mocha -p tsconfig.json src/tests/**/*.ts --reporter mocha-simple-html-reporter --reporter-options output=out/report.html",
-    "clean": "rm -rf lib node_modules out"
+    "clean": "rm -rf lib node_modules out",
+    "prettier:base": "prettier --parser typescript --single-quote",
+    "prettier:check": "npm run prettier:base -- --list-different \"src/**/*.{ts,tsx}\"",
+    "prettier:write": "npm run prettier:base -- --write \"src/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@octokit/rest": "^15.12.1",
@@ -30,6 +33,7 @@
     "mocha": "^5.2.0",
     "mocha-junit-reporter": "^1.18.0",
     "mocha-simple-html-reporter": "^1.1.0",
+    "prettier": "^1.14.3",
     "ts-mocha": "^2.0.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.1.2"
