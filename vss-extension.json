@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "openshift-vsts",
     "publisher": "HardyFerentschik",
-    "version": "0.0.52",
+    "version": "0.0.53",
     "name": "OpenShift 3 Integration",
     "description": "OpenShift tasks for Azure DevOps",
     "public": false,
@@ -37,17 +37,6 @@
     ],
     "contributions": [
         {
-            "id": "openshift",
-            "type": "ms.vss-web.hub",
-            "targets": [
-                "ms.vss-code-web.code-hub-group"
-            ],
-            "properties": {
-                "name": "OpenShift",
-                "uri": "openshift-vsts.html"
-            }
-        },
-        {
             "id": "oc-cmd-task",
             "description": "Task to run oc command.",
             "type": "ms.vss-distributed-task.task",
@@ -61,10 +50,6 @@
         "default": "images/icon.png"
     },
     "files": [
-        {
-            "path": "openshift-vsts.html",
-            "addressable": true
-        },
         {
             "path": "tasks/oc-cmd"
         }
