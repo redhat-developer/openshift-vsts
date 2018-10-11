@@ -5,8 +5,15 @@ import fs = require('fs');
 import { ToolRunner } from 'vsts-task-lib/toolrunner';
 
 const octokit = require('@octokit/rest')()
+if (process.env['GITHUB_ACCESS_TOKEN']) {
+    tl.debug("using octokit with token based authentication");
+    octokit.authenticate({
+        type: 'token',
+        token: process.env['GITHUB_ACCESS_TOKEN']
+    });
+}
 
-export async function installOc(downloadVersion: string):  Promise<string | null> {
+export async function installOc(downloadVersion: string): Promise<string | null> {
     if (!downloadVersion) {
         downloadVersion = await latestStable();
     }
@@ -30,7 +37,7 @@ export async function installOc(downloadVersion: string):  Promise<string | null
     if (ocBinary === null) {
         tl.setResult(tl.TaskResult.Failed, "Unable to download or extract oc binary.");
         return null;
-    } 
+    }
 
     return ocBinary;
 }
@@ -55,6 +62,8 @@ export async function latestStable(): Promise<string> {
             }
             return result.data.tag_name;
         })
+
+    tl.debug(`latest stable oc version: ${version}`);    
     return version;
 }
 
@@ -86,7 +95,6 @@ export async function tarballURL(tag: string): Promise<string | null> {
             let url: string;
             for (var asset of result.data.assets) {
                 url = asset.browser_download_url
-                tl.debug(url);
                 if (url.match(/^.*linux-64bit.tar.gz$/)) {
                     return url;
                 }
@@ -97,6 +105,7 @@ export async function tarballURL(tag: string): Promise<string | null> {
             tl.debug(`Error retrieving tagged release ${e}`);
             return null;
         })
+    tl.debug(`tarball URL: ${url}`);
     return url;
 }
 
