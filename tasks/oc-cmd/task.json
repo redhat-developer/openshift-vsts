@@ -15,7 +15,7 @@
   "version": {
     "Major": "1",
     "Minor": "0",
-    "Patch": 27
+    "Patch": 28
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "oc-cmd $(message)",
@@ -23,14 +23,14 @@
     {
       "name": "k8sService",
       "type": "connectedService:kubernetes",
-      "label": "k8s end point",
+      "label": "OpenShift/Kubernetes service connection",
       "required": true,
-      "helpMarkDown": "Select OpenShift endpoint to use."
+      "helpMarkDown": "Select OpenShift service connection to use."
     },
     {
       "name": "version",
       "type": "string",
-      "label": "oc version to use for command execution",
+      "label": "Version of oc to use",
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest)"
@@ -38,7 +38,7 @@
     {
       "name": "cmd",
       "type": "string",
-      "label": "oc command to run",
+      "label": "Command to run",
       "defaultValue": "",
       "required": true,
       "helpMarkDown": "Specify the oc command to run."

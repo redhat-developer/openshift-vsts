@@ -12,3 +12,6 @@ out
 
 # IDE
 .vscode
+
+# Misc
+.DS_Store

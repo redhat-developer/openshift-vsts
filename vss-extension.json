@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "openshift-vsts",
     "publisher": "HardyFerentschik",
-    "version": "0.0.53",
+    "version": "0.0.54",
     "name": "OpenShift 3 Integration",
     "description": "OpenShift tasks for Azure DevOps",
     "public": false,

@@ -1,31 +1,30 @@
 # How to develop openshift-vsts
 
-<!-- TOC -->
+<!-- TOC depthFrom:2 -->
 
-- [How to develop openshift-vsts](#how-to-develop-openshift-vsts)
-    - [Prerequisites](#prerequisites)
-    - [Build tasks](#build-tasks)
-        - [Transpile TypeScript to JavaScript](#transpile-typescript-to-javascript)
-        - [Build VSTS extension](#build-vsts-extension)
-    - [Test](#test)
-    - [Debug](#debug)
-    - [Publish](#publish)
-    - [References](#references)
+- [Prerequisites](#prerequisites)
+- [Build tasks](#build-tasks)
+    - [Transpile TypeScript to JavaScript](#transpile-typescript-to-javascript)
+    - [Build VSTS extension](#build-vsts-extension)
+- [Test](#test)
+- [Debug](#debug)
+- [Publish](#publish)
+- [References](#references)
 
 <!-- /TOC -->
 
 ## Prerequisites
 
-* Install [Node.js](https://nodejs.org/en/)
-* Run npm setup script
-        
+- Install [Node.js](https://nodejs.org/en/)
+- Run npm setup script
+
     `> npm run setup`
 
 ## Build tasks
 
 The various build tasks are driven via `npm`.
 Check the _package.json_ files for the defined run scripts.
-To get a list of all a available tasks run:
+To get a list of all available tasks run:
 
 `> npm run`
 
@@ -50,15 +49,12 @@ Test are written using [mocha](https://mochajs.org/) and live in the *_tests_* s
 
 ## Debug
 
-Assuming you are using Visual Studio Code, the following _launch.json_ will allow you to debug your TypeScript file:
+Assuming you are using Visual Studio Code, the following _launch.json_ allows you to debug your TypeScript file:
 
-```
+```json
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": [       
+    "configurations": [
         {
             "type": "node",
             "request": "launch",
@@ -94,7 +90,7 @@ Assuming you are using Visual Studio Code, the following _launch.json_ will allo
 
 Prerequisite is a [personal access token](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts#acquire-the-tfs-cross-platform-command-line-interface).
 
-```
+```bash
 > export TOKEN=<token>
 > export SHARE_WITH=<project-id>
 > npm run market
@@ -102,12 +98,12 @@ Prerequisite is a [personal access token](https://docs.microsoft.com/en-us/azure
 
 ## References
 
-* Microsoft's [Develop Extensions](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) guide
-    * [Getting Started](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=vsts)
-    * [Tutorials](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/tutorials?view=vsts)
-    * [Available pipeline environment variables](https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=vsts)
-    * [Publish from the command line](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts)
-* [vsts-task-lib TypeScript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/vsts-task-lib.md#toolrunnerToolRunnerargIf)
-* Microsoft's [Azure Pipelines tasks](https://github.com/Microsoft/vsts-tasks)
-* [Step by Step: Node Task with Typescript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/stepbystep.md)
-* [How to Use npm as a Build Tool](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool)
+- Microsoft's [Develop Extensions](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) guide
+- [Getting Started](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=vsts)
+- [Tutorials](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/tutorials?view=vsts)
+  - [Available pipeline environment variables](https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=vsts)
+  - [Publish from the command line](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts)
+- [vsts-task-lib TypeScript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/vsts-task-lib.md#toolrunnerToolRunnerargIf)
+- Microsoft's [Azure Pipelines tasks](https://github.com/Microsoft/vsts-tasks)
+- [Step by Step: Node Task with Typescript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/stepbystep.md)
+- [How to Use npm as a Build Tool](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool)
