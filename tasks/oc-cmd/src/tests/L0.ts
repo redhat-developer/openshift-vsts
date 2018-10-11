@@ -1,85 +1,92 @@
 let fs = require('fs-extra');
 let expect = require('chai').expect;
-let cmd = require("../oc-cmd");
-let install = require("../oc-install");
+let cmd = require('../oc-cmd');
+let install = require('../oc-install');
 
-describe('#setupConfig', function () {
-    before(() => {
-        let testOutDir = `${__dirname}/../../out`
-        if (!fs.existsSync(testOutDir)) {
-            fs.mkdirSync(testOutDir)
-        }
+describe('#setupConfig', function() {
+  before(() => {
+    let testOutDir = `${__dirname}/../../out`;
+    if (!fs.existsSync(testOutDir)) {
+      fs.mkdirSync(testOutDir);
+    }
+  });
+
+  after(() => {
+    fs.remove(`${__dirname}/../../out/.kube`)
+      .then(() => {
+        console.log('success!');
+      })
+      .catch((err: any) => {
+        console.error(err);
+      });
+    delete process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'];
+    delete process.env['KUBECONFIG'];
+  });
+
+  it('writes kubeconfig', function() {
+    let testWorkingDir = `${__dirname}/../../out`;
+    process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] = testWorkingDir;
+    let config = 'my dummy kube config';
+    cmd.setupConfig(config).then((result: undefined) => {
+      expect(result).to.be.undefined;
+      expect(fs.existsSync(`${testWorkingDir}/.kube/config`)).to.be.true;
+
+      let kubeconfig = process.env['KUBECONFIG'];
+      if (kubeconfig === undefined) {
+        expect.fail('PATH not set');
+      } else {
+        expect(kubeconfig.includes(`${testWorkingDir}/.kube/config`)).to.be
+          .true;
+      }
     });
-
-    after(() => {
-        fs.remove(`${__dirname}/../../out/.kube`)
-            .then(() => {
-                console.log('success!')
-            })
-            .catch((err: any) => {
-                console.error(err)
-            })
-        delete process.env['SYSTEM_DEFAULTWORKINGDIRECTORY']
-        delete process.env['KUBECONFIG']
-    });
-
-    it('writes kubeconfig', function () {
-        let testWorkingDir = `${__dirname}/../../out`
-        process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] = testWorkingDir
-        let config = "my dummy kube config"
-        cmd.setupConfig(config).then((result: undefined) => {
-            expect(result).to.be.undefined;
-            expect(fs.existsSync(`${testWorkingDir}/.kube/config`)).to.be.true;
-
-            let kubeconfig = process.env['KUBECONFIG']
-            if (kubeconfig === undefined) {
-                expect.fail("PATH not set")
-            } else {
-                expect(kubeconfig.includes(`${testWorkingDir}/.kube/config`)).to.be.true;
-            }
-        });
-    });
+  });
 });
 
-describe('#tarballURL', function () {
-    it('should return null when the tag is empty', function () {
-        return install.tarballURL("").then((result: string) => {
-            expect(result).to.be.null;
-        });
+describe('#tarballURL', function() {
+  it('should return null when the tag is empty', function() {
+    return install.tarballURL('').then((result: string) => {
+      expect(result).to.be.null;
     });
+  });
 
-    it('should return null when the tag is null', function () {
-        return install.tarballURL(null).then((result: any) => {
-            expect(result).to.be.null;
-        });
+  it('should return null when the tag is null', function() {
+    return install.tarballURL(null).then((result: any) => {
+      expect(result).to.be.null;
     });
+  });
 
-    it('should return null when the tag is invalid', function () {
-        return install.tarballURL("foo").then((result: any) => {
-            expect(result).to.be.null;
-        });
+  it('should return null when the tag is invalid', function() {
+    return install.tarballURL('foo').then((result: any) => {
+      expect(result).to.be.null;
     });
+  });
 });
 
-describe('#prepareOcArguments', function () {
-    before(() => {
-        delete process.env['FOO']
-        process.env['VSTS_TEST_VAR'] = "nodes"
-    });
+describe('#prepareOcArguments', function() {
+  before(() => {
+    delete process.env['FOO'];
+    process.env['VSTS_TEST_VAR'] = 'nodes';
+  });
 
-    after(() => {
-        delete process.env['VSTS_TEST_VAR']
-    });
+  after(() => {
+    delete process.env['VSTS_TEST_VAR'];
+  });
 
-    it('should split arguments', function () {
-        expect(cmd.prepareOcArguments("get nodes")).to.be.an('array').that.include.ordered.members(['get', 'nodes']);
-    });
+  it('should split arguments', function() {
+    expect(cmd.prepareOcArguments('get nodes'))
+      .to.be.an('array')
+      .that.include.ordered.members(['get', 'nodes']);
+  });
 
-    it('interpolate environment variables', function () {
-        expect(cmd.prepareOcArguments("get ${VSTS_TEST_VAR}")).to.be.an('array').that.include.ordered.members(['get', 'nodes']);
-    });
+  it('interpolate environment variables', function() {
+    expect(cmd.prepareOcArguments('get ${VSTS_TEST_VAR}'))
+      .to.be.an('array')
+      .that.include.ordered.members(['get', 'nodes']);
+  });
 
-    it('leave unkown environment variables intact', function () {
-        expect(cmd.prepareOcArguments("get ${FOO}")).to.be.an('array').that.include.ordered.members(['get', '${FOO}']);
-    });  
+  it('leave unkown environment variables intact', function() {
+    expect(cmd.prepareOcArguments('get ${FOO}'))
+      .to.be.an('array')
+      .that.include.ordered.members(['get', '${FOO}']);
+  });
 });

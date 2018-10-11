@@ -8,9 +8,10 @@
     "clean": "rm -f *.vsix && for i in `ls tasks` ; do (cd tasks/$i; npm run clean); done",
     "build": "for i in `ls tasks` ; do (cd `pwd`/tasks/$i; npm run build); done",
     "test": "for i in `ls tasks` ; do (cd ./tasks/$i; npm run test); done",
+    "prettier:check": "for i in `ls tasks` ; do (cd ./tasks/$i; npm run prettier:check); done",
     "vsix": "tfx extension create",
     "bump-task-version": "for i in `ls tasks` ; do TASK=$(cat tasks/$i/task.json | json -e 'this.version.Patch++'); echo \"$TASK\" > tasks/$i/task.json; done",
-    "premarket": "npm run clean && npm run build && npm run test && npm run bump-task-version",
+    "premarket": "npm run clean && npm run build && npm run test && npm run prettier:check && npm run bump-task-version ",
     "market": "tfx extension publish --share-with $SHARE_WITH --token $TOKEN --rev-version"
   },
   "repository": {
