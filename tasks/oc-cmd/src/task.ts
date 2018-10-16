@@ -1,18 +1,18 @@
 'use strict';
 
-import tl = require('vsts-task-lib/task');
+import task = require('vsts-task-lib/task');
 import oc = require('./oc-cmd');
 import install = require('./oc-install');
 
-if (process.env['AGENT_OS'] === 'Linux') {
-  let version = tl.getInput('version');
-  let endpoint = tl.getInput('k8sService');
-  let kubeconfig = tl.getEndpointAuthorizationParameter(
+if (task.osType() === 'Linux') {
+  let version = task.getInput('version');
+  let endpoint = task.getInput('k8sService');
+  let kubeconfig = task.getEndpointAuthorizationParameter(
     endpoint,
     'kubeconfig',
     true
   );
-  let argLine = tl.getInput('cmd');
+  let argLine = task.getInput('cmd');
   install
     .installOc(version)
     .then(function(ocPath: string | null) {
@@ -22,15 +22,18 @@ if (process.env['AGENT_OS'] === 'Linux') {
       return oc.execOc(kubeconfig, ocPath, argLine);
     })
     .then(function() {
-      tl.setResult(
-        tl.TaskResult.Succeeded,
+      task.setResult(
+        task.TaskResult.Succeeded,
         'oc command successfully executed.'
       );
     })
     .catch(function(err) {
-      tl.setResult(tl.TaskResult.Failed, err);
+      task.setResult(task.TaskResult.Failed, err);
       return;
     });
 } else {
-  tl.setResult(tl.TaskResult.Failed, 'Task needs to run on an Linux agent.');
+  task.setResult(
+    task.TaskResult.Failed,
+    'Task needs to run on an Linux agent.'
+  );
 }

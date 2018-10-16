@@ -8,7 +8,6 @@ let tr: tmrm.TaskMockRunner = new tmrm.TaskMockRunner(taskPath);
 process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] = '/tmp';
 process.env['ENDPOINT_AUTH_PARAMETER_K8SENDPOINT_KUBECONFIG'] =
   'dummy kube config';
-process.env['AGENT_OS'] = 'Linux';
 
 tr.setInput('k8sService', 'k8sendpoint');
 tr.setInput('version', 'v3.9.0');
@@ -42,6 +41,9 @@ let a: ma.TaskLibAnswers = <ma.TaskLibAnswers>{
     '/tmp/.download/openshift-origin-client-tools-v3.9.0-191fece-linux-64bit': false,
     '/tmp/.download/openshift-origin-client-tools-v3.9.0-191fece-linux-64bit/oc': true,
     '/tmp/.kube': false
+  },
+  osType: {
+    osType: 'Linux'
   }
 };
 tr.setAnswers(a);

@@ -1,0 +1,54 @@
+# Build NodeJS Express app using Azure Pipelines
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript?view=vsts
+pool:
+  vmImage: 'Ubuntu 16.04'
+  
+steps:
+- checkout: self
+  persistCredentials: true
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: '8.x'
+
+- script: npm run setup 
+  displayName: Install dependencies  
+  
+- script: npm run build
+  displayName: Transpile to JavaScript 
+
+- script: npm run test:report:ci
+  displayName: Unit tests   
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: '**/test-report.xml'
+    testRunTitle: 'Test results'  
+
+- script: npm run prettier:check
+  displayName: Syntax check  
+
+- script: npm run extension:create:dev 
+  displayName: Build extension   
+      
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+    includeRootFolder: false
+
+- task: CopyFiles@2
+  inputs:
+    contents: 'out/*.vsix'
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'vsix'    
+
+- bash: |
+    git config user.email no-reply@example.com
+    git config user.name "Azure DevOps Pipeline"
+    npm run commit
+  workingDirectory: $(Build.SourcesDirectory)
+  condition: eq(variables['release'], 'true')

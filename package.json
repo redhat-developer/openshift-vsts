@@ -5,21 +5,31 @@
   "main": "index.js",
   "scripts": {
     "setup": "npm install -g tfx-cli typescript json",
-    "clean": "rm -f *.vsix && for i in `ls tasks` ; do (cd tasks/$i; npm run clean); done",
+    "clean": "rm -rf out && for i in `ls tasks` ; do (cd tasks/$i; npm run clean); done",
     "build": "for i in `ls tasks` ; do (cd `pwd`/tasks/$i; npm run build); done",
     "test": "for i in `ls tasks` ; do (cd ./tasks/$i; npm run test); done",
+    "test:report": "for i in `ls tasks` ; do (cd ./tasks/$i; npm run test:report); done",
+    "test:report:ci": "for i in `ls tasks` ; do (cd ./tasks/$i; npm run test:report:ci); done",
     "prettier:check": "for i in `ls tasks` ; do (cd ./tasks/$i; npm run prettier:check); done",
-    "vsix": "tfx extension create",
     "bump-task-version": "for i in `ls tasks` ; do TASK=$(cat tasks/$i/task.json | json -e 'this.version.Patch++'); echo \"$TASK\" > tasks/$i/task.json; done",
-    "premarket": "npm run clean && npm run build && npm run test && npm run prettier:check && npm run bump-task-version ",
-    "market": "tfx extension publish --share-with $SHARE_WITH --token $TOKEN --rev-version"
+    "commit": "export EXT_VERSION=$(json -f vss-extension.json version) && git commit -a -m \"cut v${EXT_VERSION}\" && git tag v${EXT_VERSION} && git push --tags origin HEAD:master",
+    "preextension:create": "npm run bump-task-version",
+    "extension:create": "tfx extension create --token $TOKEN --output-path out --rev-version",
+    "preextension:create:dev": "npm run extension:create",
+    "extension:create:dev": "tfx extension create --token $TOKEN --output-path out --publisher RedHatDeveloperStaging --override \"{\\\"name\\\": \\\"OpenShift 3 Integration (staging)\\\"}\"",
+    "extension:publish": "tfx extension publish --token $TOKEN --vsix out/RedHatDeveloper.openshift-vsts-$(json -f vss-extension.json version).vsix",
+    "extension:publish:dev": "tfx extension publish --token $TOKEN --vsix out/RedHatDeveloperStaging.openshift-vsts-$(json -f vss-extension.json version).vsix",
+    "extension:share":"tfx extension share --token $TOKEN --share-with $EXT_SHARES --publisher RedHatDeveloper --extension-id openshift-vsts",
+    "extension:share:dev":"tfx extension share --token $TOKEN --share-with $EXT_SHARES --publisher RedHatDeveloperStaging --extension-id openshift-vsts",
+    "extension:unshare":"tfx extension unshare --token $TOKEN --unshare-with $EXT_SHARES --publisher RedHatDeveloper --extension-id openshift-vsts",
+    "extension:unshare:dev":"tfx extension unshare --token $TOKEN --unshare-with $EXT_SHARES --publisher RedHatDeveloperStaging --extension-id openshift-vsts-staging"    
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hferentschik/openshift-vsts.git"
+    "url": "https://github.com/hferentschik/openshift-vsts.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Hardy Ferentschik",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/hferentschik/openshift-vsts/issues"
@@ -31,7 +41,10 @@
   },
   "config": {
     "commit-message-validator": {
-      "pattern": "Issue #[0-9]+ [a-zA-Z]+.*",
+      "pattern": [
+        "Issue #[0-9]+ [a-zA-Z]+.*",
+        "cut v[0-9]+\\.[0-9]+\\.[0-9]+"
+    ],
       "errorMessage": "Invalid commit message"
     }
   },

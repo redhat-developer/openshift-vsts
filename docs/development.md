@@ -9,6 +9,8 @@
 - [Test](#test)
 - [Debug](#debug)
 - [Publish](#publish)
+    - [Staging](#staging)
+    - [Production](#production)
 - [References](#references)
 
 <!-- /TOC -->
@@ -39,13 +41,19 @@ To watch your TypeScript files for changes and transpile on the fly:
 
 ### Build VSTS extension
 
-`> npm run vsix`
+`> npm run extension:create`
+
+This will also bump the version numbers of the extensions as well as all tasks.
 
 ## Test
 
 Test are written using [mocha](https://mochajs.org/) and live in the *_tests_* subdirectory of the corresponding task. You can run the tests via:
 
 `> npm test`
+
+You can get an HTML version of the test results into the _out_ directory by running:
+
+`> npm test:report`
 
 ## Debug
 
@@ -90,10 +98,49 @@ Assuming you are using Visual Studio Code, the following _launch.json_ allows yo
 
 Prerequisite is a [personal access token](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts#acquire-the-tfs-cross-platform-command-line-interface).
 
+### Staging
+
+Do do a staging deploy to [Red Hat Developer Staging](https://marketplace.visualstudio.com/manage/publishers/redhatdeveloperstaging):
+
 ```bash
 > export TOKEN=<token>
-> export SHARE_WITH=<project-id>
-> npm run market
+> npm run clean
+> npm run build
+> npm run extension:create:dev
+> npm run extension:publish:dev
+```
+
+Once the extension is installed, you can share it with a given user:
+
+```bash
+> export EXT_SHARES=<comma seperated list of users to share with>
+> npm run extension:share:dev
+```
+
+To unshare:
+
+```bash
+> export EXT_SHARES=<comma seperated list of users to share with>
+> npm run extension:unshare:dev
+```
+
+### Production
+
+Do do a production deploy to [Red Hat Developer](https://marketplace.visualstudio.com/manage/publishers/redhatdeveloper):
+
+```bash
+> export TOKEN=<token>
+> npm run clean
+> npm run build
+> npm run extension:create
+> npm run extension:publish
+```
+
+Once the extension is installed, you can share it with a given user:
+
+```bash
+> export EXT_SHARES=<comma seperated list of users to share with>
+> npm run extension:share
 ```
 
 ## References
@@ -107,3 +154,4 @@ Prerequisite is a [personal access token](https://docs.microsoft.com/en-us/azure
 - Microsoft's [Azure Pipelines tasks](https://github.com/Microsoft/vsts-tasks)
 - [Step by Step: Node Task with Typescript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/stepbystep.md)
 - [How to Use npm as a Build Tool](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool)
+- [Use Git within a pipeline scrfipt task](https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=vsts&tabs=yaml)
