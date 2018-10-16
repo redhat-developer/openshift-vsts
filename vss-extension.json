@@ -1,8 +1,8 @@
 {
     "manifestVersion": 1,
     "id": "openshift-vsts",
-    "publisher": "HardyFerentschik",
-    "version": "0.0.54",
+    "publisher": "RedHatDeveloper",
+    "version": "0.0.63",
     "name": "OpenShift 3 Integration",
     "description": "OpenShift tasks for Azure DevOps",
     "public": false,
@@ -12,7 +12,8 @@
     "tags": [
         "utility",
         "tasks",
-        "openshift"
+        "openshift",
+        "oc"
     ],
     "links": {
         "getstarted": {
@@ -47,7 +48,7 @@
         }              
     ],
     "icons": {
-        "default": "images/icon.png"
+        "default": "images/logo.png"
     },
     "files": [
         {
