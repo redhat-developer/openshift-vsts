@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "openshift-vsts",
     "publisher": "RedHatDeveloper",
-    "version": "0.0.63",
+    "version": "0.0.64",
     "name": "OpenShift 3 Integration",
     "description": "OpenShift tasks for Azure DevOps",
     "public": false,
