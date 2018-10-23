@@ -2,10 +2,10 @@
     "manifestVersion": 1,
     "id": "openshift-vsts",
     "publisher": "RedHatDeveloper",
-    "version": "0.0.64",
-    "name": "OpenShift 3 Integration",
+    "version": "0.0.75",
+    "name": "OpenShift Extension",
     "description": "OpenShift tasks for Azure DevOps",
-    "public": false,
+    "public": true,
     "categories": [
         "Build and release"
     ],
@@ -39,7 +39,7 @@
     "contributions": [
         {
             "id": "oc-cmd-task",
-            "description": "Task to run oc command.",
+            "description": "Task to run user-defined oc command.",
             "type": "ms.vss-distributed-task.task",
             "targets": [ "ms.vss-distributed-task.tasks" ],
             "properties": {
