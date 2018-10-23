@@ -100,10 +100,11 @@ Prerequisite is a [personal access token](https://docs.microsoft.com/en-us/azure
 
 ### Staging
 
-Do do a staging deploy to [Red Hat Developer Staging](https://marketplace.visualstudio.com/manage/publishers/redhatdeveloperstaging):
+Do do a staging deploy you can specify a staging publisher by setting the `DEV_PUBLISHER` environment variable:
 
 ```bash
 > export TOKEN=<token>
+> export DEV_PUBLISHER=<stage/test publisher>
 > npm run clean
 > npm run build
 > npm run extension:create:dev
@@ -114,6 +115,7 @@ Once the extension is installed, you can share it with a given user:
 
 ```bash
 > export EXT_SHARES=<comma seperated list of users to share with>
+> export DEV_PUBLISHER=<stage/test publisher>
 > npm run extension:share:dev
 ```
 
@@ -121,6 +123,7 @@ To unshare:
 
 ```bash
 > export EXT_SHARES=<comma seperated list of users to share with>
+> export DEV_PUBLISHER=<stage/test publisher>
 > npm run extension:unshare:dev
 ```
 
@@ -134,13 +137,6 @@ Do do a production deploy to [Red Hat Developer](https://marketplace.visualstudi
 > npm run build
 > npm run extension:create
 > npm run extension:publish
-```
-
-Once the extension is installed, you can share it with a given user:
-
-```bash
-> export EXT_SHARES=<comma seperated list of users to share with>
-> npm run extension:share
 ```
 
 ## References
