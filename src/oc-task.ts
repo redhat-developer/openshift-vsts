@@ -1,13 +1,14 @@
 'use strict';
 
 import task = require('vsts-task-lib/task');
-import oc = require('./oc-cmd');
-import install = require('./oc-install');
+import oc = require('./oc-run');
+
+import * as install from './oc-install';
 
 if (task.osType() === 'Linux') {
   let version = task.getInput('version');
   let endpoint = task.getInput('k8sService');
-  let kubeconfig = task.getEndpointAuthorizationParameter(
+  let kubeConfig = task.getEndpointAuthorizationParameter(
     endpoint,
     'kubeconfig',
     true
@@ -19,7 +20,7 @@ if (task.osType() === 'Linux') {
       if (ocPath === null) {
         throw 'No oc binary found';
       }
-      return oc.execOc(kubeconfig, ocPath, argLine);
+      return oc.execOc(kubeConfig, ocPath, argLine);
     })
     .then(function() {
       task.setResult(
@@ -32,8 +33,5 @@ if (task.osType() === 'Linux') {
       return;
     });
 } else {
-  task.setResult(
-    task.TaskResult.Failed,
-    'Task needs to run on an Linux agent.'
-  );
+  task.setResult(task.TaskResult.Failed, 'task needs to run on a Linux agent');
 }

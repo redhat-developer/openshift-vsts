@@ -13,6 +13,9 @@ steps:
 
 - script: npm run setup 
   displayName: Install dependencies  
+
+- script: npm install 
+  displayName: Install dependencies    
   
 - script: npm run build
   displayName: Transpile to JavaScript 

@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "openshift-vsts",
     "publisher": "redhat",
-    "version": "1.0.1",
+    "version": "1.0.6",
     "name": "OpenShift Extension",
     "description": "OpenShift tasks for Azure DevOps",
     "public": true,
@@ -45,7 +45,16 @@
             "properties": {
               "name": "tasks/oc-cmd"
             }
-        }              
+        },
+        {
+            "id": "config-map-task",
+            "description": "Task to apply ConfigMap properties.",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [ "ms.vss-distributed-task.tasks" ],
+            "properties": {
+              "name": "tasks/config-map"
+            }
+        }                 
     ],
     "icons": {
         "default": "images/logo.png"
@@ -53,6 +62,9 @@
     "files": [
         {
             "path": "tasks/oc-cmd"
+        },
+        {
+            "path": "tasks/config-map"
         }
     ]
 }

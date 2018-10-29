@@ -25,7 +25,7 @@
 ## Build tasks
 
 The various build tasks are driven via `npm`.
-Check the _package.json_ files for the defined run scripts.
+Check _package.json_ for the defined run scripts.
 To get a list of all available tasks run:
 
 `> npm run`
@@ -34,10 +34,9 @@ To get a list of all available tasks run:
 
 `> npm run build`
 
-Either from the top level directory or from within each task.
 To watch your TypeScript files for changes and transpile on the fly:
 
-`> npm run watch`
+`> npm run build:watch`
 
 ### Build VSTS extension
 
@@ -54,45 +53,6 @@ Test are written using [mocha](https://mochajs.org/) and live in the *_tests_* s
 You can get an HTML version of the test results into the _out_ directory by running:
 
 `> npm test:report`
-
-## Debug
-
-Assuming you are using Visual Studio Code, the following _launch.json_ allows you to debug your TypeScript file:
-
-```json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch oc cmd",
-            "program": "${workspaceFolder}/tasks/oc-cmd/src/task.ts",
-            "env": {"SYSTEM_DEFAULTWORKINGDIRECTORY":"${workspaceFolder}/tasks/oc-cmd/out"},
-            "outFiles": [
-                "${workspaceFolder}/tasks/oc-cmd/lib/*.js"
-            ],
-            "outputCapture": "std"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Mocha oc cmd",
-            "program": "${workspaceFolder}/tasks/oc-cmd/node_modules/.bin/ts-mocha",
-            "args": [
-                "-p",
-                "${workspaceFolder}/tasks/oc-cmd/tsconfig.json",
-                "--timeout",
-                "999999",
-                "--colors",
-                "${workspaceFolder}/tasks/oc-cmd/src/tests/*.ts",
-            ],
-            "internalConsoleOptions": "neverOpen",
-            "protocol": "inspector"
-        }
-    ]
-}
-```
 
 ## Publish
 

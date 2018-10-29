@@ -21,7 +21,7 @@ export async function execOc(
   await setupConfig(kubeConfig);
 
   let oc: ToolRunner = tl.tool(ocPath);
-  for (var arg of prepareOcArguments(argLine)) {
+  for (let arg of prepareOcArguments(argLine)) {
     oc.arg(arg);
   }
   await oc.exec();
@@ -35,7 +35,7 @@ export async function execOc(
  * @return array of arguments with potential environment variables interpolated
  */
 export function prepareOcArguments(argLine: string): string[] {
-  var interpolatedArgs = sub(argLine, process.env);
+  let interpolatedArgs = sub(argLine, process.env);
   return split(interpolatedArgs);
 }
 
@@ -47,9 +47,7 @@ export function prepareOcArguments(argLine: string): string[] {
 export async function setupConfig(config: string) {
   let kubeConfigDir = process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + '/.kube';
   if (!tl.exist(kubeConfigDir)) {
-    let mkdir: ToolRunner = tl.tool('mkdir');
-    mkdir.arg('-p').arg(kubeConfigDir);
-    await mkdir.exec();
+    tl.mkdirP(kubeConfigDir);
   }
   let kubeConfig = kubeConfigDir + '/config';
   tl.writeFile(kubeConfig, config);
