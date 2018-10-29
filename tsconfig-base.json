@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
+        "composite": true,
         "target": "es6",
         "module": "commonjs",
-        "outDir": "./lib/",
         "sourceMap": true,
         "declaration": true,
         "strict": true,
@@ -12,16 +12,6 @@
         "noFallthroughCasesInSwitch": true,
         "lib": [
             "es2015"
-        ],
-        "typeRoots": [
-            "./node_modules/@types"
         ]
-    },
-    "include": [
-        "src/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        "lib"
-    ]
+    }
 }

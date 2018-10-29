@@ -1,7 +1,7 @@
 {
   "id": "ebaf1cdc-a60f-4e57-ba29-e3b8f80aeb1e",
   "name": "oc-cmd",
-  "friendlyName": "Execute OpenShift command",
+  "friendlyName": "Execute oc command",
   "description": "OpenShift execute CLI command.",
   "author": "Hardy Ferentschik",
   "helpMarkDown": "See [getting started](https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md)",
@@ -15,7 +15,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 0
+    "Patch": 4
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "oc-cmd $(message)",
@@ -23,7 +23,7 @@
     {
       "name": "k8sService",
       "type": "connectedService:kubernetes",
-      "label": "OpenShift/Kubernetes service connection",
+      "label": "OpenShift service connection",
       "required": true,
       "helpMarkDown": "Select OpenShift service connection to use."
     },
@@ -46,7 +46,7 @@
   ],
   "execution": {
     "Node": {
-      "target": "lib/task.js",
+      "target": "lib/oc-task.js",
       "workingDirectory": "$(currentDirectory)"
     }
   }

@@ -10,7 +10,6 @@ before_script:
   - npm run setup
   
 script: 
-  - npm run build
   - npm run test
   - npm run prettier:check
   - npm run extension:create 

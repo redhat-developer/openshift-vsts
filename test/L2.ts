@@ -4,34 +4,20 @@ import * as mockTest from 'vsts-task-lib/mock-test';
 let expect = require('chai').expect;
 
 describe('oc cmd task', function() {
-  it('needs to run on Linux agent', (done: MochaDone) => {
-    let tp = path.join(
-      __dirname,
-      '..',
-      '..',
-      'lib',
-      'tests',
-      'test-agent-match.js'
-    );
+  it('needs to run on Linux agent', (done: Mocha.Done) => {
+    let tp = path.join(__dirname, 'lib', 'test-agent-match.js');
     let runner: mockTest.MockTestRunner = new mockTest.MockTestRunner(tp);
     runner.run();
 
     expect(runner.failed).to.equal(true);
     expect(runner.errorIssues[0]).to.equal(
-      'Task needs to run on an Linux agent.'
+      'task needs to run on a Linux agent'
     );
     done();
   });
 
-  it('executes oc cmd', (done: MochaDone) => {
-    let tp = path.join(
-      __dirname,
-      '..',
-      '..',
-      'lib',
-      'tests',
-      'test-cmd-exec.js'
-    );
+  it('executes oc cmd', (done: Mocha.Done) => {
+    let tp = path.join(__dirname, 'lib', 'test-cmd-exec.js');
     let runner: mockTest.MockTestRunner = new mockTest.MockTestRunner(tp);
     runner.run();
 

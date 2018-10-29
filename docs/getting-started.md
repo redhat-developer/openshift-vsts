@@ -4,6 +4,7 @@
 
 - [Configuring Kubernetes service connection](#configuring-kubernetes-service-connection)
 - [Executing user-defined oc commands](#executing-user-defined-oc-commands)
+- [Updating a ConfigMap](#updating-a-configmap)
 
 <!-- /TOC -->
 
@@ -38,15 +39,15 @@ In the appearing dialogue you need to enter the following information:
 
 Once you have a Kubernetes service connection defined, you can start using the _Execute OpenShift command_ task offered by this extension.
 
-![Adding Execute OpenShift command](../images/adding_oc_cmd_task.png)
+![Adding Execute oc task](../images/adding_oc_cmd_task.png)
 
 In the edit pipeline view, select the _+_ to add a task to your pipeline.
-You can filter the appearing task list by searching for _Execute OpenShift_.
-Add the _Execute OpenShift command_ task to your pipeline using the _Add_ button.
+You can filter the appearing task list by searching for _Execute oc command_.
+Add the _Execute oc command_ task to your pipeline using the _Add_ button.
 
-The _Execute OpenShift command_ has four configuration options.
+The _Execute oc command_ has four configuration options.
 
-![Configuration of OpenShift command](../images/cmd_exec_config.png)
+![Configuration of Execute oc task](../images/cmd_exec_config.png)
 
 <dl>
   <dt>Display name</dt>
@@ -66,3 +67,37 @@ For example, to reference a file in the artefact _my_sources you could do:
 ```bash
 apply -f ${SYSTEM_DEFAULTWORKINGDIRECTORY/_my_sources/my-openshift-config.yaml`
 ```
+
+## Updating a ConfigMap
+
+Once you have a Kubernetes service connection defined, you can start using the _Execute OpenShift command_ task offered by this extension.
+
+![Adding Update ConfigMap task](../images/adding_config_map_task.png)
+
+In the edit pipeline view, select the _+_ to add a task to your pipeline.
+You can filter the appearing task list by searching for _Update ConfigMap_.
+Add the _Execute OpenShift command_ task to your pipeline using the _Add_ button.
+
+The _Update ConfigMap_ task has six configuration options.
+
+![Configuration of Update ConfigMap task](../images/configure_config_map_task.png)
+
+<dl>
+  <dt>Display name</dt>
+  <dd>The name displayed in the task list, eg "Rollout latest".</dd>
+  <dt>OpenShift/Kubernetes service connection</dt>
+  <dd>Required. The service connection to use to execute this command. See <a href="#configuring-kubernetes-service-connection">Configuring Kubernetes service connection</a>.</dd>
+  <dt>Version of oc to use</dt>
+  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used.</dd>  
+  <dt>Name of ConfigMap</dt>
+  <dd>Required.The name of the ConfigMap to update.</dd>
+  <dt>Namespace of ConfigMap</dt>
+  <dd>The namespace in which to find the ConfigMap. The current namespace is used if none is specified.</dd>
+  <dt>ConfigMap Properties</dt>
+  <dd>The properties to set/update. Only the properties which need creating/updating need to be listed. Space separated values need to be surrounded by quotes ("). </dd>  
+</dl>
+
+<img align="left" width="32" height="32" src="../images/lightbulb.png">
+It is possible to use variables defined in the agent.
+For example, to reference a variable `MY_VAR` defined in the pipeline configuration, you can use ${MY_VAR} as property value.
+

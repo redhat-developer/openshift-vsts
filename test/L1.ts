@@ -1,7 +1,6 @@
-let fs = require('fs-extra');
+import * as fs from 'fs-extra';
 let expect = require('chai').expect;
-let cmd = require('../oc-cmd');
-let install = require('../oc-install');
+let cmd = require('../src/oc-run');
 
 describe('#setupConfig', function() {
   before(() => {
@@ -38,26 +37,6 @@ describe('#setupConfig', function() {
         expect(kubeconfig.includes(`${testWorkingDir}/.kube/config`)).to.be
           .true;
       }
-    });
-  });
-});
-
-describe('#tarballURL', function() {
-  it('should return null when the tag is empty', function() {
-    return install.tarballURL('').then((result: string) => {
-      expect(result).to.be.null;
-    });
-  });
-
-  it('should return null when the tag is null', function() {
-    return install.tarballURL(null).then((result: any) => {
-      expect(result).to.be.null;
-    });
-  });
-
-  it('should return null when the tag is invalid', function() {
-    return install.tarballURL('foo').then((result: any) => {
-      expect(result).to.be.null;
     });
   });
 });

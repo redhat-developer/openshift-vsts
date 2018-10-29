@@ -1,0 +1,72 @@
+{
+  "id": "69a85a38-f912-4fe6-98de-d97f8afa2f80",
+  "name": "config-map",
+  "friendlyName": "Update ConfigMap",
+  "description": "Applies environment properties to specified OpenShift ConfigMap.",
+  "author": "Hardy Ferentschik",
+  "helpMarkDown": "See [getting started](https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md)",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "preview": true,
+  "demands": [],
+  "version": {
+    "Major": 0,
+    "Minor": 0,
+    "Patch": 15
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "config-map $(message)",
+  "inputs": [
+    {
+      "name": "k8sService",
+      "type": "connectedService:kubernetes",
+      "label": "OpenShift service connection",
+      "required": true,
+      "helpMarkDown": "Select OpenShift service connection to use."
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "label": "Version of oc",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest)"
+    },
+    {
+      "name": "configMapName",
+      "type": "string",
+      "label": "Name of the ConfigMap",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Name of the ConfigMap to which to apply the properties."
+    },
+    {
+      "name": "namespace",
+      "type": "string",
+      "label": "Namespace of ConfigMap",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Specify the namespace of the ConfigName. If none is specified the current namespace is used."
+    },
+    {
+      "name": "properties",
+      "type": "multiLine",
+      "label": "ConfigMap properties",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "To view the ConfigMap parameters in a grid, click on “…” next to the textbox.",
+      "properties": {
+        "editorExtension": "ms.vss-services-azure.parameters-grid"
+      }
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "lib/config-map-task.js",
+      "workingDirectory": "$(currentDirectory)"
+    }
+  }
+}
