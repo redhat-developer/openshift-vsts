@@ -1,5 +1,5 @@
 {
-  "id": "60911e85-ba6d-4333-9111-e1147b373617",
+  "id": "ebaf1cdc-a60f-4e57-ba29-e3b8f80aeb1e",
   "name": "oc-cmd",
   "friendlyName": "Execute OpenShift command",
   "description": "OpenShift execute CLI command.",
@@ -10,12 +10,12 @@
     "Build",
     "Release"
   ],
-  "preview": true,
+  "preview": false,
   "demands": [],
   "version": {
-    "Major": "1",
-    "Minor": "0",
-    "Patch": 51
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "oc-cmd $(message)",

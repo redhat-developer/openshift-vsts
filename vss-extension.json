@@ -1,13 +1,13 @@
 {
     "manifestVersion": 1,
     "id": "openshift-vsts",
-    "publisher": "RedHatDeveloper",
-    "version": "0.0.77",
+    "publisher": "redhat",
+    "version": "1.0.1",
     "name": "OpenShift Extension",
     "description": "OpenShift tasks for Azure DevOps",
     "public": true,
     "categories": [
-        "Build and release"
+        "Azure Pipelines"
     ],
     "tags": [
         "utility",

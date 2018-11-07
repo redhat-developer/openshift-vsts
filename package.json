@@ -17,10 +17,10 @@
     "extension:create": "tfx extension create --token $TOKEN --output-path out --rev-version",
     "preextension:create:dev": "npm run extension:create",
     "extension:create:dev": "tfx extension create --token $TOKEN --output-path out --publisher $DEV_PUBLISHER --overrides-file ./scripts/vsix-manifest-overrides.json",
-    "extension:publish": "tfx extension publish --token $TOKEN --vsix out/RedHatDeveloper.openshift-vsts-$(json -f vss-extension.json version).vsix",
+    "extension:publish": "tfx extension publish --token $TOKEN --vsix out/redhat.openshift-vsts-$(json -f vss-extension.json version).vsix",
     "extension:publish:dev": "tfx extension publish --token $TOKEN --vsix out/$DEV_PUBLISHER.openshift-vsts-$(json -f vss-extension.json version).vsix",
-    "extension:share:dev":"tfx extension share --token $TOKEN --share-with $EXT_SHARES --publisher $DEV_PUBLISHER --extension-id openshift-vsts",
-    "extension:unshare:dev":"tfx extension unshare --token $TOKEN --unshare-with $EXT_SHARES --publisher $DEV_PUBLISHER --extension-id openshift-vsts"    
+    "extension:share:dev": "tfx extension share --token $TOKEN --share-with $EXT_SHARES --publisher $DEV_PUBLISHER --extension-id openshift-vsts",
+    "extension:unshare:dev": "tfx extension unshare --token $TOKEN --unshare-with $EXT_SHARES --publisher $DEV_PUBLISHER --extension-id openshift-vsts"
   },
   "repository": {
     "type": "git",
@@ -42,7 +42,7 @@
       "pattern": [
         "Issue #[0-9]+ [a-zA-Z]+.*",
         "cut v[0-9]+\\.[0-9]+\\.[0-9]+"
-    ],
+      ],
       "errorMessage": "Invalid commit message"
     }
   },

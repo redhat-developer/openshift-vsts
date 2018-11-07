@@ -129,7 +129,7 @@ To unshare:
 
 ### Production
 
-Do do a production deploy to [Red Hat Developer](https://marketplace.visualstudio.com/manage/publishers/redhatdeveloper):
+Do do a production deploy under the [Red Hat Publisher](https://marketplace.visualstudio.com/manage/publishers/redhat):
 
 ```bash
 > export TOKEN=<token>
