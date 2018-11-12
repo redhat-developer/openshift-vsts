@@ -68,6 +68,10 @@ For example, to reference a file in the artefact _my_sources you could do:
 apply -f ${SYSTEM_DEFAULTWORKINGDIRECTORY/_my_sources/my-openshift-config.yaml`
 ```
 
+<img align="left" width="32" height="32" src="../images/lightbulb.png">
+In case you are reaching the GitHub API rate limit, you can set `GITHUB_ACCESS_TOKEN` as a pipeline variable.
+To create a GitHub access token refer to <a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/">Creating a personal access token for the command line<a/>.
+
 ## Updating a ConfigMap
 
 Once you have a Kubernetes service connection defined, you can start using the _Execute OpenShift command_ task offered by this extension.

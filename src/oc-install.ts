@@ -2,9 +2,14 @@
 
 import tl = require('vsts-task-lib/task');
 import fs = require('fs');
+import path = require('path');
 import { ToolRunner } from 'vsts-task-lib/toolrunner';
 
+const decompress = require('decompress');
+const decompressTargz = require('decompress-targz');
+const Zip = require('adm-zip');
 const octokit = require('@octokit/rest')();
+
 if (process.env['GITHUB_ACCESS_TOKEN']) {
   tl.debug('using octokit with token based authentication');
   octokit.authenticate({
@@ -13,14 +18,23 @@ if (process.env['GITHUB_ACCESS_TOKEN']) {
   });
 }
 
+/**
+ * Downloads the specified version of the oc CLI and returns the full path to
+ * the executable.
+ *
+ * @param downloadVersion the version of `oc` to install.
+ * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'. See https://nodejs.org/api/os.html#os_os_type
+ * @return the full path to the installed executable or null if the install failed.
+ */
 export async function installOc(
-  downloadVersion: string
+  downloadVersion: string,
+  osType: string
 ): Promise<string | null> {
   if (!downloadVersion) {
     downloadVersion = await latestStable();
   }
 
-  tl.debug('creating download directory for the tarballs');
+  tl.debug('creating download directory');
   let downloadDir =
     process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + '/.download';
   if (!fs.existsSync(downloadDir)) {
@@ -29,14 +43,14 @@ export async function installOc(
     await mkdir.exec();
   }
 
-  let url = await tarballURL(downloadVersion);
+  let url = await ocBundleURL(downloadVersion, osType);
   if (url === null) {
     tl.setResult(tl.TaskResult.Failed, 'Unable to determine oc download URL.');
     return null;
   }
   tl.debug(`downloading: ${url}`);
 
-  let ocBinary = await downloadAndExtract(url, downloadDir);
+  let ocBinary = await downloadAndExtract(url, downloadDir, osType);
   if (ocBinary === null) {
     tl.setResult(
       tl.TaskResult.Failed,
@@ -55,7 +69,7 @@ export async function installOc(
  * @return the release/tag of the latest OpenShift CLI on GitHub.
  */
 export async function latestStable(): Promise<string> {
-  tl.debug('determinig latest oc version');
+  tl.debug('determining latest oc version');
 
   let version = await octokit.repos
     .getLatestRelease({
@@ -75,17 +89,41 @@ export async function latestStable(): Promise<string> {
 }
 
 /**
- * Returns the tarball download URL for the Linux oc CLI for a given release tag.
+ * Returns the download URL for the oc CLI for a given release tag.
+ * The binary type is determined by the agent's operating system.
  *
  * @param {string} tag The release tag.
+ * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
  * @returns {Promise} Promise string representing the URL to the tarball. null is returned
  * if no matching URL can be determined for the given tag.
  */
-export async function tarballURL(tag: string): Promise<string | null> {
-  tl.debug(`determinig tarball URL for tag ${tag}`);
+export async function ocBundleURL(
+  tag: string,
+  osType: string
+): Promise<string | null> {
+  tl.debug(`determining tarball URL for tag ${tag}`);
 
   if (!tag) {
     return null;
+  }
+
+  let expr = '';
+  switch (osType) {
+    case 'Linux': {
+      expr = '^.*-linux-64bit.tar.gz$';
+      break;
+    }
+    case 'Darwin': {
+      expr = '^.*-mac.zip$';
+      break;
+    }
+    case 'Windows_NT': {
+      expr = '^.*-windows.zip$';
+      break;
+    }
+    default: {
+      return null;
+    }
   }
 
   let url = await octokit.repos
@@ -101,9 +139,9 @@ export async function tarballURL(tag: string): Promise<string | null> {
       }
 
       let url: string;
-      for (var asset of result.data.assets) {
+      for (let asset of result.data.assets) {
         url = asset.browser_download_url;
-        if (url.match(/^.*linux-64bit.tar.gz$/)) {
+        if (url.match(new RegExp(expr))) {
           return url;
         }
       }
@@ -118,56 +156,90 @@ export async function tarballURL(tag: string): Promise<string | null> {
 }
 
 /**
- * Downloads and extract the oc release tarball.
+ * Downloads and extract the oc release archive.
  *
  * @param url the oc release download URL.
- * @param downloadDir the directory into which to extract the tarball.
- * It is the responsbiltiy of the caller to ensure that the directory exist.
+ * @param downloadDir the directory into which to extract the archive.
+ * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
+ * It is the responsibility of the caller to ensure that the directory exist.
  */
 export async function downloadAndExtract(
   url: string,
-  downloadDir: string
+  downloadDir: string,
+  osType: string
 ): Promise<string | null> {
   if (!url) {
     return null;
   }
+
+  downloadDir = path.normalize(downloadDir);
 
   if (!tl.exist(downloadDir)) {
     throw `${downloadDir} does not exist.`;
   }
 
   let parts = url.split('/');
-  let tarball = parts[parts.length - 1];
-  let targetFile = downloadDir + `/${tarball}`;
+  let archive = parts[parts.length - 1];
+  let archivePath = path.join(downloadDir, archive);
 
-  if (!tl.exist(targetFile)) {
+  if (!tl.exist(archivePath)) {
     let curl: ToolRunner = tl.tool('curl');
     curl
+      .arg('-s')
       .arg('-L')
       .arg('-o')
-      .arg(targetFile)
+      .arg(archivePath)
       .arg(url);
     await curl.exec();
   }
 
-  let expandDir = tarball.replace('.tar.gz', '');
-  let expandPath = downloadDir + `/${expandDir}`;
-  if (!tl.exist(expandPath)) {
-    tl.debug(`expanding ${targetFile}`);
-
-    let tar: ToolRunner = tl.tool('tar');
-    tar
-      .arg('-xvf')
-      .arg(targetFile)
-      .arg('-C')
-      .arg(downloadDir);
-    await tar.exec();
+  let archiveType = path.extname(archive);
+  let expandDir = archive.replace(archiveType, '');
+  // handle tar.gz explicitly
+  if (path.extname(expandDir) == '.tar') {
+    archiveType = '.tar.gz';
+    expandDir = expandDir.replace('.tar', '');
   }
 
-  let ocBinary = `${expandPath}/oc`;
+  let expandPath = path.join(downloadDir, expandDir);
+  if (!tl.exist(expandPath)) {
+    tl.debug(`expanding ${archivePath} into ${expandPath}`);
+
+    switch (archiveType) {
+      case '.zip': {
+        let zip = new Zip(archivePath);
+        zip.extractAllTo(expandPath);
+        break;
+      }
+      case '.tgz':
+      case '.tar.gz': {
+        await decompress(archivePath, downloadDir, {
+          plugins: [decompressTargz()]
+        });
+        break;
+      }
+      default: {
+        throw `unknown archive format ${archivePath}`;
+      }
+    }
+  }
+
+  let ocBinary: string;
+  switch (osType) {
+    case 'Windows_NT': {
+      ocBinary = 'oc.exe';
+      break;
+    }
+    default: {
+      ocBinary = 'oc';
+    }
+  }
+
+  ocBinary = path.join(expandPath, ocBinary);
   if (!tl.exist(ocBinary)) {
     return null;
   } else {
+    fs.chmodSync(ocBinary, '0755');
     return ocBinary;
   }
 }

@@ -7,13 +7,9 @@ import * as install from './oc-install';
 import { ConfigMap } from './config-map';
 
 async function run() {
-  if (task.osType() !== 'Linux') {
-    throw new Error('task needs to run on a Linux agent');
-  }
-
   let version = task.getInput('version');
-  let ocPath = await install.installOc(version);
-
+  let agentOS = task.osType();
+  let ocPath = await install.installOc(version, agentOS);
   if (ocPath === null) {
     throw new Error('no oc binary found');
   }

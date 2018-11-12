@@ -15,7 +15,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 4
+    "Patch": 8
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "oc-cmd $(message)",
@@ -46,7 +46,7 @@
   ],
   "execution": {
     "Node": {
-      "target": "lib/oc-task.js",
+      "target": "lib/oc-exec-task.js",
       "workingDirectory": "$(currentDirectory)"
     }
   }
