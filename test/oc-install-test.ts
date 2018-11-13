@@ -5,10 +5,75 @@ chai.use(require('chai-fs'));
 let expect = chai.expect;
 let install = require('../src/oc-install');
 
-let testOutDir = `${__dirname}/../out/test/downloadAndExtract`;
-
 describe('#oc-install', function() {
+  describe('#ocInstall', function() {
+    let testOutDir = `${__dirname}/../out/test/ocInstall`;
+
+    before(() => {
+      if (!fs.existsSync(testOutDir)) {
+        fs.mkdirpSync(testOutDir);
+      }
+      process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] = testOutDir;
+    });
+
+    after(() => {
+      delete process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'];
+      fs.remove(testOutDir)
+        .then(() => {
+          console.log('success!');
+        })
+        .catch((err: any) => {
+          console.error(err);
+        });
+    });
+
+    it('installs oc from URL @network', function() {
+      this.timeout(120000);
+      return install
+        .installOc(
+          'https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip',
+          'Darwin'
+        )
+        .then((ocPath: string) => {
+          expect(ocPath).to.eq(
+            path.join(
+              testOutDir,
+              '.download',
+              'openshift-origin-client-tools-v3.11.0-0cbc58b-mac',
+              'oc'
+            )
+          );
+          expect(ocPath).to.be.a.file();
+        })
+        .catch((err: Error) => {
+          expect.fail(err);
+        });
+    });
+
+    it('installs oc from version tag @network', function() {
+      this.timeout(120000);
+      return install
+        .installOc('v3.11.0', 'Windows_NT')
+        .then((ocPath: string) => {
+          expect(ocPath).to.eq(
+            path.join(
+              testOutDir,
+              '.download',
+              'openshift-origin-client-tools-v3.11.0-0cbc58b-windows',
+              'oc.exe'
+            )
+          );
+          expect(ocPath).to.be.a.file();
+        })
+        .catch((err: Error) => {
+          expect.fail(err);
+        });
+    });
+  });
+
   describe('#downloadAndExtract', function() {
+    let testOutDir = `${__dirname}/../out/test/downloadAndExtract`;
+
     before(() => {
       if (!fs.existsSync(testOutDir)) {
         fs.mkdirpSync(testOutDir);

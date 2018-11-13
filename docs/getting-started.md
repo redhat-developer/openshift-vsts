@@ -55,7 +55,7 @@ The _Execute oc command_ has four configuration options.
   <dt>OpenShift/Kubernetes service connection</dt>
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-kubernetes-service-connection">Configuring Kubernetes service connection</a>.</dd>
   <dt>Version of oc to use</dt>
-  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used.</dd>  
+  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used. You can also specify a direct URL to the oc release bundle.</dd>  
   <dt>Command to run</dt>
   <dd>The actual oc command to run starting with the oc sub-command, eg "rollout latest dc/my-app -n production".</dd>
 </dl>
@@ -92,7 +92,7 @@ The _Update ConfigMap_ task has six configuration options.
   <dt>OpenShift/Kubernetes service connection</dt>
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-kubernetes-service-connection">Configuring Kubernetes service connection</a>.</dd>
   <dt>Version of oc to use</dt>
-  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used.</dd>  
+  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used. You can also specify a direct URL to the oc release bundle.</dd>  
   <dt>Name of ConfigMap</dt>
   <dd>Required.The name of the ConfigMap to update.</dd>
   <dt>Namespace of ConfigMap</dt>
