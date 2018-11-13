@@ -3,14 +3,13 @@
 <!-- TOC depthFrom:2 -->
 
 - [Prerequisites](#prerequisites)
-- [Build tasks](#build-tasks)
-    - [Transpile TypeScript to JavaScript](#transpile-typescript-to-javascript)
-    - [Build VSTS extension](#build-vsts-extension)
-- [Test](#test)
-- [Debug](#debug)
-- [Publish](#publish)
-    - [Staging](#staging)
-    - [Production](#production)
+- [npm build tasks](#npm-build-tasks)
+    - [Transpile](#transpile)
+    - [Test](#test)
+    - [Create extension](#create-extension)
+    - [Publish extension](#publish-extension)
+        - [To staging](#to-staging)
+        - [To production](#to-production)
 - [References](#references)
 
 <!-- /TOC -->
@@ -22,15 +21,17 @@
 
     `> npm run setup`
 
-## Build tasks
+## npm build tasks
 
 The various build tasks are driven via `npm`.
-Check _package.json_ for the defined run scripts.
+Check [_package.json_](https://github.com/hferentschik/openshift-vsts/blob/master/package.json) for the defined run scripts.
 To get a list of all available tasks run:
 
 `> npm run`
 
-### Transpile TypeScript to JavaScript
+### Transpile
+
+To transpile TypeScript to JavaScript:
 
 `> npm run build`
 
@@ -38,27 +39,40 @@ To watch your TypeScript files for changes and transpile on the fly:
 
 `> npm run build:watch`
 
-### Build VSTS extension
+### Test
 
-`> npm run extension:create`
-
-This will also bump the version numbers of the extensions as well as all tasks.
-
-## Test
-
-Test are written using [mocha](https://mochajs.org/) and live in the *_tests_* subdirectory of the corresponding task. You can run the tests via:
+Test are written using [mocha](https://mochajs.org/) and live in the *_test_* directory of the checkout. You can run the tests via:
 
 `> npm test`
+
+There are a couple of test which go over the network and access the GitHub API.
+You can exclude them by setting the `MOCHA_TAG` environment variable like so:
+
+`MOCHA_TAG='--grep @network --invert' npm run test`
+
+For more information regarding test tagging refer to Mocha's [Tagging](https://github.com/mochajs/mocha/wiki/Tagging) documenttion.
 
 You can get an HTML version of the test results into the _out_ directory by running:
 
 `> npm test:report`
 
-## Publish
+If you are running the tests a lot, you might reach the GitHub API rate limit.
+In this case you can create a [GitHub access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line) and export it under the environment variable `GITHUB_ACCESS_TOKEN`.
 
-Prerequisite is a [personal access token](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts#acquire-the-tfs-cross-platform-command-line-interface).
+### Create extension 
 
-### Staging
+To create the extension (vsix file): 
+
+`> npm run extension:create`
+
+This will also bump the version numbers of the extensions as well as all tasks.
+
+### Publish extension
+
+Prerequisite for publising from the command line is a [personal access token](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts#acquire-the-tfs-cross-platform-command-line-interface).
+Once you have setup your token, you can chose to publish to a test/staging publisher or the production publisher 'redhat'.
+
+#### To staging
 
 Do do a staging deploy you can specify a staging publisher by setting the `DEV_PUBLISHER` environment variable:
 
@@ -87,9 +101,9 @@ To unshare:
 > npm run extension:unshare:dev
 ```
 
-### Production
+#### To production
 
-Do do a production deploy under the [Red Hat Publisher](https://marketplace.visualstudio.com/manage/publishers/redhat):
+Do do a production deploy under the [Red Hat](https://marketplace.visualstudio.com/manage/publishers/redhat) publisher:
 
 ```bash
 > export TOKEN=<token>
@@ -98,6 +112,8 @@ Do do a production deploy under the [Red Hat Publisher](https://marketplace.visu
 > npm run extension:create
 > npm run extension:publish
 ```
+
+You need to be member of this publisher!
 
 ## References
 

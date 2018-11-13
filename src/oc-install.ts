@@ -5,6 +5,7 @@ import fs = require('fs');
 import path = require('path');
 import { ToolRunner } from 'vsts-task-lib/toolrunner';
 
+const validUrl = require('valid-url');
 const decompress = require('decompress');
 const decompressTargz = require('decompress-targz');
 const Zip = require('adm-zip');
@@ -43,13 +44,19 @@ export async function installOc(
     await mkdir.exec();
   }
 
-  let url = await ocBundleURL(downloadVersion, osType);
+  let url: string | null;
+  if (validUrl.isWebUri(downloadVersion)) {
+    url = downloadVersion;
+  } else {
+    url = await ocBundleURL(downloadVersion, osType);
+  }
+
   if (url === null) {
     tl.setResult(tl.TaskResult.Failed, 'Unable to determine oc download URL.');
     return null;
   }
-  tl.debug(`downloading: ${url}`);
 
+  tl.debug(`downloading: ${url}`);
   let ocBinary = await downloadAndExtract(url, downloadDir, osType);
   if (ocBinary === null) {
     tl.setResult(
@@ -107,6 +114,7 @@ export async function ocBundleURL(
     return null;
   }
 
+  // determine the bundle suffix on GitHub based on the OS type
   let expr = '';
   switch (osType) {
     case 'Linux': {
@@ -151,7 +159,7 @@ export async function ocBundleURL(
       tl.debug(`Error retrieving tagged release ${e}`);
       return null;
     });
-  tl.debug(`tarball URL: ${url}`);
+  tl.debug(`archive URL: ${url}`);
   return url;
 }
 
