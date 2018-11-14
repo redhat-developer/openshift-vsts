@@ -33,7 +33,7 @@
       "label": "Version of oc to use",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest)"
+      "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
     },
     {
       "name": "cmd",
