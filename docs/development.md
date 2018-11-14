@@ -117,6 +117,7 @@ They need to be executed from the _master_ branch.
 ```bash
 > export TOKEN=<token>
 > npm run clean
+> npm install
 > npm run test
 > EXT_VERSION=<version> npm run extension:version:set
 > npm run extension:create
