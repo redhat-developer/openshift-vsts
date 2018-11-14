@@ -65,11 +65,19 @@ To create the extension (vsix file):
 
 `> npm run extension:create`
 
-This will also bump the version numbers of the extensions as well as all tasks.
+To create the extension for a deploy to a staging publisher:
+
+`> npm run extension:create:dev`
+
+During development it can be handy to push patch releases to a test publisher.
+The following command will create the extension bumping the version of the extension as well as all as the versions of all tasks:
+
+`> npm run extension:create:patch`
+
 
 ### Publish extension
 
-Prerequisite for publising from the command line is a [personal access token](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts#acquire-the-tfs-cross-platform-command-line-interface).
+Prerequisite for publishing from the command line is a [personal access token](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts#acquire-the-tfs-cross-platform-command-line-interface).
 Once you have setup your token, you can chose to publish to a test/staging publisher or the production publisher 'redhat'.
 
 #### To staging
@@ -103,14 +111,17 @@ To unshare:
 
 #### To production
 
-Do do a production deploy under the [Red Hat](https://marketplace.visualstudio.com/manage/publishers/redhat) publisher:
+Do do a production deploy under the [Red Hat](https://marketplace.visualstudio.com/manage/publishers/redhat) publisher follow these steps.
+They need to be executed from the _master_ branch. 
 
 ```bash
 > export TOKEN=<token>
 > npm run clean
-> npm run build
+> npm run test
+> EXT_VERSION=<version> npm run extension:version:set
 > npm run extension:create
 > npm run extension:publish
+> npm run extension:publish:commit
 ```
 
 You need to be member of this publisher!

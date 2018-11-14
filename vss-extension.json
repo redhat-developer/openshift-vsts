@@ -25,7 +25,7 @@
         "repository": {
             "uri": "https://github.com/hferentschik/openshift-vsts"
         }
-	},
+    },
     "content": {
         "details": {
             "path": "README.md"
@@ -41,20 +41,24 @@
             "id": "oc-cmd-task",
             "description": "Task to run user-defined oc command.",
             "type": "ms.vss-distributed-task.task",
-            "targets": [ "ms.vss-distributed-task.tasks" ],
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
             "properties": {
-              "name": "tasks/oc-cmd"
+                "name": "tasks/oc-cmd"
             }
         },
         {
             "id": "config-map-task",
             "description": "Task to apply ConfigMap properties.",
             "type": "ms.vss-distributed-task.task",
-            "targets": [ "ms.vss-distributed-task.tasks" ],
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
             "properties": {
-              "name": "tasks/config-map"
+                "name": "tasks/config-map"
             }
-        }                 
+        }
     ],
     "icons": {
         "default": "images/logo.png"

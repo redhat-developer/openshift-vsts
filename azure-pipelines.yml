@@ -29,11 +29,15 @@ steps:
     testRunTitle: 'Test results'  
 
 - script: npm run prettier:check
-  displayName: Syntax check  
+  displayName: Syntax check
 
-- script: npm run extension:create:dev 
-  displayName: Build extension   
-      
+- script: npm run extension:version:set
+  displayName: Set release version
+  condition: eq(variables['release'], 'true')
+
+- script: npm run extension:create:dev
+  displayName: Build extension
+
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
@@ -52,6 +56,6 @@ steps:
 - bash: |
     git config user.email no-reply@example.com
     git config user.name "Azure DevOps Pipeline"
-    npm run commit
+    npm run extension:publish:commit
   workingDirectory: $(Build.SourcesDirectory)
   condition: eq(variables['release'], 'true')
