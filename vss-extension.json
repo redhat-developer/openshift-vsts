@@ -38,7 +38,7 @@
     },
     "content": {
         "details": {
-            "path": "README.md"
+            "path": "docs/details.md"
         },
         "license": {
             "path": "LICENSE"

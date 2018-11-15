@@ -2,7 +2,7 @@
 
 <!-- TOC depthFrom:2 -->
 
-- [Configuring Kubernetes service connection](#configuring-kubernetes-service-connection)
+- [Configuring the Kubernetes/OpenShift service connection](#configuring-the-kubernetesopenshift-service-connection)
 - [Executing user-defined oc commands](#executing-user-defined-oc-commands)
 - [Updating a ConfigMap](#updating-a-configmap)
 
@@ -12,9 +12,9 @@ The OpenShift extension for Azure DevOps allows you to connect and interact with
 
 The following paragraphs guide you through the process of using this extension.
 
-## Configuring Kubernetes service connection
+## Configuring the Kubernetes/OpenShift service connection
 
-To execute OpensShift commands as part of your build or deployment, you first need a way to connect to your cluster.
+To execute `oc` commands as part of your build or deployment, you first need a way to connect to your cluster.
 In Azure DevOps, access to external and remote services are configured in [service connections](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=vsts).
 Azure DevOps comes with a built-in connection for Kubernetes, the so-called [Kubernetes service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=vsts#sep-kuber).
 Since Kubernetes and OpenShift use the same authentication mechanism, we can leverage this existing service connection for our purposes.
