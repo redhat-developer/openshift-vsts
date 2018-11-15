@@ -16,8 +16,14 @@
         "oc"
     ],
     "links": {
+        "home": {
+            "uri": "https://github.com/hferentschik/openshift-vsts"
+        },
         "getstarted": {
             "uri": "https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md"
+        },
+        "support": {
+            "uri": "https://github.com/hferentschik/openshift-vsts/issues"
         },
         "issues": {
             "uri": "https://github.com/hferentschik/openshift-vsts/issues"
@@ -26,9 +32,16 @@
             "uri": "https://github.com/hferentschik/openshift-vsts"
         }
     },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/hferentschik/openshift-vsts"
+    },
     "content": {
         "details": {
             "path": "README.md"
+        },
+        "license": {
+            "path": "LICENSE"
         }
     },
     "targets": [
