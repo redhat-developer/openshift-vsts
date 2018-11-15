@@ -2,20 +2,11 @@
 
 [![Build Status](https://travis-ci.org/hferentschik/openshift-vsts.svg?branch=master)](https://travis-ci.org/hferentschik/openshift-vsts) [![Build Status](https://dev.azure.com/hardy0575/openshift-vsts/_apis/build/status/openshift-vsts-ci)](https://dev.azure.com/hardy0575/openshift-vsts/_build/latest?definitionId=3)
 
-<!-- TOC depthFrom:2 -->
-
-- [What is it](#what-is-it)
-- [How to contribute](#how-to-contribute)
-
-<!-- /TOC -->
-
 ## What is it
 
-The OpenShift TFS/VSTS extension offer a set of tasks to integrate [OpenShift](https://github.com/openshift/origin) into your pipelines allowing to execute user-defined `oc` commands.
+The OpenShift TFS/VSTS extension offers tasks for integrating [OpenShift](https://github.com/openshift/origin) into your Azure DevOps build and release pipelines, for example by executing user defined `oc` commands.
 
-The extension is currently under development and will eventually be distributed via the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/azuredevops).
-
-Refer to the [Getting Started](./docs/getting-started.md) guide to see the full list of tasks and how to use them.
+The extension is distributed via the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/azuredevops) and can be found [here](https://marketplace.visualstudio.com/items?itemName=redhat.openshift-vsts).
 
 ## How to contribute
 
