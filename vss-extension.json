@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "openshift-vsts",
     "publisher": "redhat",
-    "version": "1.1.5",
+    "version": "1.1.9",
     "name": "OpenShift Extension",
     "description": "OpenShift tasks for Azure DevOps",
     "public": true,
@@ -74,6 +74,17 @@
             "properties": {
                 "name": "tasks/config-map"
             }
+        },
+        {
+            "id": "oc-setup-task",
+            "description": "Task to install oc and setup PATH.",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/oc-setup"
+            }
         }
     ],
     "icons": {
@@ -85,6 +96,9 @@
         },
         {
             "path": "tasks/config-map"
+        },
+        {
+            "path": "tasks/oc-setup"
         }
     ]
 }

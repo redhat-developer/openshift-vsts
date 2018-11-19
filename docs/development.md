@@ -1,19 +1,21 @@
 # How to develop openshift-vsts
 
-<!-- TOC depthFrom:2 -->
+<!-- MarkdownTOC autolink="true" autoanchor="true" -->
 
 - [Prerequisites](#prerequisites)
 - [npm build tasks](#npm-build-tasks)
-    - [Transpile](#transpile)
-    - [Test](#test)
-    - [Create extension](#create-extension)
-    - [Publish extension](#publish-extension)
-        - [To staging](#to-staging)
-        - [To production](#to-production)
+	- [Transpile](#transpile)
+	- [Test](#test)
+	- [Create extension](#create-extension)
+	- [Publish extension](#publish-extension)
+		- [To staging](#to-staging)
+		- [To production](#to-production)
+	- [Write docs](#write-docs)
 - [References](#references)
 
-<!-- /TOC -->
+<!-- /MarkdownTOC -->
 
+<a id="prerequisites"></a>
 ## Prerequisites
 
 - Install [Node.js](https://nodejs.org/en/)
@@ -21,6 +23,7 @@
 
     `> npm run setup`
 
+<a id="npm-build-tasks"></a>
 ## npm build tasks
 
 The various build tasks are driven via `npm`.
@@ -29,6 +32,7 @@ To get a list of all available tasks run:
 
 `> npm run`
 
+<a id="transpile"></a>
 ### Transpile
 
 To transpile TypeScript to JavaScript:
@@ -39,6 +43,7 @@ To watch your TypeScript files for changes and transpile on the fly:
 
 `> npm run build:watch`
 
+<a id="test"></a>
 ### Test
 
 Test are written using [mocha](https://mochajs.org/) and live in the *_test_* directory of the checkout. You can run the tests via:
@@ -59,6 +64,7 @@ You can get an HTML version of the test results into the _out_ directory by runn
 If you are running the tests a lot, you might reach the GitHub API rate limit.
 In this case you can create a [GitHub access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line) and export it under the environment variable `GITHUB_ACCESS_TOKEN`.
 
+<a id="create-extension"></a>
 ### Create extension 
 
 To create the extension (vsix file): 
@@ -75,11 +81,13 @@ The following command will create the extension bumping the version of the exten
 `> npm run extension:create:patch`
 
 
+<a id="publish-extension"></a>
 ### Publish extension
 
 Prerequisite for publishing from the command line is a [personal access token](https://docs.microsoft.com/en-us/azure/devops/extend/publish/command-line?view=vsts#acquire-the-tfs-cross-platform-command-line-interface).
 Once you have setup your token, you can chose to publish to a test/staging publisher or the production publisher 'redhat'.
 
+<a id="to-staging"></a>
 #### To staging
 
 Do do a staging deploy you can specify a staging publisher by setting the `DEV_PUBLISHER` environment variable:
@@ -109,6 +117,7 @@ To unshare:
 > npm run extension:unshare:dev
 ```
 
+<a id="to-production"></a>
 #### To production
 
 Do do a production deploy under the [Red Hat](https://marketplace.visualstudio.com/manage/publishers/redhat) publisher follow these steps.
@@ -127,6 +136,17 @@ They need to be executed from the _master_ branch.
 
 You need to be member of this publisher!
 
+<a id="write-docs"></a>
+### Write docs
+
+To write on the docs you can leverage [markserv](https://www.npmjs.com/package/markserv) npm, rendering and updating the docs as you go.
+Just run:
+
+```bash
+> npm run docs
+```
+
+<a id="references"></a>
 ## References
 
 - Microsoft's [Develop Extensions](https://docs.microsoft.com/en-us/azure/devops/extend/?view=vsts) guide
@@ -138,4 +158,4 @@ You need to be member of this publisher!
 - Microsoft's [Azure Pipelines tasks](https://github.com/Microsoft/vsts-tasks)
 - [Step by Step: Node Task with Typescript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/stepbystep.md)
 - [How to Use npm as a Build Tool](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool)
-- [Use Git within a pipeline scrfipt task](https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=vsts&tabs=yaml)
+- [Use Git within a pipeline script task](https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=vsts&tabs=yaml)
