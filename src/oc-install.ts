@@ -251,3 +251,55 @@ export async function downloadAndExtract(
     return ocBinary;
   }
 }
+
+/**
+ * Adds oc to the PATH environment variable.
+ *
+ * @param ocPath the full path to the oc binary. Must be a non null.
+ * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
+ */
+export async function addOcToPath(ocPath: string, osType: string) {
+  if (ocPath === null || ocPath === '') {
+    throw new Error('path cannot be null or empty');
+  }
+
+  if (osType == 'Windows_NT') {
+    let dir = ocPath.substr(0, ocPath.lastIndexOf('\\'));
+    tl.setVariable('PATH', dir + ';' + tl.getVariable('PATH'));
+  } else {
+    let dir = ocPath.substr(0, ocPath.lastIndexOf('/'));
+    tl.setVariable('PATH', dir + ':' + tl.getVariable('PATH'));
+  }
+}
+
+/**
+ * Writes the cluster auth config to disk and sets the KUBECONFIG env variable
+ *
+ * @param config The cluster auth config to write to disk
+ * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
+ */
+export async function writeKubeConfig(config: string, osType: string) {
+  if (config === null || config === '') {
+    throw new Error('empty or null kubeconfig is not allowed');
+  }
+
+  let workingDir;
+  if (osType == 'Windows_NT') {
+    workingDir = process.env['USERPROFILE'];
+  } else {
+    workingDir = process.env['HOME'];
+  }
+
+  if (workingDir === undefined) {
+    throw new Error('Unable to determine home directory');
+  }
+
+  let kubeConfigDir = path.join(workingDir, '.kube');
+  if (!tl.exist(kubeConfigDir)) {
+    tl.mkdirP(kubeConfigDir);
+  }
+
+  let kubeConfig = path.join(kubeConfigDir, 'config');
+  tl.writeFile(kubeConfig, config);
+  tl.setVariable('KUBECONFIG', kubeConfig);
+}

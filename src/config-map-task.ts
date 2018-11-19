@@ -19,7 +19,8 @@ async function run() {
   let properties = task.getInput('properties');
   let configMap = new ConfigMap(configMapName, properties);
 
-  await oc.execOc(getKubeConfig(), ocPath, configMap.patchCmd(namespace));
+  await install.writeKubeConfig(getKubeConfig(), agentOS);
+  await oc.execOc(ocPath, configMap.patchCmd(namespace));
 
   task.setResult(
     task.TaskResult.Succeeded,
@@ -29,12 +30,7 @@ async function run() {
 
 function getKubeConfig(): string {
   let endpoint = task.getInput('k8sService');
-  let kubeConfig = task.getEndpointAuthorizationParameter(
-    endpoint,
-    'kubeconfig',
-    true
-  );
-  return kubeConfig;
+  return task.getEndpointAuthorizationParameter(endpoint, 'kubeconfig', true);
 }
 
 run()

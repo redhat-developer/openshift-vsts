@@ -1,8 +1,8 @@
 {
-  "id": "ebaf1cdc-a60f-4e57-ba29-e3b8f80aeb1e",
-  "name": "oc-cmd",
-  "friendlyName": "Execute oc command",
-  "description": "OpenShift execute CLI command.",
+  "id": "44babac3-ab28-4f68-b843-bf2c295a4a2d",
+  "name": "oc-setup",
+  "friendlyName": "Install and setup oc",
+  "description": "Installs oc and configures the PATH and KUBECONFIG environment variables.",
   "author": "Hardy Ferentschik",
   "helpMarkDown": "See [getting started](https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md)",
   "category": "Utility",
@@ -13,12 +13,12 @@
   "preview": true,
   "demands": [],
   "version": {
-    "Major": 1,
-    "Minor": 1,
-    "Patch": 8
+    "Major": 0,
+    "Minor": 0,
+    "Patch": 5
   },
   "minimumAgentVersion": "1.95.0",
-  "instanceNameFormat": "oc-cmd $(message)",
+  "instanceNameFormat": "oc-setup $(message)",
   "inputs": [
     {
       "name": "k8sService",
@@ -30,23 +30,15 @@
     {
       "name": "version",
       "type": "string",
-      "label": "Version of oc to use",
+      "label": "Version of oc",
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
-    },
-    {
-      "name": "cmd",
-      "type": "string",
-      "label": "Command to run",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Specify the oc command to run."
     }
   ],
   "execution": {
     "Node": {
-      "target": "lib/oc-exec-task.js",
+      "target": "lib/oc-setup-task.js",
       "workingDirectory": "$(currentDirectory)"
     }
   }
