@@ -29,5 +29,9 @@ export async function execOc(ocPath: string, argLine: string): Promise<void> {
  */
 export function prepareOcArguments(argLine: string): string[] {
   let interpolatedArgs = sub(argLine, process.env);
-  return split(interpolatedArgs);
+  let args = split(interpolatedArgs);
+  if (args[0] === 'oc' || args[0] === 'oc.exe') {
+    args = args.slice(1);
+  }
+  return args;
 }
