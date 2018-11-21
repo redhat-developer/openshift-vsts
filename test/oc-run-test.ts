@@ -29,5 +29,17 @@ describe('oc-run', function() {
         .to.be.an('array')
         .that.include.ordered.members(['get', '${FOO}']);
     });
+
+    it('remove leading oc', function() {
+      expect(cmd.prepareOcArguments('oc get nodes'))
+        .to.be.an('array')
+        .that.include.ordered.members(['get', 'nodes']);
+    });
+
+    it('remove leading oc.exe', function() {
+      expect(cmd.prepareOcArguments('oc.exe get nodes'))
+        .to.be.an('array')
+        .that.include.ordered.members(['get', 'nodes']);
+    });
   });
 });
