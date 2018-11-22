@@ -4,7 +4,7 @@
   "friendlyName": "Update ConfigMap",
   "description": "Applies environment properties to specified OpenShift ConfigMap.",
   "author": "Hardy Ferentschik",
-  "helpMarkDown": "See [getting started](https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md)",
+  "helpMarkDown": "See [getting started](https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md)",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -15,7 +15,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 0
+    "Patch": 1
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "config-map $(message)",

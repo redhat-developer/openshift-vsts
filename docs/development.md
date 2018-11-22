@@ -27,7 +27,7 @@
 ## npm build tasks
 
 The various build tasks are driven via `npm`.
-Check [_package.json_](https://github.com/hferentschik/openshift-vsts/blob/master/package.json) for the defined run scripts.
+Check [_package.json_](https://github.com/redhat-developer/openshift-vsts/blob/master/package.json) for the defined run scripts.
 To get a list of all available tasks run:
 
 `> npm run`

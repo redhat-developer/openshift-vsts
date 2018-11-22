@@ -1,6 +1,6 @@
 # OpenShift TFS/VSTS Marketplace Extension
 
-[![Build Status](https://travis-ci.org/hferentschik/openshift-vsts.svg?branch=master)](https://travis-ci.org/hferentschik/openshift-vsts) [![Build Status](https://dev.azure.com/hardy0575/openshift-vsts/_apis/build/status/openshift-vsts-ci)](https://dev.azure.com/hardy0575/openshift-vsts/_build/latest?definitionId=3)
+[![Build Status](https://travis-ci.org/redhat-developer/openshift-vsts.svg?branch=master)](https://travis-ci.org/redhat-developer/openshift-vsts) [![Build Status](https://dev.azure.com/hardy0575/openshift-vsts/_apis/build/status/openshift-vsts-ci)](https://dev.azure.com/hardy0575/openshift-vsts/_build/latest?definitionId=3)
 
 ## What is it
 

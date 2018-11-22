@@ -4,7 +4,7 @@
   "friendlyName": "Install and setup oc",
   "description": "Installs oc and configures the PATH and KUBECONFIG environment variables.",
   "author": "Hardy Ferentschik",
-  "helpMarkDown": "See [getting started](https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md)",
+  "helpMarkDown": "See [getting started](https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md)",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -15,7 +15,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 0
+    "Patch": 1
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "oc-setup $(message)",
