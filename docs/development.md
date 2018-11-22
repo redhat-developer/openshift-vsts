@@ -11,6 +11,7 @@
 		- [To staging](#to-staging)
 		- [To production](#to-production)
 	- [Write docs](#write-docs)
+- [CI](#ci)
 - [References](#references)
 
 <!-- /MarkdownTOC -->
@@ -145,6 +146,11 @@ Just run:
 ```bash
 > npm run docs
 ```
+
+<a id="ci"></a>
+## CI
+
+Currently there are two CI systems configured for this project. On on [Azure DevOps](https://dev.azure.com/hardy0575/openshift-vsts) and one on [TravisCI](https://travis-ci.org/redhat-developer/openshift-vsts).
 
 <a id="references"></a>
 ## References
