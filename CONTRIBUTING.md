@@ -9,7 +9,7 @@
 
 ## Filing issues
 
-File issues using the standard [Github issue tracker](https://github.com/hferentschik/openshift-vsts.git/) issues for this repository.
+File issues using the standard [Github issue tracker](https://github.com/redhat-developer/openshift-vsts/issues) for this repository.
 Before you submit a new issue, please search the list of issues to see if anyone already submitted a similar issue.
 
 ## Contributing patches

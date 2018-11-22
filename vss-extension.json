@@ -20,24 +20,24 @@
     ],
     "links": {
         "home": {
-            "uri": "https://github.com/hferentschik/openshift-vsts"
+            "uri": "https://github.com/redhat-developer/openshift-vsts"
         },
         "getstarted": {
-            "uri": "https://github.com/hferentschik/openshift-vsts/blob/master/docs/getting-started.md"
+            "uri": "https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md"
         },
         "support": {
-            "uri": "https://github.com/hferentschik/openshift-vsts/issues"
+            "uri": "https://github.com/redhat-developer/openshift-vsts/issues"
         },
         "issues": {
-            "uri": "https://github.com/hferentschik/openshift-vsts/issues"
+            "uri": "https://github.com/redhat-developer/openshift-vsts/issues"
         },
         "repository": {
-            "uri": "https://github.com/hferentschik/openshift-vsts"
+            "uri": "https://github.com/redhat-developer/openshift-vsts"
         }
     },
     "repository": {
         "type": "git",
-        "uri": "https://github.com/hferentschik/openshift-vsts"
+        "uri": "https://github.com/redhat-developer/openshift-vsts"
     },
     "content": {
         "details": {

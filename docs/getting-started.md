@@ -115,7 +115,7 @@ It is possible to use variables defined in the agent.
 For example, to reference a file in the artefact _my_sources you could do:
 
 ```bash
-apply -f ${SYSTEM_DEFAULTWORKINGDIRECTORY}/_my_sources/my-openshift-config.yaml`
+apply -f ${SYSTEM_DEFAULTWORKINGDIRECTORY}/_my_sources/my-openshift-config.yaml
 ```
 
 <img align="left" width="32" height="32" src="../images/lightbulb.png">
