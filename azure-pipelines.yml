@@ -51,7 +51,8 @@ steps:
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: 'vsix'    
+    artifactName: 'vsix'
+  condition: eq(variables['release'], 'true')
 
 - bash: |
     git config user.email no-reply@example.com
