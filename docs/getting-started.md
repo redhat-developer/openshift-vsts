@@ -45,6 +45,11 @@ In the appearing dialogue you need to enter the following information:
 Once you have specified all the required information, you can verify it using the _verify connection_ link.
 If your connection is working, you are ready to go.
 
+<img align="left" width="32" height="32" src="../images/lightbulb.png">
+'Verify connection' tries to list the cluster nodes to verify the connection. 
+In case the current context of your KubeConfig is lacking the permissions to list the nodes, you get an error with the title 'Forbidden'.
+In the context of verifiying the connection to the cluster this inidicates a successful verification.
+
 <a id="pipeline-tasks"></a>
 ## Pipeline Tasks 
 
