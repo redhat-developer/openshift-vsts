@@ -1,39 +1,32 @@
 'use strict';
 
 import task = require('vsts-task-lib/task');
-import oc = require('./oc-run');
+import oc = require('./oc-exec');
 
 import * as install from './oc-install';
+import * as auth from './oc-auth';
 
-let version = task.getInput('version');
-let endpoint = task.getInput('k8sService');
-let kubeConfig = task.getEndpointAuthorizationParameter(
-  endpoint,
-  'kubeconfig',
-  true
-);
-let argLine = task.getInput('cmd');
-let agentOS = task.osType();
-let ocPath = '';
-install
-  .installOc(version, agentOS)
-  .then(function(path: string | null) {
-    if (path === null) {
-      throw 'No oc binary found';
-    }
-    ocPath = path;
-    return install.writeKubeConfig(kubeConfig, agentOS);
-  })
-  .then(function() {
-    return oc.execOc(ocPath, argLine);
-  })
+async function run() {
+  let version = task.getInput('version');
+  let argLine = task.getInput('cmd');
+  let agentOS = task.osType();
+
+  let ocPath = await install.installOc(version, agentOS);
+  if (ocPath === null) {
+    throw new Error('no oc binary found');
+  }
+
+  await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
+  await oc.execOc(ocPath, argLine);
+}
+
+run()
   .then(function() {
     task.setResult(
       task.TaskResult.Succeeded,
       'oc command successfully executed.'
     );
   })
-  .catch(function(err) {
-    task.setResult(task.TaskResult.Failed, err);
-    return;
+  .catch(function(err: Error) {
+    task.setResult(task.TaskResult.Failed, err.message);
   });

@@ -4,6 +4,7 @@
   "description": "OpenShift TFS/VSTS Marketplace Extension",
   "main": "index.js",
   "scripts": {
+    "all": "npm install && npm run build && npm run test",
     "setup": "npm install -g tfx-cli typescript json del-cli copy-node-modules markserv",
     "clean": "del-cli **/out **/lib **/node_modules **/.taskkey",
     "build": "tsc -b .",
@@ -24,7 +25,7 @@
     "preextension:create": "npm run copy-task-lib && npm run copy-node-modules",
     "extension:create": "tfx extension create --token $TOKEN --output-path out",
     "preextension:create:dev": "npm run extension:create",
-    "preextension:create:patch": "npm run bump-task-version &&  npm run extension:create -- --rev-version",
+    "preextension:create:patch": "npm run bump-task-version && npm run extension:create -- --rev-version",
     "extension:create:dev": "tfx extension create --token $TOKEN --output-path out --publisher $DEV_PUBLISHER --overrides-file ./scripts/vsix-manifest-overrides.json",
     "extension:create:patch": "tfx extension create --token $TOKEN --output-path out --publisher $DEV_PUBLISHER --overrides-file ./scripts/vsix-manifest-overrides.json",
     "extension:publish": "tfx extension publish --token $TOKEN --vsix out/redhat.openshift-vsts-$(json -f vss-extension.json version).vsix",

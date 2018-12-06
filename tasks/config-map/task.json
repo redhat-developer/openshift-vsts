@@ -13,16 +13,16 @@
   "preview": true,
   "demands": [],
   "version": {
-    "Major": 1,
+    "Major": 2,
     "Minor": 0,
-    "Patch": 1
+    "Patch": 12
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "config-map $(message)",
   "inputs": [
     {
-      "name": "k8sService",
-      "type": "connectedService:kubernetes",
+      "name": "openshiftService",
+      "type": "connectedService:openshift",
       "label": "OpenShift service connection",
       "required": true,
       "helpMarkDown": "Select OpenShift service connection to use."

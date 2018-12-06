@@ -2,8 +2,9 @@
 
 import task = require('vsts-task-lib/task');
 
-import * as oc from './oc-run';
+import * as oc from './oc-exec';
 import * as install from './oc-install';
+import * as auth from './oc-auth';
 import { ConfigMap } from './config-map';
 
 async function run() {
@@ -19,18 +20,8 @@ async function run() {
   let properties = task.getInput('properties');
   let configMap = new ConfigMap(configMapName, properties);
 
-  await install.writeKubeConfig(getKubeConfig(), agentOS);
+  await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
   await oc.execOc(ocPath, configMap.patchCmd(namespace));
-
-  task.setResult(
-    task.TaskResult.Succeeded,
-    'oc command successfully executed.'
-  );
-}
-
-function getKubeConfig(): string {
-  let endpoint = task.getInput('k8sService');
-  return task.getEndpointAuthorizationParameter(endpoint, 'kubeconfig', true);
 }
 
 run()
@@ -41,6 +32,5 @@ run()
     );
   })
   .catch(function(err: Error) {
-    console.log('foo');
     task.setResult(task.TaskResult.Failed, err.message);
   });
