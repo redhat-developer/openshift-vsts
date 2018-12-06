@@ -165,3 +165,4 @@ Currently there are two CI systems configured for this project. On on [Azure Dev
 - [Step by Step: Node Task with Typescript API](https://github.com/Microsoft/vsts-task-lib/blob/master/node/docs/stepbystep.md)
 - [How to Use npm as a Build Tool](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool)
 - [Use Git within a pipeline script task](https://docs.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=vsts&tabs=yaml)
+- [Custom authentication schemes](https://jessehouwing.net/vsts-build-release-define-custom-authentication-scheme/)

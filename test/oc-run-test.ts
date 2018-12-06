@@ -1,5 +1,5 @@
 let expect = require('chai').expect;
-let cmd = require('../src/oc-run');
+let cmd = require('../src/oc-exec');
 
 describe('oc-run', function() {
   describe('#prepareOcArguments', function() {

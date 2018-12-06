@@ -9,10 +9,17 @@ const split = require('argv-split');
 /**
  * Prepares oc for execution and runs the specified command.
  *
- * @param ocPath absolute path to the oc binary
+ * @param ocPath absolute path to the oc binary. If null is passed the binary is determined by running 'which oc'.
  * @param argLine the command to run
  */
-export async function execOc(ocPath: string, argLine: string): Promise<void> {
+export async function execOc(
+  ocPath: string | null,
+  argLine: string
+): Promise<void> {
+  if (ocPath === null) {
+    ocPath = 'oc';
+  }
+
   let oc: ToolRunner = tl.tool(ocPath);
   for (let arg of prepareOcArguments(argLine)) {
     oc.arg(arg);

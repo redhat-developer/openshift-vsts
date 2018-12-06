@@ -5,8 +5,10 @@ The following paragraphs guide you through the process of using this extension.
 
 <!-- MarkdownTOC autolink="true" autoanchor="true" -->
 
-- [Prerequisite](#prerequisite)
-  - [Configuring the OpenShift service connection](#configuring-the-openshift-service-connection)
+- [Configuring the OpenShift service connection](#configuring-the-openshift-service-connection)
+  - [Basic Authentication](#basic-authentication)
+  - [Token Authentication](#token-authentication)
+  - [Kubeconfig](#kubeconfig)
 - [Pipeline Tasks](#pipeline-tasks)
   - [Install and setup oc](#install-and-setup-oc)
   - [Executing single oc commands](#executing-single-oc-commands)
@@ -14,41 +16,72 @@ The following paragraphs guide you through the process of using this extension.
 
 <!-- /MarkdownTOC -->
 
-
-<a id="prerequisite"></a>
-## Prerequisite
-
 <a id="configuring-the-openshift-service-connection"></a>
-### Configuring the OpenShift service connection
+## Configuring the OpenShift service connection
 
 To use any of the pipeline tasks, you first need a way to connect to your cluster.
 In Azure DevOps, access to external and remote services is configured in [service connections](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=vsts).
-Azure DevOps comes with a built-in connection for Kubernetes, the [Kubernetes service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=vsts#sep-kuber).
-Since Kubernetes and OpenShift use the same authentication mechanism, we can leverage this existing service connection for our purposes.
-The image below shows where you can find it.
+The OpenShift extension for Azure DevOps provides a custom OpenShift service connection type which allows you to connect to your cluster using various authentication forms.
 
- ![Kubernetes Service Connection](../images/kubernetes_service_connection.png)
-
-First, select the project's settings (cogwheel icon).
+To configure an OpenShift connection, select the project settings (cogwheel icon).
 From there choose _Service connections_, followed by _New service connection_.
-In the appearing dialogue you need to enter the following information:
+Select the OpenShift service connection and use one of the following methods to cofigure authentication:
+
+<a id="basic-authentication"></a>
+### Basic Authentication
+
+![Basic Authentication](../images/basic_authentication.png)
 
 <dl>
   <dt>Connection Name</dt>
-  <dd>Required. The name you will use to refer to this service connection in task properties of the OpenShift execute task.</dd>
+  <dd>Required. The name you will use to refer to this service connection.</dd>
   <dt>Server URL</dt>
-  <dd>Required. The URL of the Kubernetes/Openshift cluster.</dd>
+  <dd>Required. The URL of the Openshift cluster.</dd>
+  <dt>Username</dt>
+  <dd>Required. OpenShift username.</dd>
+  <dt>Password</dt>
+  <dd>Required. Password for the specified user.</dd>    
+  <dt>Accept untrusted SSL certificates</dt>
+  <dd>Whether it is ok to accept self-signed (untrusted) certificated.</dd>  
+</dl>
+
+
+<a id="token-authentication"></a>
+### Token Authentication
+
+![Token Authentication](../images/token_authentication.png)
+
+<dl>
+  <dt>Connection Name</dt>
+  <dd>Required. The name you will use to refer to this service connection.</dd>
+  <dt>Server URL</dt>
+  <dd>Required. The URL of the Openshift cluster.</dd>
+  <dt>Accept untrusted SSL certificates</dt>
+  <dd>Whether it is ok to accept self-signed (untrusted) certificated.</dd>  
+  <dt>API Token</dt>
+  <dd>Required.The API token used for authentication.</dd>  
+</dl>
+
+<a id="kubeconfig"></a>
+### Kubeconfig
+
+![Kubeconfig Authentication](../images/kubeconfig_authentication.png)
+
+<dl>
+  <dt>Connection Name</dt>
+  <dd>Required. The name you will use to refer to this service connection.</dd>
+  <dt>Server URL</dt>
+  <dd>Required. The URL of the Openshift cluster.</dd>
   <dt>Kubeconfig</dt>
   <dd>The contents of the kubectl configuration file.</dd>  
 </dl>
 
-Once you have specified all the required information, you can verify it using the _verify connection_ link.
-If your connection is working, you are ready to go.
+---
 
-<img align="left" width="32" height="32" src="../images/lightbulb.png">
-'Verify connection' tries to list the cluster nodes to verify the connection. 
-In case the current context of your KubeConfig is lacking the permissions to list the nodes, you get an error with the title 'Forbidden'.
-In the context of verifiying the connection to the cluster this inidicates a successful verification.
+_**Note:** In version 1.\* of this extension the Azure DevOps built-in [Kubernetes service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=vsts#sep-kuber) was used.
+If you want to you keep using this service connection you need to select the 1.* version when configuring a task._
+
+---
 
 <a id="pipeline-tasks"></a>
 ## Pipeline Tasks 
@@ -115,17 +148,21 @@ The _Execute oc command_ has four configuration options.
   <dd>The actual oc command to run starting with the oc sub-command, eg "rollout latest dc/my-app -n production".</dd>
 </dl>
 
-<img align="left" width="32" height="32" src="../images/lightbulb.png">
-It is possible to use variables defined in the agent.
-For example, to reference a file in the artefact _my_sources you could do:
+---
+
+_**Note:** It is possible to use variables defined in the agent.
+For example, to reference a file in the artefact \_my\_sources you could do:_
 
 ```bash
 apply -f ${SYSTEM_DEFAULTWORKINGDIRECTORY}/_my_sources/my-openshift-config.yaml
 ```
 
-<img align="left" width="32" height="32" src="../images/lightbulb.png">
-In case you are reaching the GitHub API rate limit, you can set GITHUB_ACCESS_TOKEN as a pipeline variable.
-To create a GitHub access token refer to <a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/">Creating a personal access token for the command line</a>.
+---
+
+---
+
+_**Note:** In case you are reaching the GitHub API rate limit, you can set GITHUB_ACCESS_TOKEN as a pipeline variable.
+To create a GitHub access token refer to [Creating a personal access token for the command line](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line)._
 
 ---
 
@@ -160,6 +197,8 @@ The _Update ConfigMap_ task has six configuration options.
   <dd>The properties to set/update. Only the properties which need creating/updating need to be listed. Space separated values need to be surrounded by quotes ("). </dd>  
 </dl>
 
-<img align="left" width="32" height="32" src="../images/lightbulb.png">
-It is possible to use variables defined in the agent.
-For example, to reference a variable MY_VAR defined in the pipeline configuration, you can use ${MY_VAR} as the property value.
+---
+
+_**Note:** It is possible to use variables defined in the agent.
+For example, to reference a variable MY_VAR defined in the pipeline configuration, you can use ${MY_VAR} as the property value._
+

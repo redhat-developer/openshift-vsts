@@ -3,33 +3,26 @@
 import task = require('vsts-task-lib/task');
 
 import * as install from './oc-install';
+import * as auth from './oc-auth';
 
-let version = task.getInput('version');
-let endpoint = task.getInput('k8sService');
-let kubeConfig = task.getEndpointAuthorizationParameter(
-  endpoint,
-  'kubeconfig',
-  true
-);
-let agentOS = task.osType();
-install
-  .installOc(version, agentOS)
-  .then(function(ocPath: string | null) {
-    if (ocPath === null) {
-      throw 'No oc binary installed';
-    }
-    return install.addOcToPath(ocPath, agentOS);
-  })
-  .then(function() {
-    return install.writeKubeConfig(kubeConfig, agentOS);
-  })
+async function run() {
+  let version = task.getInput('version');
+  let agentOS = task.osType();
+  let ocPath = await install.installOc(version, agentOS);
+  if (ocPath === null) {
+    throw new Error('no oc binary found');
+  }
+  await install.addOcToPath(ocPath, agentOS);
+  await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
+}
+
+run()
   .then(function() {
     task.setResult(
       task.TaskResult.Succeeded,
-      'oc successfully installed and configured.'
+      'oc successfully installed and configured'
     );
   })
-  .catch(function(err) {
-    task.setResult(task.TaskResult.Failed, err);
-    return;
+  .catch(function(err: Error) {
+    task.setResult(task.TaskResult.Failed, err.message);
   });
