@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "openshift-vsts",
     "publisher": "redhat",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "name": "OpenShift Extension",
     "description": "OpenShift tasks for Azure DevOps",
     "public": true,
@@ -53,6 +53,70 @@
         }
     ],
     "contributions": [
+        {
+            "id": "service-endpoint",
+            "description": "Service endpoint for OpenShift cluster",
+            "type": "ms.vss-endpoint.service-endpoint-type",
+            "targets": [
+                "ms.vss-endpoint.endpoint-types"
+            ],
+            "properties": {
+                "name": "openshift",
+                "displayName": "OpenShift server connection",
+                "url": {
+                    "displayName": "Server URL",
+                    "helpText": "URL for the OpenShift cluster to connect to."
+                },
+                "authenticationSchemes": [
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-token"
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
+                        "inputDescriptors": [
+                            {
+                                "id": "username",
+                                "name": "Username",
+                                "description": "Username",
+                                "inputMode": "textbox",
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "password",
+                                "name": "Password",
+                                "description": "Password",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "inputDescriptors": [
+                            {
+                                "id": "kubeconfig",
+                                "name": "Kubeconfig",
+                                "description": "Copy your kubectl config",
+                                "inputMode": "textArea",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "helpMarkDown": "<a href=\"https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md\" target=\"_blank\"><b>Learn More</b></a>"
+            }
+        },
         {
             "id": "oc-cmd-task",
             "description": "Task to run user-defined oc command.",
