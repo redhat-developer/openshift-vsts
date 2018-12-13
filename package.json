@@ -20,7 +20,7 @@
     "copy-node-modules": "for i in `ls tasks` ; do copy-node-modules . tasks/$i; done",
     "copy-task-lib": "for i in `ls tasks` ; do cp -r src/lib tasks/$i/; done",
     "bump-task-version": "for i in `ls tasks` ; do TASK=$(cat tasks/$i/task.json | json -e 'this.version.Patch++'); echo \"$TASK\" > tasks/$i/task.json; done",
-    "extension:version:set": "JSON=$(cat vss-extension.json | json -4 -e \"this.version='${EXT_VERSION}'\") && echo \"$JSON\" > vss-extension.json",
+    "extension:version:set": "JSON=$(cat vss-extension.json | json -e \"this.version='${EXT_VERSION}'\") && echo \"$JSON\" > vss-extension.json",
     "extension:version:view": "cat vss-extension.json | json version",
     "preextension:create": "npm run copy-task-lib && npm run copy-node-modules",
     "extension:create": "tfx extension create --token $TOKEN --output-path out",
