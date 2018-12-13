@@ -6,9 +6,18 @@
   "name": "OpenShift Extension",
   "description": "OpenShift tasks for Azure DevOps",
   "public": true,
-  "galleryFlags": ["Preview"],
-  "categories": ["Azure Pipelines"],
-  "tags": ["utility", "tasks", "openshift", "oc"],
+  "galleryFlags": [
+    "Preview"
+  ],
+  "categories": [
+    "Azure Pipelines"
+  ],
+  "tags": [
+    "utility",
+    "tasks",
+    "openshift",
+    "oc"
+  ],
   "links": {
     "home": {
       "uri": "https://github.com/redhat-developer/openshift-vsts"
@@ -48,7 +57,9 @@
       "id": "service-endpoint",
       "description": "Service endpoint for OpenShift cluster",
       "type": "ms.vss-endpoint.service-endpoint-type",
-      "targets": ["ms.vss-endpoint.endpoint-types"],
+      "targets": [
+        "ms.vss-endpoint.endpoint-types"
+      ],
       "properties": {
         "name": "openshift",
         "displayName": "OpenShift",
@@ -134,7 +145,9 @@
       "id": "oc-cmd-task",
       "description": "Task to run user-defined oc command.",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "tasks/oc-cmd"
       }
@@ -143,7 +156,9 @@
       "id": "config-map-task",
       "description": "Task to apply ConfigMap properties.",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "tasks/config-map"
       }
@@ -152,7 +167,9 @@
       "id": "oc-setup-task",
       "description": "Task to install oc and setup PATH.",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "tasks/oc-setup"
       }
