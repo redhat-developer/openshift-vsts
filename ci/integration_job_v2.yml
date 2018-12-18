@@ -1,0 +1,36 @@
+parameters:
+  name: ''
+  vmImage: ''
+
+jobs:
+- job: ${{parameters.name}}
+  displayName: ${{parameters.name}}
+  pool:
+    vmImage: ${{parameters.vmImage}}
+  steps:
+  - task: oc-setup@2
+    displayName: Setup oc
+    inputs:
+      openshiftService: 'integration_test_connection_openshift'
+  - script: |
+      oc new-project integration-test-${{parameters.name}}
+      oc get pods
+    displayName: Create namespace and list pods
+  - task: oc-cmd@2
+    displayName: Create ConfigMap
+    inputs:
+      openshiftService: 'integration_test_connection_openshift'
+      cmd: 'oc create configmap test-config --from-literal=foo=bar -n integration-test-${{parameters.name}}'
+  - task: config-map@2
+    displayName: Update ConfigMap
+    inputs:
+      openshiftService: 'integration_test_connection_openshift'
+      configMapName: 'test-config'
+      namespace: 'integration-test-${{parameters.name}}'
+      properties: '-foo snafu'
+  - script: 'oc get configmaps test-config -o yaml -n integration-test-${{parameters.name}} | grep snafu'
+    displayName: Check ConfigMap
+  - bash: |
+      oc delete project integration-test-${{parameters.name}}
+    displayName: Delete namespace
+    condition: always()

@@ -1,0 +1,16 @@
+trigger: none
+pr: none
+
+jobs:
+- template: integration_job_v2.yml
+  parameters:
+    name: mac
+    vmImage: 'macOS-10.13'
+- template: integration_job_v2.yml
+  parameters:
+    name: linux
+    vmImage: 'ubuntu-16.04'
+- template: integration_job_v2.yml
+  parameters:
+    name: windows
+    vmImage: 'vs2017-win2016'

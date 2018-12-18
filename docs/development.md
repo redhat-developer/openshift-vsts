@@ -95,12 +95,14 @@ Do do a staging deploy you can specify a staging publisher by setting the `DEV_P
 
 ```bash
 > export TOKEN=<token>
-> export DEV_PUBLISHER=<stage/test publisher>
+> export DEV_PUBLISHER=<publisher>
 > npm run clean
 > npm run build
 > npm run extension:create:dev
 > npm run extension:publish:dev
 ```
+
+The [OpenShift VSTS](https://marketplace.visualstudio.com/manage/publishers/openshiftvsts) (OpenShiftVSTS) can be used as a shared development publisher.
 
 Once the extension is installed, you can share it with a given user:
 
