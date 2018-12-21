@@ -13,6 +13,7 @@ The following paragraphs guide you through the process of using this extension.
   - [Install and setup oc](#install-and-setup-oc)
   - [Executing single oc commands](#executing-single-oc-commands)
   - [Updating a ConfigMap](#updating-a-configmap)
+- [YAML configuration](#yaml-configuration)
 
 <!-- /MarkdownTOC -->
 
@@ -201,4 +202,50 @@ The _Update ConfigMap_ task has six configuration options.
 
 _**Note:** It is possible to use variables defined in the agent.
 For example, to reference a variable MY_VAR defined in the pipeline configuration, you can use ${MY_VAR} as the property value._
+
+<a id="yaml-configuration"></a>
+## YAML configuration
+
+You can also use the tasks of the OpenShift extension as part of a YAML defined pipeline.
+The following configuration shows an example for each of the provided tasks:
+
+
+```yaml
+jobs:
+- job: myjob
+  displayName: MyJob
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  # Install oc so that it can be used within a 'script' or bash 'task'
+  - task: oc-setup@2
+    displayName: Setup oc
+    inputs:
+      openshiftService: 'my_openshift_connection'
+  # A script task making use of 'oc'    
+  - script: |
+      oc new-project my-project
+      oc apply -f ${SYSTEM_DEFAULTWORKINGDIRECTORY}/openshift/config.yaml -n my-project
+    displayName: 
+  # Single shot 'oc' command
+  - task: oc-cmd@2
+    displayName: Wait for deployment
+    inputs:
+      openshiftService: 'my_openshift_connection'
+      cmd: 'rollout status -w deployment/my-app'
+  # Updating an existing ConfigMap
+  - task: config-map@2
+    displayName: Update ConfigMap
+    inputs:
+      openshiftService: 'my_openshift_connection'
+      configMapName: 'my-config'
+      namespace: 'my-project'
+      properties: '-my-key1 my-value1 -my-key2 my-value2'
+```
+
+_**Note:** With Azure DevOps YAML defined pipelines are currently only available for build pipelines.
+Configuration as code for release pipelines is under development.
+See [here](https://stackoverflow.com/questions/52323065/azure-devops-yaml-release-pipelines) and [here](https://dev.azure.com/mseng/Azure%20DevOps%20Roadmap/_workitems/edit/1221170)._
+
+
 
