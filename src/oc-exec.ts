@@ -1,7 +1,7 @@
 'use strict';
 
 import tl = require('vsts-task-lib/task');
-import stream = require("stream");
+import stream = require('stream');
 import { ToolRunner, IExecOptions } from 'vsts-task-lib/toolrunner';
 
 const sub = require('substituter');
