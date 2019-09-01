@@ -1,11 +1,11 @@
 {
   "manifestVersion": 1,
   "id": "openshift-vsts",
-  "publisher": "redhat",
-  "version": "1.3.0",
+  "publisher": "RedhatLuca",
+  "version": "0.0.67",
   "name": "OpenShift Extension",
   "description": "OpenShift tasks for Azure DevOps",
-  "public": true,
+  "public": false,
   "galleryFlags": [
     "Preview"
   ],
@@ -173,6 +173,17 @@
       "properties": {
         "name": "tasks/oc-setup"
       }
+    },
+    {
+      "id": "oc-cmd-json-task",
+      "description": "Task to run user-defined oc command with json inputs.",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "tasks/oc-cmd-json"
+      }
     }
   ],
   "icons": {
@@ -187,6 +198,9 @@
     },
     {
       "path": "tasks/oc-setup"
+    },
+    {
+      "path": "tasks/oc-cmd-json"
     }
   ]
 }

@@ -9,7 +9,7 @@ import * as auth from './oc-auth';
 async function run() {
   let version = task.getInput('version');
   let argLine = task.getInput('cmd');
-  let jsonPatch = task.getInput('json');
+  let json = task.getInput('json');
   let agentOS = task.osType();
 
   let ocPath = await install.installOc(version, agentOS);
@@ -18,8 +18,7 @@ async function run() {
   }
 
   await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
-  argLine = `${argLine} '${jsonPatch}'`;
-  await oc.execOc(ocPath, argLine);
+  await oc.execOc(ocPath, argLine, json);
 }
 
 run()

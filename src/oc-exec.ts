@@ -14,14 +14,18 @@ const split = require('argv-split');
  */
 export async function execOc(
   ocPath: string | null,
-  argLine: string
+  argLine: string,
+  json?: string
 ): Promise<void> {
   if (ocPath === null) {
     ocPath = 'oc';
   }
 
   let oc: ToolRunner = tl.tool(ocPath);
-  for (let arg of prepareOcArguments(argLine)) {
+  let args = prepareOcArguments(argLine);
+  args = mergeJsonInOcArguments(args, json);
+
+  for (let arg of args) {
     oc.arg(arg);
   }
   await oc.exec();
@@ -41,4 +45,28 @@ export function prepareOcArguments(argLine: string): string[] {
     args = args.slice(1);
   }
   return args;
+}
+
+export function mergeJsonInOcArguments(args: string[], json?: string): string[] {
+  if (!json) {
+    return args;
+  }
+
+  tl.debug(`json ${json}`);
+
+  const jsonObj = JSON.parse(json);
+  
+  const argsJsonValue = args.map(item => {
+    for (const e of Object.keys(jsonObj)) {
+        if (item.indexOf(e) > -1) {
+            //current arg (item) contains json Obj property
+            item = item.replace(e, JSON.stringify(jsonObj[e]));
+        }
+    }
+
+    return item;
+  });
+
+  return argsJsonValue;
+  
 }
