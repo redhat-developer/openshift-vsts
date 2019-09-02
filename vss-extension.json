@@ -1,11 +1,11 @@
 {
   "manifestVersion": 1,
   "id": "openshift-vsts",
-  "publisher": "RedhatLuca",
-  "version": "0.0.67",
+  "publisher": "redhat",
+  "version": "1.3.0",
   "name": "OpenShift Extension",
   "description": "OpenShift tasks for Azure DevOps",
-  "public": false,
+  "public": true,
   "galleryFlags": [
     "Preview"
   ],

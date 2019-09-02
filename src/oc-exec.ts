@@ -47,7 +47,17 @@ export function prepareOcArguments(argLine: string): string[] {
   return args;
 }
 
-export function mergeJsonInOcArguments(args: string[], json?: string): string[] {
+/**
+ * Replace arguments with the json values if needed
+ *
+ * @param args Array of arguments to be passed before executing oc command
+ * @param json String containing json value which has to be inserted inside args
+ * @return array of arguments with potential json values
+ */
+export function mergeJsonInOcArguments(
+  args: string[],
+  json?: string
+): string[] {
   if (!json) {
     return args;
   }
@@ -55,18 +65,16 @@ export function mergeJsonInOcArguments(args: string[], json?: string): string[] 
   tl.debug(`json ${json}`);
 
   const jsonObj = JSON.parse(json);
-  
-  const argsJsonValue = args.map(item => {
-    for (const e of Object.keys(jsonObj)) {
-        if (item.indexOf(e) > -1) {
-            //current arg (item) contains json Obj property
-            item = item.replace(e, JSON.stringify(jsonObj[e]));
-        }
-    }
 
+  const argsJsonMerged = args.map(item => {
+    for (const jsonProp of Object.keys(jsonObj)) {
+      if (item.indexOf(jsonProp) > -1) {
+        // current arg (item) contains json Obj property
+        item = item.replace(jsonProp, JSON.stringify(jsonObj[jsonProp]));
+      }
+    }
     return item;
   });
 
-  return argsJsonValue;
-  
+  return argsJsonMerged;
 }
