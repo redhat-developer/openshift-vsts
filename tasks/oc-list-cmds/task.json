@@ -1,0 +1,53 @@
+{
+  "id": "4c18ba07-df95-4741-aeaa-ff2c1ca77164",
+  "name": "oc-list-cmds",
+  "friendlyName": "Execute oc commands",
+  "description": "OpenShift execute CLI commands.",
+  "author": "Hardy Ferentschik",
+  "helpMarkDown": "See [getting started](https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md)",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "preview": true,
+  "demands": [],
+  "version": {
+    "Major": 2,
+    "Minor": 0,
+    "Patch": 12
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "oc-cmds $(message)",
+  "inputs": [
+    {
+      "name": "openshiftService",
+      "type": "connectedService:openshift",
+      "label": "OpenShift service connection",
+      "required": true,
+      "helpMarkDown": "Select OpenShift service connection to use."
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "label": "Version of oc to use",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
+    },
+    {
+      "name": "cmds",
+      "type": "string",
+      "label": "Commands to run",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Specify the oc commands to run."
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "lib/oc-exec-list-tasks.js",
+      "workingDirectory": "$(currentDirectory)"
+    }
+  }
+}

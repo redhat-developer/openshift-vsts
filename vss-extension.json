@@ -1,11 +1,11 @@
 {
   "manifestVersion": 1,
   "id": "openshift-vsts",
-  "publisher": "redhat",
-  "version": "1.3.0",
+  "publisher": "RedhatLuca",
+  "version": "0.0.69",
   "name": "OpenShift Extension",
   "description": "OpenShift tasks for Azure DevOps",
-  "public": true,
+  "public": false,
   "galleryFlags": [
     "Preview"
   ],
@@ -153,6 +153,17 @@
       }
     },
     {
+      "id": "oc-list-cmds-task",
+      "description": "Task to run a list of user-defined oc commands.",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "tasks/oc-list-cmds"
+      }
+    },
+    {
       "id": "config-map-task",
       "description": "Task to apply ConfigMap properties.",
       "type": "ms.vss-distributed-task.task",
@@ -181,6 +192,9 @@
   "files": [
     {
       "path": "tasks/oc-cmd"
+    },
+    {
+      "path": "tasks/oc-list-cmds"
     },
     {
       "path": "tasks/config-map"
