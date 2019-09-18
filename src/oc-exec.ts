@@ -15,8 +15,10 @@ const split = require('argv-split');
  */
 export async function execOc(
   ocPath: string | null,
-  argLine: string
+  argLine: string,
+  ignoreFlag?: boolean
 ): Promise<void> {
+  
   if (ocPath === null) {
     ocPath = 'oc';
   }
@@ -26,16 +28,21 @@ export async function execOc(
     oc.arg(arg);
   }
 
-  const options: IExecOptions = {
-    cwd: process.cwd(),
-    env: Object.assign({}, process.env) as { [key: string]: string },
-    silent: false,
-    failOnStdErr: false,
-    ignoreReturnCode: true,
-    windowsVerbatimArguments: false,
-    outStream: process.stdout as stream.Writable,
-    errStream: process.stderr as stream.Writable
-  };
+  let options: IExecOptions | undefined = undefined;
+  
+  if (ignoreFlag) {
+    tl.debug(`creating options`);
+    options = {
+      cwd: process.cwd(),
+      env: Object.assign({}, process.env) as { [key: string]: string },
+      silent: false,
+      failOnStdErr: false,
+      ignoreReturnCode: true,
+      windowsVerbatimArguments: false,
+      outStream: process.stdout as stream.Writable,
+      errStream: process.stderr as stream.Writable
+    };    
+  } 
 
   await oc.exec(options);
   return;

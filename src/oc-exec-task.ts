@@ -9,6 +9,7 @@ import * as auth from './oc-auth';
 async function run() {
   let version = task.getInput('version');
   let argLine = task.getInput('cmd');
+  const ignoreFlag: boolean = task.getBoolInput('ignoreFlag');
   let agentOS = task.osType();
 
   let ocPath = await InstallHandler.installOc(version, agentOS);
@@ -17,7 +18,7 @@ async function run() {
   }
 
   await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
-  await oc.execOc(ocPath, argLine);
+  await oc.execOc(ocPath, argLine, ignoreFlag);
 }
 
 run()

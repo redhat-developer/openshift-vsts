@@ -42,6 +42,14 @@
       "defaultValue": "",
       "required": true,
       "helpMarkDown": "Specify the oc command to run."
+    },
+    {
+      "name": "ignoreFlag",
+      "type": "boolean",
+      "label": "Ignore non success return value",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Specify if the non success return value of the oc command run has to be ignored. E.g if the command oc create/delete/... fail because the resource has already been created/deleted/.. the pipeline will continue its execution"
     }
   ],
   "execution": {
