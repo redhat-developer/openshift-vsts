@@ -1,6 +1,6 @@
 let expect = require('chai').expect;
 
-import { ConfigMap } from '../src/lib/config-map';
+import { ConfigMap } from '../src/config-map';
 
 describe('ConfigMap', function() {
   describe('#constructor', function() {

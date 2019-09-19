@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import path = require('path');
-import { OpenShiftEndpoint } from '../src/lib/oc-auth';
+import { OpenShiftEndpoint } from '../src/oc-auth';
 let chai = require('chai');
 chai.use(require('chai-fs'));
 let expect = chai.expect;
