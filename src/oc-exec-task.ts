@@ -3,7 +3,7 @@
 import task = require('vsts-task-lib/task');
 import oc = require('./oc-exec');
 
-import * as install from './oc-install';
+import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
 
 async function run() {
@@ -11,7 +11,7 @@ async function run() {
   let argLine = task.getInput('cmd');
   let agentOS = task.osType();
 
-  let ocPath = await install.installOc(version, agentOS);
+  let ocPath = await InstallHandler.installOc(version, agentOS);
   if (ocPath === null) {
     throw new Error('no oc binary found');
   }
