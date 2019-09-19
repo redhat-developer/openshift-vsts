@@ -34,7 +34,7 @@ export class InstallHandler {
     osType: string
   ): Promise<string | null> {
     if (!downloadVersion) {
-      downloadVersion = await latestStable();
+      downloadVersion = await InstallHandler.latestStable();
     }
 
     tl.debug('creating download directory');
@@ -50,7 +50,7 @@ export class InstallHandler {
     if (validUrl.isWebUri(downloadVersion)) {
       url = downloadVersion;
     } else {
-      url = await ocBundleURL(downloadVersion, osType);
+      url = await InstallHandler.ocBundleURL(downloadVersion, osType);
     }
 
     if (url === null) {
@@ -59,7 +59,7 @@ export class InstallHandler {
     }
 
     tl.debug(`downloading: ${url}`);
-    let ocBinary = await downloadAndExtract(url, downloadDir, osType);
+    let ocBinary = await InstallHandler.downloadAndExtract(url, downloadDir, osType);
     if (ocBinary === null) {
       tl.setResult(
         tl.TaskResult.Failed,

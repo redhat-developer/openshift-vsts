@@ -2,17 +2,17 @@
 
 import task = require('vsts-task-lib/task');
 
-import * as install from './oc-install';
+import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
 
 async function run() {
   let version = task.getInput('version');
   let agentOS = task.osType();
-  let ocPath = await install.installOc(version, agentOS);
+  let ocPath = await InstallHandler.installOc(version, agentOS);
   if (ocPath === null) {
     throw new Error('no oc binary found');
   }
-  await install.addOcToPath(ocPath, agentOS);
+  await InstallHandler.addOcToPath(ocPath, agentOS);
   await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
 }
 
