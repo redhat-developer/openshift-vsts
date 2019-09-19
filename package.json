@@ -6,7 +6,7 @@
   "scripts": {
     "all": "npm install && npm run build && npm run test",
     "setup": "npm install -g tfx-cli typescript json del-cli copy-node-modules markserv",
-    "clean": "del-cli **/out **/lib **/node_modules **/.taskkey",
+    "clean": "del-cli **/out **/node_modules **/.taskkey",
     "build": "tsc -b .",
     "build:watch": "tsc -b tsconfig.json -w",
     "docs": "markserv .",
@@ -18,7 +18,7 @@
     "prettier:check": "npm run prettier:base -- --list-different \"**/*.ts\"",
     "prettier:write": "npm run prettier:base -- --write \"**/*.ts\"",
     "copy-node-modules": "for i in `ls tasks` ; do copy-node-modules . tasks/$i; done",
-    "copy-task-lib": "for i in `ls tasks` ; do cp -r src/lib tasks/$i/; done",
+    "copy-task-lib": "for i in `ls tasks` ; do cp -r out/src tasks/$i/; done",
     "bump-task-version": "for i in `ls tasks` ; do TASK=$(cat tasks/$i/task.json | json -e 'this.version.Patch++'); echo \"$TASK\" > tasks/$i/task.json; done",
     "extension:version:set": "JSON=$(cat vss-extension.json | json -e \"this.version='${EXT_VERSION}'\") && echo \"$JSON\" > vss-extension.json",
     "extension:version:view": "cat vss-extension.json | json version",
