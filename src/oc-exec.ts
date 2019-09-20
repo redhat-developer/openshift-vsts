@@ -1,8 +1,7 @@
 'use strict';
 
 import tl = require('vsts-task-lib/task');
-import stream = require('stream');
-import { ToolRunner, IExecOptions } from 'vsts-task-lib/toolrunner';
+import { ToolRunner } from 'vsts-task-lib/toolrunner';
 
 const sub = require('substituter');
 const split = require('argv-split');
@@ -25,19 +24,7 @@ export async function execOc(
   for (let arg of prepareOcArguments(argLine)) {
     oc.arg(arg);
   }
-
-  const options: IExecOptions = {
-    cwd: process.cwd(),
-    env: Object.assign({}, process.env) as { [key: string]: string },
-    silent: false,
-    failOnStdErr: false,
-    ignoreReturnCode: true,
-    windowsVerbatimArguments: false,
-    outStream: process.stdout as stream.Writable,
-    errStream: process.stderr as stream.Writable
-  };
-
-  await oc.exec(options);
+  await oc.exec();
   return;
 }
 
