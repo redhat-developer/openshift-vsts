@@ -23,7 +23,7 @@
     "test:report:ci": "npm run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=out/test-report.xml",
     "prettier:base": "prettier --parser typescript --single-quote",
     "prettier:check": "npm run prettier:base -- --list-different \"**/*.ts\"",
-    "prettier:write": "npm run prettier:base -- --write \"**/*.ts\"",
+    "prettier:write": "npm run prettier:base -- --write \"**/**/*.ts\"",
     "copy-node-modules": "for i in `ls tasks` ; do copy-node-modules . tasks/$i; done",
     "copy-task-lib": "for i in `ls tasks` ; do cp -r out/src/. tasks/$i/lib/; done",
     "bump-task-version": "for i in `ls tasks` ; do TASK=$(cat tasks/$i/task.json | json -e 'this.version.Patch++'); echo \"$TASK\" > tasks/$i/task.json; done",

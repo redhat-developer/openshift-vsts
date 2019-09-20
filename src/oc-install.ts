@@ -20,7 +20,6 @@ if (process.env['GITHUB_ACCESS_TOKEN']) {
 }
 
 export class InstallHandler {
-
   /**
    * Downloads the specified version of the oc CLI and returns the full path to
    * the executable.
@@ -54,12 +53,19 @@ export class InstallHandler {
     }
 
     if (url === null) {
-      tl.setResult(tl.TaskResult.Failed, 'Unable to determine oc download URL.');
+      tl.setResult(
+        tl.TaskResult.Failed,
+        'Unable to determine oc download URL.'
+      );
       return null;
     }
 
     tl.debug(`downloading: ${url}`);
-    let ocBinary = await InstallHandler.downloadAndExtract(url, downloadDir, osType);
+    let ocBinary = await InstallHandler.downloadAndExtract(
+      url,
+      downloadDir,
+      osType
+    );
     if (ocBinary === null) {
       tl.setResult(
         tl.TaskResult.Failed,
