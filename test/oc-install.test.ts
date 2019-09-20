@@ -52,7 +52,7 @@ describe('InstallHandler', function() {
       const ocBundleStub = sandbox
         .stub(InstallHandler, 'ocBundleURL')
         .resolves(null);
-      await InstallHandler.installOc('', 'Darwin');
+      await InstallHandler.installOc('v3.10.0', 'Darwin');
       expect(ocBundleStub.calledOnce).to.be.true;
     });
 
