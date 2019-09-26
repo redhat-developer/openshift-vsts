@@ -53,11 +53,7 @@ export class InstallHandler {
     }
 
     if (url === null) {
-      tl.setResult(
-        tl.TaskResult.Failed,
-        'Unable to determine oc download URL.'
-      );
-      return null;
+      return Promise.reject('Unable to determine oc download URL.');
     }
 
     tl.debug(`downloading: ${url}`);
@@ -67,11 +63,7 @@ export class InstallHandler {
       osType
     );
     if (ocBinary === null) {
-      tl.setResult(
-        tl.TaskResult.Failed,
-        'Unable to download or extract oc binary.'
-      );
-      return null;
+      return Promise.reject('Unable to download or extract oc binary.');
     }
 
     return ocBinary;
