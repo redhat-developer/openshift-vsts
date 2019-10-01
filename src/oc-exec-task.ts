@@ -10,9 +10,10 @@ async function run() {
   let version = task.getInput('version');
   let argLine = task.getInput('cmd');
   const ignoreFlag: boolean = task.getBoolInput('ignoreFlag');
+  const useLocalOc: boolean = task.getBoolInput('useLocalOc');
   let agentOS = task.osType();
 
-  let ocPath = await InstallHandler.installOc(version, agentOS);
+  let ocPath = await InstallHandler.installOc(version, agentOS, useLocalOc);
   if (ocPath === null) {
     throw new Error('no oc binary found');
   }

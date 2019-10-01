@@ -2,7 +2,7 @@
 
 import tl = require('vsts-task-lib/task');
 import stream = require('stream');
-import { ToolRunner, IExecOptions } from 'vsts-task-lib/toolrunner';
+import { ToolRunner, IExecOptions, IExecSyncResult } from 'vsts-task-lib/toolrunner';
 
 const sub = require('substituter');
 const split = require('argv-split');
@@ -60,4 +60,31 @@ export function prepareOcArguments(argLine: string): string[] {
     args = args.slice(1);
   }
   return args;
+}
+
+export function execOcSync(
+  ocPath: string | null,
+  argLine: string
+) : IExecSyncResult | undefined {
+  if (ocPath === null) {
+    ocPath = 'oc';
+  }
+
+  let oc: ToolRunner = tl.tool(ocPath);
+  for (let arg of prepareOcArguments(argLine)) {
+    oc.arg(arg);
+  }
+
+  try {
+    const result: IExecSyncResult = oc.execSync();
+    tl.debug(`execSync executed`);
+    tl.debug(`stdout ${result.stdout}`);
+    tl.debug(`stderr ${result.stderr}`);
+    tl.debug(`error ${result.error.message}`);
+    return result;
+  } catch (ex) {
+    tl.debug(`error ex ${ex}`);
+  }
+  
+  return;
 }

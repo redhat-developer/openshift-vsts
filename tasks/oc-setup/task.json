@@ -34,6 +34,14 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
+    },
+    {
+      "name": "uselocalOc",
+      "type": "boolean",
+      "label": "use local oc executable",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check if oc is already installed in the machine and use that if available"
     }
   ],
   "execution": {

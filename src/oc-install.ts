@@ -3,7 +3,8 @@
 import tl = require('vsts-task-lib/task');
 import fs = require('fs');
 import path = require('path');
-import { ToolRunner } from 'vsts-task-lib/toolrunner';
+import { ToolRunner, IExecSyncResult } from 'vsts-task-lib/toolrunner';
+import { execOcSync } from './oc-exec';
 
 const validUrl = require('valid-url');
 const decompress = require('decompress');
@@ -30,8 +31,16 @@ export class InstallHandler {
    */
   static async installOc(
     downloadVersion: string,
-    osType: string
+    osType: string,
+    useLocalOc: boolean
   ): Promise<string | null> {
+    if (useLocalOc) {
+      const localOcPath = InstallHandler.getLocalOcPath(downloadVersion);
+      if (localOcPath) {
+        return localOcPath;
+      }
+    }
+
     if (!downloadVersion) {
       downloadVersion = await InstallHandler.latestStable();
     }
@@ -271,4 +280,50 @@ export class InstallHandler {
       tl.setVariable('PATH', dir + ':' + tl.getVariable('PATH'));
     }
   }
+
+  static getLocalOcPath(version?: string): string | undefined {
+    let ocPath: string | undefined = undefined;
+    try {
+      ocPath = tl.which('oc');
+      tl.debug(`ocPath ${ocPath}`);
+    } catch (ex) {
+      tl.debug('Oc has not been found on this machine. Err ' + ex);
+    }
+    
+    if (version && ocPath) {
+      const localOcVersion = InstallHandler.getOcVersion(ocPath);
+      tl.debug(`localOcVersion ${localOcVersion} vs ${version}`);
+      if (!localOcVersion || localOcVersion.toLowerCase() !== version.toLowerCase()) {
+        return undefined;
+      }    
+    }
+  
+    return ocPath;
+  }
+  
+  static getOcVersion(ocPath: string) {
+    let result: IExecSyncResult | undefined = execOcSync(ocPath, 'version --short=true --client=true');
+  
+    if (!result || result.error) {
+      tl.debug(`error ${result ? result.error.message : ''} - ${result ? result.error.stack : ''}`);
+      // if oc version failed we're dealing with oc < 4.1
+      result = execOcSync(ocPath, 'version');
+    }
+  
+    if (!result || !result.stdout) {
+      tl.debug('stdout empty');
+      return undefined;
+    }
+  
+    tl.debug(`stdout ${result.stdout}`);
+    const regexVersion = new RegExp("v[0-9]+.[0-9]+.[0-9]+");
+    const versionObj = regexVersion.exec(result.stdout);
+  
+    if (versionObj && versionObj.length > 0) {
+      return versionObj[0];
+    }
+  
+    return undefined;
+  }
 }
+
