@@ -65,7 +65,7 @@ export function prepareOcArguments(argLine: string): string[] {
 export function execOcSync(
   ocPath: string | null,
   argLine: string
-) : IExecSyncResult | undefined {
+): IExecSyncResult | undefined {
   if (ocPath === null) {
     ocPath = 'oc';
   }
@@ -77,14 +77,12 @@ export function execOcSync(
 
   try {
     const result: IExecSyncResult = oc.execSync();
-    tl.debug(`execSync executed`);
-    tl.debug(`stdout ${result.stdout}`);
-    tl.debug(`stderr ${result.stderr}`);
-    tl.debug(`error ${result.error.message}`);
+    tl.debug(`stdout ${result && result.stdout ? result.stdout : ''}`);
+    tl.debug(`stderr ${result && result.stderr ? result.stderr : ''}`);
     return result;
   } catch (ex) {
     tl.debug(`error ex ${ex}`);
   }
-  
+
   return;
 }
