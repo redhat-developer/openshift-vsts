@@ -33,7 +33,7 @@ node('rhel7'){
 
 	if(params.UPLOAD_LOCATION) {
 		stage('Snapshot') {
-			def filesToPush = findFiles(glob: '*.vsix')
+			def filesToPush = findFiles(glob: '**.vsix')
             def extensionJson = readJSON file: 'vss-extension.json'
 			sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/openshift-vsts/openshift-vsts-${extensionJson.version}-${env.BUILD_NUMBER}.vsix"
             stash name:'vsix', includes:filesToPush[0].path
