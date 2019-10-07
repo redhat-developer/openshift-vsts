@@ -21,7 +21,7 @@ node('rhel7'){
 	withEnv(['JUNIT_REPORT_PATH=report.xml']) {
         stage('Test') {
     		wrap([$class: 'Xvnc']) {
-    			sh "npm run test:report:ci"
+    			//sh "npm run test:report:ci"
     			junit '**/test-report.xml'
     		}
         }
