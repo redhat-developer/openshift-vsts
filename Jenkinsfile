@@ -3,7 +3,7 @@
 node('rhel7'){
 	stage('Checkout repo') {
 		deleteDir()
-		git url: 'https://github.com/jeffmaury/openshift-vsts.git',
+		git url: 'https://github.com/redhat-developer/openshift-vsts.git',
 			branch: "${BRANCH}"
 	}
 
@@ -21,8 +21,8 @@ node('rhel7'){
 	withEnv(['JUNIT_REPORT_PATH=report.xml']) {
         stage('Test') {
     		wrap([$class: 'Xvnc']) {
-    			//sh "npm run test:report:ci"
-    			//junit '**/test-report.xml'
+    			sh "npm run test:report:ci"
+    			junit '**/test-report.xml'
     		}
         }
 	}
