@@ -28,7 +28,7 @@ node('rhel7'){
 	}
 
 	stage('Package') {
-        sh "npm run extension:create:dev"
+        sh "npm run extension:create"
 	}
 
 	if(params.UPLOAD_LOCATION) {
