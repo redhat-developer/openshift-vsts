@@ -22,7 +22,7 @@ node('rhel7'){
         stage('Test') {
     		wrap([$class: 'Xvnc']) {
     			//sh "npm run test:report:ci"
-    			junit '**/test-report.xml'
+    			//junit '**/test-report.xml'
     		}
         }
 	}
