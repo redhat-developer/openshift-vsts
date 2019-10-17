@@ -8,8 +8,8 @@ import * as auth from './oc-auth';
 async function run() {
   let version = task.getInput('version');
   let agentOS = task.osType();
-  const useLocalOc: boolean = task.getBoolInput('useLocalOc');
-  let ocPath = await InstallHandler.installOc(version, agentOS, useLocalOc);
+
+  let ocPath = await InstallHandler.installOc(version, agentOS, false);
   if (ocPath === null) {
     throw new Error('no oc binary found');
   }
