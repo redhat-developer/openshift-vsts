@@ -87,8 +87,7 @@
     "sinon": "^7.4.2",
     "ts-mocha": "^2.0.0",
     "ts-node": "^7.0.1",
-    "typescript": "^3.1.2",
-    "vscode": "^1.1.33"
+    "typescript": "^3.1.2"
   },
   "config": {
     "commit-message-validator": {
