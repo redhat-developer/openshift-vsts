@@ -1,7 +1,19 @@
 {
-    "files": [],
-    "references": [
-        { "path": "src" },
-        { "path": "test" }
-    ]
+    "compilerOptions": {
+        "composite": true,
+        "target": "es6",
+        "module": "commonjs",
+        "sourceMap": true,
+        "declaration": true,
+        "strict": false,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "lib": [
+            "es2015"
+        ],
+        "outDir": "out",
+        "rootDir": "."
+    }
 }
