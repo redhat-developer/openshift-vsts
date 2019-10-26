@@ -19,9 +19,13 @@ jobs:
           verbose: false
       - script: |
           npm run setup
+        displayName: 'npm run setup'
+      - script: |
           npm install
+        displayName: 'npm install'
+      - script: |
           npm run build
-        displayName: 'npm run setup, install, run build'
+        displayName: 'npm run build'
       - script: |
           npm run test:report:ci
         displayName: 'Run tests'  
@@ -31,11 +35,6 @@ jobs:
           testRunTitle: 'Test results'  
       - script: npm run prettier:check
         displayName: Syntax check
-      - script: npm run extension:version:set
-        displayName: Set release version
-        condition: eq(variables['release'], 'true')
-      - script: npm run extension:create:dev
-        displayName: Build extension
   - job: macOS
     pool:
       name: Hosted macOS
@@ -51,9 +50,13 @@ jobs:
           verbose: false
       - script: |
           npm run setup
+        displayName: 'npm run setup'
+      - script: |
           npm install
+        displayName: 'npm install'
+      - script: |
           npm run build
-        displayName: 'npm run setup, install, run build'
+        displayName: 'npm run build'
       - script: |
           npm run test:report:ci
         displayName: 'Run tests'  
@@ -63,11 +66,6 @@ jobs:
           testRunTitle: 'Test results'  
       - script: npm run prettier:check
         displayName: Syntax check
-      - script: npm run extension:version:set
-        displayName: Set release version
-        condition: eq(variables['release'], 'true')
-      - script: npm run extension:create:dev
-        displayName: Build extension
   - job: Linux
     pool:
       name: Hosted Ubuntu 1604
@@ -82,9 +80,13 @@ jobs:
           verbose: false
       - script: |
           npm run setup
+        displayName: 'npm run setup'
+      - script: |
           npm install
+        displayName: 'npm install'
+      - script: |
           npm run build
-        displayName: 'npm run setup, install, run build'
+        displayName: 'npm run build'
       - script: |
           npm run test:report:ci
         displayName: 'Run tests'  
@@ -94,8 +96,3 @@ jobs:
           testRunTitle: 'Test results'  
       - script: npm run prettier:check
         displayName: Syntax check
-      - script: npm run extension:version:set
-        displayName: Set release version
-        condition: eq(variables['release'], 'true')
-      - script: npm run extension:create:dev
-        displayName: Build extension
