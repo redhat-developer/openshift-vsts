@@ -18,7 +18,6 @@ export async function execOc(
   argLine: string,
   ignoreFlag?: boolean
 ): Promise<void> {
-  
   if (ocPath === null) {
     ocPath = 'oc';
   }
@@ -29,7 +28,7 @@ export async function execOc(
   }
 
   let options: IExecOptions | undefined = undefined;
-  
+
   if (ignoreFlag) {
     tl.debug(`creating options`);
     options = {
@@ -41,8 +40,8 @@ export async function execOc(
       windowsVerbatimArguments: false,
       outStream: process.stdout as stream.Writable,
       errStream: process.stderr as stream.Writable
-    };    
-  } 
+    };
+  }
 
   await oc.exec(options);
   return;
