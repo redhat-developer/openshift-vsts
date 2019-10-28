@@ -300,35 +300,35 @@ export class InstallHandler {
         return undefined;
       }
     }
-  
+
     return ocPath;
   }
-  
+
   static getOcVersion(ocPath: string) {
     let result: IExecSyncResult | undefined = execOcSync(
       ocPath,
       'version --short=true --client=true'
     );
-  
+
     if (!result || result.stderr) {
       tl.debug(`error ${result && result.stderr ? result.stderr : ''}`);
       // if oc version failed we're dealing with oc < 4.1
       result = execOcSync(ocPath, 'version');
     }
-  
+
     if (!result || !result.stdout) {
       tl.debug('stdout empty');
       return undefined;
     }
-  
+
     tl.debug(`stdout ${result.stdout}`);
     const regexVersion = new RegExp('v[0-9]+.[0-9]+.[0-9]+');
     const versionObj = regexVersion.exec(result.stdout);
-  
+
     if (versionObj && versionObj.length > 0) {
       return versionObj[0];
     }
-  
+
     return undefined;
-  }  
+  }
 }

@@ -84,5 +84,5 @@ export function execOcSync(
     tl.debug(`error ex ${ex}`);
   }
 
-  return;
+  return undefined;
 }

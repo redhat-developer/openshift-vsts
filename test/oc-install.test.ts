@@ -31,7 +31,7 @@ describe('InstallHandler', function() {
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(InstallHandler, 'ocBundleURL').resolves('url');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      await InstallHandler.installOc('', 'Darwin');
+      await InstallHandler.installOc('', 'Darwin', false);
       expect(latestStub.calledOnce).to.be.true;
     });
 
@@ -42,7 +42,7 @@ describe('InstallHandler', function() {
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(InstallHandler, 'ocBundleURL').resolves('url');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      await InstallHandler.installOc('version', 'Darwin');
+      await InstallHandler.installOc('version', 'Darwin', false);
       expect(latestStub.calledOnce).to.be.false;
     });
 
@@ -53,7 +53,7 @@ describe('InstallHandler', function() {
         .stub(InstallHandler, 'ocBundleURL')
         .resolves('url');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      await InstallHandler.installOc('v3.10.0', 'Darwin');
+      await InstallHandler.installOc('v3.10.0', 'Darwin', false);
       expect(ocBundleStub.calledOnce).to.be.true;
     });
 
@@ -62,7 +62,7 @@ describe('InstallHandler', function() {
       sandbox.stub(validUrl, 'isWebUri').returns('');
       sandbox.stub(InstallHandler, 'ocBundleURL').resolves(null);
       try {
-        await InstallHandler.installOc('path', 'Darwin');
+        await InstallHandler.installOc('path', 'Darwin', false);
         expect.fail();
       } catch (ex) {
         expect(ex).equals('Unable to determine oc download URL.');
@@ -75,7 +75,8 @@ describe('InstallHandler', function() {
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
       await InstallHandler.installOc(
         'https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip',
-        'Darwin'
+        'Darwin',
+        false
       );
       expect(ocBundleStub.calledOnce).to.be.false;
     });
@@ -85,7 +86,7 @@ describe('InstallHandler', function() {
       sandbox.stub(validUrl, 'isWebUri').returns('path');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves(null);
       try {
-        await InstallHandler.installOc('path', 'Darwin');
+        await InstallHandler.installOc('path', 'Darwin', false);
         expect.fail();
       } catch (ex) {
         expect(ex).equals('Unable to download or extract oc binary.');
@@ -96,7 +97,7 @@ describe('InstallHandler', function() {
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(validUrl, 'isWebUri').returns('path');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      const result = await InstallHandler.installOc('path', 'Darwin');
+      const result = await InstallHandler.installOc('path', 'Darwin', false);
       expect(result).equals('path');
     });
   });
