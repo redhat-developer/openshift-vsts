@@ -53,7 +53,7 @@ export class InstallHandler {
     }
 
     if (url === null) {
-      return Promise.reject('Unable to determine oc download URL.');
+      return Promise.reject('Unable to determine oc download URL');
     }
 
     tl.debug(`downloading: ${url}`);
