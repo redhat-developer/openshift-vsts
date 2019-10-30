@@ -1,0 +1,61 @@
+{
+  "id": "f90cb14b-ec6b-41e8-9d5d-c46cd21d1346",
+  "name": "oc-cmd-json",
+  "friendlyName": "Execute oc command with Json Helper",
+  "description": "OpenShift execute CLI command with Json Helper.",
+  "author": "Hardy Ferentschik",
+  "helpMarkDown": "See [getting started](https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md)",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "preview": true,
+  "demands": [],
+  "version": {
+    "Major": 2,
+    "Minor": 0,
+    "Patch": 12
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "oc-cmd-json $(message)",
+  "inputs": [
+    {
+      "name": "openshiftService",
+      "type": "connectedService:openshift",
+      "label": "OpenShift service connection",
+      "required": true,
+      "helpMarkDown": "Select OpenShift service connection to use."
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "label": "Version of oc to use",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
+    },
+    {
+      "name": "cmd",
+      "type": "string",
+      "label": "Command to run",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Specify the oc command to run."
+    },
+    {
+      "name": "json",
+      "type": "string",
+      "label": "Json which will be merged with the command",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Specify the json string which will be used in the command."
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "lib/oc-exec-json-task.js",
+      "workingDirectory": "$(currentDirectory)"
+    }
+  }
+}

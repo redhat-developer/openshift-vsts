@@ -173,6 +173,17 @@
       "properties": {
         "name": "tasks/oc-setup"
       }
+    },
+    {
+      "id": "oc-cmd-json-task",
+      "description": "Task to run user-defined oc command with json inputs.",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "tasks/oc-cmd-json"
+      }
     }
   ],
   "icons": {
@@ -187,6 +198,9 @@
     },
     {
       "path": "tasks/oc-setup"
+    },
+    {
+      "path": "tasks/oc-cmd-json"
     }
   ]
 }
