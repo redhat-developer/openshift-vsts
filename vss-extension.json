@@ -153,6 +153,17 @@
       }
     },
     {
+      "id": "oc-list-cmds-task",
+      "description": "Task to run a list of user-defined oc commands.",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "tasks/oc-list-cmds"
+      }
+    },
+    {
       "id": "config-map-task",
       "description": "Task to apply ConfigMap properties.",
       "type": "ms.vss-distributed-task.task",
@@ -181,6 +192,9 @@
   "files": [
     {
       "path": "tasks/oc-cmd"
+    },
+    {
+      "path": "tasks/oc-list-cmds"
     },
     {
       "path": "tasks/config-map"
