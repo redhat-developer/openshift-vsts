@@ -76,6 +76,7 @@
     "chai": "^4.2.0",
     "chai-fs": "^2.0.0",
     "commit-message-validator": "^0.1.6",
+    "copy-node-modules": "^1.1.1",
     "husky": "^1.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
