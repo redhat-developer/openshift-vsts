@@ -281,6 +281,12 @@ export class InstallHandler {
     }
   }
 
+  /**
+   * Retrieve the path of the oc CLI installed in the machine.
+   *
+   * @param version the version of `oc` to be used. If not specified any `oc` version, if found, will be used.
+   * @return the full path to the installed executable or undefined if the oc CLI version requested is not found.
+   */
   static getLocalOcPath(version?: string): string | undefined {
     let ocPath: string | undefined = undefined;
     try {

@@ -5,9 +5,11 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 
 import { InstallHandler } from '../src/oc-install';
+import * as ocExec from '../src/oc-exec';
 import * as validUrl from 'valid-url';
 
 import tl = require('vsts-task-lib/task');
+import { IExecSyncResult } from 'vsts-task-lib/toolrunner';
 
 describe('InstallHandler', function() {
   let sandbox: sinon.SinonSandbox;
@@ -162,6 +164,107 @@ describe('InstallHandler', function() {
         .catch(function(err: Error) {
           expect(err.message).to.eq('path cannot be null or empty');
         });
+    });
+  });
+
+  describe('#getlocalOcPath', function() {
+    it('returns path found by which if no error occurs and there is no version as input', function() {
+      const whichStub = sandbox.stub(tl, 'which').returns('path');
+      const res = InstallHandler.getLocalOcPath();
+      sinon.assert.calledWith(whichStub, 'oc');
+      expect(res).equals('path');
+    });
+
+    it('returns undefined if which fails retrieving oc path', function() {
+      sandbox.stub(tl, 'which').throws();
+      const res = InstallHandler.getLocalOcPath('1.1');
+      expect(res).equals(undefined);
+    });
+
+    it('returns nothing if oc path exists but oc version cannot be retrieved', function() {
+      sandbox.stub(tl, 'which').returns('path');
+      const getOcStub = sandbox
+        .stub(InstallHandler, 'getOcVersion')
+        .returns(undefined);
+      const res = InstallHandler.getLocalOcPath('1.1');
+      sinon.assert.calledWith(getOcStub, 'path');
+      expect(res).equals(undefined);
+    });
+
+    it('returns nothing if version found locally is not the one user wants to use', function() {
+      sandbox.stub(tl, 'which').returns('path');
+      sandbox.stub(InstallHandler, 'getOcVersion').returns('2.1');
+      const res = InstallHandler.getLocalOcPath('1.1');
+      expect(res).equals(undefined);
+    });
+  });
+
+  describe('#getOcVersion', function() {
+    const versionRes: IExecSyncResult = {
+      code: 1,
+      error: undefined,
+      stderr: undefined,
+      stdout: 'xxxxxx v4.1.0 xxxxxx xxxxxxx xxxxxx'
+    };
+    let execOcStub: sinon.SinonStub;
+
+    beforeEach(function() {
+      execOcStub = sandbox.stub(ocExec, 'execOcSync');
+    });
+
+    it('check if correct version is returned if oc version > 4', function() {
+      execOcStub.returns(versionRes);
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).equals('v4.1.0');
+    });
+
+    it('check if execOcSync is called twice if first call returns nothing', function() {
+      execOcStub
+        .onFirstCall()
+        .returns(undefined)
+        .onSecondCall()
+        .returns(undefined);
+      InstallHandler.getOcVersion('path');
+      sinon.assert.calledTwice(execOcStub);
+    });
+
+    it('check if correct version is returned if first execOcSync method fails = oc version < 4', function() {
+      versionRes.stdout = 'xxxxxx v3.2.0 xxxxxx xxxxxxx xxxxxx';
+      execOcStub
+        .onFirstCall()
+        .returns(undefined)
+        .onSecondCall()
+        .returns(versionRes);
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).equals('v3.2.0');
+    });
+
+    it('returns undefined if both oc calls fail', function() {
+      execOcStub
+        .onFirstCall()
+        .returns(undefined)
+        .onSecondCall()
+        .returns(undefined);
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).equals(undefined);
+    });
+
+    it('returns undefined if second call stdout is empty', function() {
+      versionRes.stdout = undefined;
+      execOcStub
+        .onFirstCall()
+        .returns(undefined)
+        .onSecondCall()
+        .returns(versionRes);
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).equals(undefined);
+    });
+
+    it('returns undefined if execOcSync returns a not empty stdout without a valid version in it', function() {
+      versionRes.stdout = 'xxxxx xxxxx xxxxxx xxxxxx xxxxx';
+      execOcStub.returns(versionRes);
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).equals(undefined);
     });
   });
 });
