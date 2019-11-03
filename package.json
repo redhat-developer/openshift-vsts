@@ -77,7 +77,6 @@
     "chai-fs": "^2.0.0",
     "commit-message-validator": "^0.1.6",
     "copy-node-modules": "^1.1.1",
-    "husky": "^1.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "mocha-jenkins-reporter": "^0.4.1",
@@ -89,19 +88,5 @@
     "ts-mocha": "^2.0.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.1.2"
-  },
-  "config": {
-    "commit-message-validator": {
-      "pattern": [
-        "Issue #[0-9]+ [a-zA-Z]+.*",
-        "cut v[0-9]+\\.[0-9]+\\.[0-9]+"
-      ],
-      "errorMessage": "Invalid commit message"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commit-message-validator"
-    }
   }
 }
