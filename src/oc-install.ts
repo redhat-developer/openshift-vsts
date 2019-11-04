@@ -290,7 +290,7 @@ export class InstallHandler {
   static getLocalOcPath(version?: string): string | undefined {
     let ocPath: string | undefined = undefined;
     try {
-      ocPath = tl.which('oc');
+      ocPath = tl.which('oc', true);
       tl.debug(`ocPath ${ocPath}`);
     } catch (ex) {
       tl.debug('Oc has not been found on this machine. Err ' + ex);

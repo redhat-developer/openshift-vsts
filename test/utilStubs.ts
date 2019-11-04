@@ -1,0 +1,45 @@
+import { ToolRunner } from 'vsts-task-lib/toolrunner';
+import sinon = require('sinon');
+
+export class UtilStubs {
+  public static readonly runnerStub: ToolRunner = ({
+    _argStringToArray: sinon.stub(),
+    _cloneExecOptions: sinon.stub(),
+    _debug: sinon.stub(),
+    _getCommandString: sinon.stub(),
+    _getSpawnArgs: sinon.stub(),
+    _getSpawnFileName: sinon.stub(),
+    _getSpawnOptions: sinon.stub(),
+    _getSpawnSyncOptions: sinon.stub(),
+    _isCmdFile: sinon.stub(),
+    _processLineBuffer: sinon.stub(),
+    _uv_quote_cmd_arg: sinon.stub(),
+    _windowsQuoteCmdArg: sinon.stub(),
+    addListener: sinon.stub(),
+    arg: sinon.stub(),
+    argIf: sinon.stub(),
+    args: sinon.stub(),
+    emit: sinon.stub(),
+    eventNames: sinon.stub(),
+    exec: sinon.stub(),
+    execSync: sinon.stub(),
+    execWithPiping: sinon.stub(),
+    getMaxListeners: sinon.stub(),
+    line: sinon.stub(),
+    listenerCount: sinon.stub(),
+    listeners: sinon.stub(),
+    off: sinon.stub(),
+    on: sinon.stub(),
+    once: sinon.stub(),
+    pipeExecOutputToTool: sinon.stub(),
+    pipeOutputToFile: sinon.stub(),
+    pipeOutputToTool: sinon.stub(),
+    prependListener: sinon.stub(),
+    prependOnceListener: sinon.stub(),
+    rawListeners: sinon.stub(),
+    removeAllListeners: sinon.stub(),
+    removeListener: sinon.stub(),
+    setMaxListeners: sinon.stub(),
+    toolPath: 'path'
+  } as unknown) as ToolRunner;
+}
