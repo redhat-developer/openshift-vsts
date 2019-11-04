@@ -2,7 +2,11 @@
 
 import tl = require('vsts-task-lib/task');
 import stream = require('stream');
-import { ToolRunner, IExecOptions, IExecSyncResult } from 'vsts-task-lib/toolrunner';
+import {
+  ToolRunner,
+  IExecOptions,
+  IExecSyncResult
+} from 'vsts-task-lib/toolrunner';
 
 const sub = require('substituter');
 const split = require('argv-split');
