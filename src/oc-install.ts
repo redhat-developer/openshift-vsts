@@ -119,7 +119,8 @@ export class InstallHandler {
 
     let url: string = '';
     // determine the base_url based on version
-    const vMajorRegEx: RegExpExecArray = new RegExp('\d+(?=\.)').exec(version);
+    const reg = new RegExp('\\d+(?=\\.)');
+    const vMajorRegEx: RegExpExecArray = reg.exec(version);
     if (!vMajorRegEx || vMajorRegEx.length === 0) {
       tl.debug('Error retrieving version');
       return null;
@@ -148,7 +149,7 @@ export class InstallHandler {
   }
 
   static async getOcBundleByOS(osType: string): Promise<string | null> {
-    let url: string;
+    let url: string = '';
 
     // determine the bundle path based on the OS type
     switch (osType) {
