@@ -5,21 +5,21 @@ import fs = require('fs');
 import path = require('path');
 import { ToolRunner, IExecSyncResult } from 'vsts-task-lib/toolrunner';
 import { execOcSync } from './oc-exec';
-import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, OPENSHIFT_V3_BASE_URL, OPENSHIFT_V4_BASE_URL } from './constants';
+import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, OPENSHIFT_V3_BASE_URL, OPENSHIFT_V4_BASE_URL, LATEST } from './constants';
 
 const validUrl = require('valid-url');
 const decompress = require('decompress');
 const decompressTargz = require('decompress-targz');
 const Zip = require('adm-zip');
-const octokit = require('@octokit/rest')();
+//const octokit = require('@octokit/rest')();
 
-if (process.env['GITHUB_ACCESS_TOKEN']) {
-  tl.debug('using octokit with token based authentication');
-  octokit.authenticate({
-    type: 'token',
-    token: process.env['GITHUB_ACCESS_TOKEN']
-  });
-}
+// if (process.env['GITHUB_ACCESS_TOKEN']) {
+//   tl.debug('using octokit with token based authentication');
+//   octokit.authenticate({
+//     type: 'token',
+//     token: process.env['GITHUB_ACCESS_TOKEN']
+//   });
+// }
 
 export class InstallHandler {
   /**
@@ -43,8 +43,13 @@ export class InstallHandler {
     }
 
     if (!downloadVersion) {
-      downloadVersion = await InstallHandler.latestStable();
+      downloadVersion = await InstallHandler.latestStable(osType);
+      if (downloadVersion === null) {
+        return Promise.reject('Unable to determine latest oc download URL');
+      }
     }
+
+    
 
     tl.debug('creating download directory');
     let downloadDir =
@@ -80,33 +85,27 @@ export class InstallHandler {
   }
 
   /**
-   * Determines the latest stable version of the OpenShift CLI on GitHub.
-   * The version is also used as release tag.
+   * Determines the latest stable version of the OpenShift CLI on mirror.openshift.
    *
-   * @return the release/tag of the latest OpenShift CLI on GitHub.
+   * @return the url of the latest OpenShift CLI on mirror.openshift.
    */
-  static async latestStable(): Promise<string> {
+  static async latestStable(osType: string): Promise<string | null> {
     tl.debug('determining latest oc version');
 
-    let version = await octokit.repos
-      .getLatestRelease({
-        owner: 'openshift',
-        repo: 'origin'
-      })
-      .then((result: any) => {
-        if (result.data.length === 0) {
-          console.log('Repository has no releases');
-          return 'v1.13.0';
-        }
-        return result.data.tag_name;
-      });
+    const bundle = await this.getOcBundleByOS(osType);
+    if (!bundle) {
+      tl.debug('Unable to find bundle url');
+      return null;
+    }
 
-    tl.debug(`latest stable oc version: ${version}`);
-    return version;
+    const url = `${OPENSHIFT_V4_BASE_URL}/${LATEST}/${bundle}`;
+
+    tl.debug(`latest stable oc version: ${url}`);
+    return url;
   }
 
   /**
-   * Returns the download URL for the oc CLI for a given release tag.
+   * Returns the download URL for the oc CLI for a given version.
    * The binary type is determined by the agent's operating system.
    *
    * @param {string} version Oc version.
@@ -139,13 +138,28 @@ export class InstallHandler {
     const vMajor: number = +vMajorRegEx[0];
 
     if (vMajor === 3) {
-      url = `${OPENSHIFT_V3_BASE_URL}/${version}`;
+      url = `${OPENSHIFT_V3_BASE_URL}/${version}/`;
     } else if (vMajor === 4) {
-      url = `${OPENSHIFT_V4_BASE_URL}/${version}`;
+      url = `${OPENSHIFT_V4_BASE_URL}/${version}/`;
     } else {
       tl.debug('Invalid version');
       return null;
     }
+
+    const bundle = await this.getOcBundleByOS(osType);
+    if (!bundle) {
+      tl.debug('Unable to find bundle url');
+      return null;
+    }
+
+    url += bundle;
+
+    tl.debug(`archive URL: ${url}`);
+    return url;
+  }
+
+  static async getOcBundleByOS(osType: string): Promise<string | null> {
+    let url: string;
 
     // determine the bundle path based on the OS type
     switch (osType) {
@@ -166,28 +180,6 @@ export class InstallHandler {
       }
     }
 
-    url = await octokit.repos
-      .getReleaseByTag({
-        owner: 'openshift',
-        repo: 'origin',
-        tag: version
-      })
-      .then((result: any) => {
-        if (result.data.length === 0) {
-          console.log('No tarball found');
-          return null;
-        }
-
-        for (let asset of result.data.assets) {
-          url = asset.browser_download_url;
-        }
-        return null;
-      })
-      .catch(function(e: any) {
-        tl.debug(`Error retrieving tagged release ${e}`);
-        return null;
-      });
-    tl.debug(`archive URL: ${url}`);
     return url;
   }
 
