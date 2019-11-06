@@ -11,15 +11,6 @@ const validUrl = require('valid-url');
 const decompress = require('decompress');
 const decompressTargz = require('decompress-targz');
 const Zip = require('adm-zip');
-//const octokit = require('@octokit/rest')();
-
-// if (process.env['GITHUB_ACCESS_TOKEN']) {
-//   tl.debug('using octokit with token based authentication');
-//   octokit.authenticate({
-//     type: 'token',
-//     token: process.env['GITHUB_ACCESS_TOKEN']
-//   });
-// }
 
 export class InstallHandler {
   /**
@@ -47,9 +38,7 @@ export class InstallHandler {
       if (downloadVersion === null) {
         return Promise.reject('Unable to determine latest oc download URL');
       }
-    }
-
-    
+    }    
 
     tl.debug('creating download directory');
     let downloadDir =
