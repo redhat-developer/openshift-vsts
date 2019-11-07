@@ -5,12 +5,23 @@ import fs = require('fs');
 import path = require('path');
 import { ToolRunner, IExecSyncResult } from 'vsts-task-lib/toolrunner';
 import { execOcSync } from './oc-exec';
-import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, OPENSHIFT_V3_BASE_URL, OPENSHIFT_V4_BASE_URL, LATEST } from './constants';
+import {
+  LINUX,
+  OC_TAR_GZ,
+  MACOSX,
+  WIN,
+  OC_ZIP,
+  OPENSHIFT_V3_BASE_URL,
+  OPENSHIFT_V4_BASE_URL,
+  LATEST,
+  OPENSHIFT_LATEST_VERSION
+} from './constants';
 
 const validUrl = require('valid-url');
 const decompress = require('decompress');
 const decompressTargz = require('decompress-targz');
 const Zip = require('adm-zip');
+const fetch = require('node-fetch');
 
 export class InstallHandler {
   /**
@@ -38,7 +49,7 @@ export class InstallHandler {
       if (downloadVersion === null) {
         return Promise.reject('Unable to determine latest oc download URL');
       }
-    }    
+    }
 
     tl.debug('creating download directory');
     let downloadDir =
@@ -53,7 +64,14 @@ export class InstallHandler {
     if (validUrl.isWebUri(downloadVersion)) {
       url = downloadVersion;
     } else {
-      url = await InstallHandler.ocBundleURL(downloadVersion, osType);
+      url = await InstallHandler.ocBundleURL(downloadVersion, osType, false);
+      // check if url is valid otherwise take the latest stable oc cli for this version
+      const response = await fetch(url, {
+        method: 'HEAD'
+      });
+      if (!response.ok) {
+        url = await InstallHandler.ocBundleURL(downloadVersion, osType, true);
+      }
     }
 
     if (url === null) {
@@ -94,7 +112,7 @@ export class InstallHandler {
   }
 
   /**
-   * Returns the download URL for the oc CLI for a given version.
+   * Returns the download URL for the oc CLI for a given version v(major).(minor).(patch) (e.g v3.11.0).
    * The binary type is determined by the agent's operating system.
    *
    * @param {string} version Oc version.
@@ -104,7 +122,8 @@ export class InstallHandler {
    */
   static async ocBundleURL(
     version: string,
-    osType: string
+    osType: string,
+    latest?: boolean
   ): Promise<string | null> {
     tl.debug(`determining tarball URL for version ${version}`);
 
@@ -119,13 +138,31 @@ export class InstallHandler {
 
     let url: string = '';
     // determine the base_url based on version
-    const reg = new RegExp('\\d+(?=\\.)');
+    let reg = new RegExp('\\d+(?=\\.)');
     const vMajorRegEx: RegExpExecArray = reg.exec(version);
     if (!vMajorRegEx || vMajorRegEx.length === 0) {
-      tl.debug('Error retrieving version');
+      tl.debug('Error retrieving version major');
       return null;
     }
     const vMajor: number = +vMajorRegEx[0];
+
+    // if we need the latest correct release of this oc version we need to retrieve the (major).(minor) of the version
+    if (latest) {
+      reg = new RegExp('\\d+\\.\\d+(?=\\.)');
+      const versionRegEx: RegExpExecArray = reg.exec(version);
+      if (!versionRegEx || versionRegEx.length === 0) {
+        tl.debug(
+          'Error retrieving version release - unable to find latest version'
+        );
+        return null;
+      }
+      const baseVersion: string = versionRegEx[0]; // e.g 3.11
+      if (!OPENSHIFT_LATEST_VERSION.has(baseVersion)) {
+        tl.debug(`Error retrieving latest patch for oc version ${baseVersion}`);
+        return null;
+      }
+      version = OPENSHIFT_LATEST_VERSION.get(baseVersion);
+    }
 
     if (vMajor === 3) {
       url = `${OPENSHIFT_V3_BASE_URL}/${version}/`;
@@ -219,26 +256,23 @@ export class InstallHandler {
       expandDir = expandDir.replace('.tar', '');
     }
 
-    let expandPath = path.join(downloadDir, expandDir);
-    if (!tl.exist(expandPath)) {
-      tl.debug(`expanding ${archivePath} into ${expandPath}`);
+    tl.debug(`expanding ${archivePath} into ${downloadDir}`);
 
-      switch (archiveType) {
-        case '.zip': {
-          let zip = new Zip(archivePath);
-          zip.extractAllTo(expandPath);
-          break;
-        }
-        case '.tgz':
-        case '.tar.gz': {
-          await decompress(archivePath, downloadDir, {
-            plugins: [decompressTargz()]
-          });
-          break;
-        }
-        default: {
-          throw `unknown archive format ${archivePath}`;
-        }
+    switch (archiveType) {
+      case '.zip': {
+        let zip = new Zip(archivePath);
+        zip.extractAllTo(downloadDir);
+        break;
+      }
+      case '.tgz':
+      case '.tar.gz': {
+        await decompress(archivePath, downloadDir, {
+          plugins: [decompressTargz()]
+        });
+        break;
+      }
+      default: {
+        throw `unknown archive format ${archivePath}`;
       }
     }
 
@@ -253,7 +287,7 @@ export class InstallHandler {
       }
     }
 
-    ocBinary = path.join(expandPath, ocBinary);
+    ocBinary = path.join(downloadDir, ocBinary);
     if (!tl.exist(ocBinary)) {
       return null;
     } else {
