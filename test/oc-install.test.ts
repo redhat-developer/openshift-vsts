@@ -29,46 +29,12 @@ describe('InstallHandler', function() {
     it('check if latestStable method is called if no ocVersion is passed', async function() {
       const latestStub = sandbox
         .stub(InstallHandler, 'latestStable')
-        .resolves('path');
+        .resolves('http://url.com/ocbundle');
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(InstallHandler, 'ocBundleURL').resolves('url');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
       await InstallHandler.installOc('', 'Darwin', false);
       expect(latestStub.calledOnce).to.be.true;
-    });
-
-    it('check if latestStable method is not called if ocVersion is passed', async function() {
-      const latestStub = sandbox
-        .stub(InstallHandler, 'latestStable')
-        .resolves('path');
-      sandbox.stub(fs, 'existsSync').returns(true);
-      sandbox.stub(InstallHandler, 'ocBundleURL').resolves('url');
-      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      await InstallHandler.installOc('version', 'Darwin', false);
-      expect(latestStub.calledOnce).to.be.false;
-    });
-
-    it('check if ocBundleUrl is correctly called if no valid url is passed', async function() {
-      sandbox.stub(fs, 'existsSync').returns(true);
-      sandbox.stub(validUrl, 'isWebUri').returns('');
-      const ocBundleStub = sandbox
-        .stub(InstallHandler, 'ocBundleURL')
-        .resolves('url');
-      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      await InstallHandler.installOc('v3.10.0', 'Darwin', false);
-      expect(ocBundleStub.calledOnce).to.be.true;
-    });
-
-    it('check if method returns a null value if url is not valid', async function() {
-      sandbox.stub(fs, 'existsSync').returns(true);
-      sandbox.stub(validUrl, 'isWebUri').returns('');
-      sandbox.stub(InstallHandler, 'ocBundleURL').resolves(null);
-      try {
-        await InstallHandler.installOc('path', 'Darwin', false);
-        expect.fail();
-      } catch (ex) {
-        expect(ex).equals('Unable to determine oc download URL.');
-      }
     });
 
     it('check if ocBundle is not called if uri is valid', async function() {
