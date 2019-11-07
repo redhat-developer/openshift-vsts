@@ -99,7 +99,7 @@ export class InstallHandler {
   static async latestStable(osType: string): Promise<string | null> {
     tl.debug('determining latest oc version');
 
-    const bundle = await this.getOcBundleByOS(osType);
+    const bundle = await InstallHandler.getOcBundleByOS(osType);
     if (!bundle) {
       tl.debug('Unable to find bundle url');
       return null;
