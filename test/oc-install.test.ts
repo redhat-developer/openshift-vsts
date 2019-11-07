@@ -10,7 +10,16 @@ import * as validUrl from 'valid-url';
 
 import tl = require('vsts-task-lib/task');
 import { IExecSyncResult } from 'vsts-task-lib/toolrunner';
-import { OPENSHIFT_V4_BASE_URL, LATEST, LINUX, OC_TAR_GZ, WIN, OC_ZIP, MACOSX } from '../src/constants';
+import {
+  OPENSHIFT_V4_BASE_URL,
+  LATEST,
+  LINUX,
+  OC_TAR_GZ,
+  WIN,
+  OC_ZIP,
+  MACOSX,
+  OPENSHIFT_V3_BASE_URL
+} from '../src/constants';
 
 describe('InstallHandler', function() {
   let sandbox: sinon.SinonSandbox;
@@ -145,14 +154,62 @@ describe('InstallHandler', function() {
   });
 
   describe('#ocBundleURL', function() {
-    it('should return null when the tag is empty', async function() {
+    it('should return null when no version is passed', async function() {
       const result = await InstallHandler.ocBundleURL('', 'Linux');
       expect(result).to.be.null;
     });
 
-    it('should return null when the tag is null', async function() {
+    it('should return null when the version passed is null', async function() {
       const result = await InstallHandler.ocBundleURL(null, 'Linux');
       expect(result).to.be.null;
+    });
+
+    it('should return null if no valid version is passed', async function() {
+      const result = await InstallHandler.ocBundleURL('version', 'Linux');
+      expect(result).to.be.null;
+    });
+
+    it('should return correct url if oc version (v = 3) is valid', async function() {
+      const bundle = 'linux/oc.tar.gz';
+      const version = '3.11.0';
+      const url = `${OPENSHIFT_V3_BASE_URL}/${version}/${bundle}`;
+      sandbox.stub(InstallHandler, 'getOcBundleByOS').resolves(bundle);
+      const res = await InstallHandler.ocBundleURL(version, 'Linux');
+      expect(res).equals(url);
+    });
+
+    it('should return correct url if oc version (v = 3) is valid', async function() {
+      const bundle = 'linux/oc.tar.gz';
+      const version = '4.11';
+      const url = `${OPENSHIFT_V4_BASE_URL}/${version}/${bundle}`;
+      sandbox.stub(InstallHandler, 'getOcBundleByOS').resolves(bundle);
+      const res = await InstallHandler.ocBundleURL(version, 'Linux');
+      expect(res).equals(url);
+    });
+
+    it('should return null if oc version requested is different from the versions supported (3 and 4)', async function() {
+      const version = '5.1.0';
+      const res = await InstallHandler.ocBundleURL(version, 'Linux');
+      expect(res).equals(null);
+    });
+
+    it('should return null if no oc bundle url is found', async function() {
+      const version = '4.11';
+      sandbox.stub(InstallHandler, 'getOcBundleByOS').resolves(null);
+      const res = await InstallHandler.ocBundleURL(version, 'Linux');
+      expect(res).equals(null);
+    });
+
+    it('should return null if latest version is requestd but version passed as param is invalid', async function() {
+      const version = '3';
+      const res = await InstallHandler.ocBundleURL(version, 'Linux', true);
+      expect(res).equals(null);
+    });
+
+    it('should return null if latest version is requestd but version passed as param dont have a latest version', async function() {
+      const version = '3.17';
+      const res = await InstallHandler.ocBundleURL(version, 'Linux', true);
+      expect(res).equals(null);
     });
   });
 

@@ -173,7 +173,7 @@ export class InstallHandler {
       return null;
     }
 
-    const bundle = await this.getOcBundleByOS(osType);
+    const bundle = await InstallHandler.getOcBundleByOS(osType);
     if (!bundle) {
       tl.debug('Unable to find bundle url');
       return null;
