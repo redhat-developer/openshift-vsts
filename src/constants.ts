@@ -11,7 +11,10 @@ export const LATEST = 'latest';
 export const OC_TAR_GZ = 'oc.tar.gz';
 export const OC_ZIP = 'oc.zip';
 
-export const OPENSHIFT_LATEST_VERSION: Map<string, string> = new Map<string, string>();
+export const OPENSHIFT_LATEST_VERSION: Map<string, string> = new Map<
+  string,
+  string
+>();
 OPENSHIFT_LATEST_VERSION.set('3.3', '3.3.1.46.45');
 OPENSHIFT_LATEST_VERSION.set('3.4', '3.4.1.44.57');
 OPENSHIFT_LATEST_VERSION.set('3.5', '3.5.5');
