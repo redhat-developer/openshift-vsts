@@ -50,6 +50,14 @@
       "defaultValue": "false",
       "required": false,
       "helpMarkDown": "Specify if the non success return value of the oc command run has to be ignored. E.g if the command oc create/delete/... fail because the resource has already been created/deleted/.. the pipeline will continue its execution"
+    }, 
+    {
+      "name": "uselocalOc",
+      "type": "boolean",
+      "label": "use local oc executable",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check if oc is already installed in the machine and use that if available"
     }
   ],
   "execution": {
