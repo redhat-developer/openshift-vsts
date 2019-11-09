@@ -267,6 +267,7 @@ export class InstallHandler {
       case '.tgz':
       case '.tar.gz': {
         await decompress(archivePath, downloadDir, {
+          filter: file => file.data.length > 0,
           plugins: [decompressTargz()]
         });
         break;

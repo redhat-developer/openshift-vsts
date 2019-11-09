@@ -65,7 +65,7 @@
     {
       "name": "uselocalOc",
       "type": "boolean",
-      "label": "use local oc executable",
+      "label": "Use local oc executable",
       "defaultValue": "false",
       "required": false,
       "helpMarkDown": "Check if oc is already installed in the machine and use that if available"
