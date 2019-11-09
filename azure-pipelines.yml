@@ -10,9 +10,9 @@ jobs:
       demands: npm
     steps:
       - task: NodeTool@0
-        displayName: 'Use Node 10.x'
+        displayName: 'Use Node 13.x'
         inputs:
-          versionSpec: 10.16.0
+          versionSpec: 13.0.1
       - task: Npm@1
         displayName: 'Install dependencies'
         inputs:
@@ -41,9 +41,9 @@ jobs:
       demands: npm
     steps:
       - task: NodeTool@0
-        displayName: 'Use Node 10.x'
+        displayName: 'Use Node 13.x'
         inputs:
-          versionSpec: 10.16.0
+          versionSpec: 13.0.1
       - task: Npm@1
         displayName: 'Install dependencies'
         inputs:
@@ -71,9 +71,9 @@ jobs:
       name: Hosted Ubuntu 1604
     steps:
       - task: NodeTool@0
-        displayName: 'Use Node 10.x'
+        displayName: 'Use Node 13.x'
         inputs:
-          versionSpec: 10.16.0
+          versionSpec: 13.0.1
       - task: Npm@1
         displayName: 'Install dependencies'
         inputs:
