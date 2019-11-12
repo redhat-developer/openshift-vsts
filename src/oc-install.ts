@@ -5,20 +5,23 @@ import fs = require('fs');
 import path = require('path');
 import { ToolRunner, IExecSyncResult } from 'vsts-task-lib/toolrunner';
 import { execOcSync } from './oc-exec';
+import {
+  LINUX,
+  OC_TAR_GZ,
+  MACOSX,
+  WIN,
+  OC_ZIP,
+  OPENSHIFT_V3_BASE_URL,
+  OPENSHIFT_V4_BASE_URL,
+  LATEST,
+  OPENSHIFT_LATEST_VERSION
+} from './constants';
 
 const validUrl = require('valid-url');
 const decompress = require('decompress');
 const decompressTargz = require('decompress-targz');
 const Zip = require('adm-zip');
-const octokit = require('@octokit/rest')();
-
-if (process.env['GITHUB_ACCESS_TOKEN']) {
-  tl.debug('using octokit with token based authentication');
-  octokit.authenticate({
-    type: 'token',
-    token: process.env['GITHUB_ACCESS_TOKEN']
-  });
-}
+const fetch = require('node-fetch');
 
 export class InstallHandler {
   /**
@@ -42,7 +45,10 @@ export class InstallHandler {
     }
 
     if (!downloadVersion) {
-      downloadVersion = await InstallHandler.latestStable();
+      downloadVersion = await InstallHandler.latestStable(osType);
+      if (downloadVersion === null) {
+        return Promise.reject('Unable to determine latest oc download URL');
+      }
     }
 
     tl.debug('creating download directory');
@@ -58,7 +64,14 @@ export class InstallHandler {
     if (validUrl.isWebUri(downloadVersion)) {
       url = downloadVersion;
     } else {
-      url = await InstallHandler.ocBundleURL(downloadVersion, osType);
+      url = await InstallHandler.ocBundleURL(downloadVersion, osType, false);
+      // check if url is valid otherwise take the latest stable oc cli for this version
+      const response = await fetch(url, {
+        method: 'HEAD'
+      });
+      if (!response.ok) {
+        url = await InstallHandler.ocBundleURL(downloadVersion, osType, true);
+      }
     }
 
     if (url === null) {
@@ -79,63 +92,114 @@ export class InstallHandler {
   }
 
   /**
-   * Determines the latest stable version of the OpenShift CLI on GitHub.
-   * The version is also used as release tag.
+   * Determines the latest stable version of the OpenShift CLI on mirror.openshift.
    *
-   * @return the release/tag of the latest OpenShift CLI on GitHub.
+   * @return the url of the latest OpenShift CLI on mirror.openshift.
    */
-  static async latestStable(): Promise<string> {
+  static async latestStable(osType: string): Promise<string | null> {
     tl.debug('determining latest oc version');
 
-    let version = await octokit.repos
-      .getLatestRelease({
-        owner: 'openshift',
-        repo: 'origin'
-      })
-      .then((result: any) => {
-        if (result.data.length === 0) {
-          console.log('Repository has no releases');
-          return 'v1.13.0';
-        }
-        return result.data.tag_name;
-      });
+    const bundle = await InstallHandler.getOcBundleByOS(osType);
+    if (!bundle) {
+      tl.debug('Unable to find bundle url');
+      return null;
+    }
 
-    tl.debug(`latest stable oc version: ${version}`);
-    return version;
+    const url = `${OPENSHIFT_V4_BASE_URL}/${LATEST}/${bundle}`;
+
+    tl.debug(`latest stable oc version: ${url}`);
+    return url;
   }
 
   /**
-   * Returns the download URL for the oc CLI for a given release tag.
+   * Returns the download URL for the oc CLI for a given version v(major).(minor).(patch) (e.g v3.11.0).
    * The binary type is determined by the agent's operating system.
    *
-   * @param {string} tag The release tag.
+   * @param {string} version Oc version.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
    * @returns {Promise} Promise string representing the URL to the tarball. null is returned
    * if no matching URL can be determined for the given tag.
    */
   static async ocBundleURL(
-    tag: string,
-    osType: string
+    version: string,
+    osType: string,
+    latest?: boolean
   ): Promise<string | null> {
-    tl.debug(`determining tarball URL for tag ${tag}`);
+    tl.debug(`determining tarball URL for version ${version}`);
 
-    if (!tag) {
+    if (!version) {
       return null;
     }
 
-    // determine the bundle suffix on GitHub based on the OS type
-    let expr = '';
+    // remove char v if present to ensure old pipelines keep working when the extension will be updated
+    if (version.startsWith('v')) {
+      version = version.substr(1);
+    }
+
+    let url: string = '';
+    // determine the base_url based on version
+    let reg = new RegExp('\\d+(?=\\.)');
+    const vMajorRegEx: RegExpExecArray = reg.exec(version);
+    if (!vMajorRegEx || vMajorRegEx.length === 0) {
+      tl.debug('Error retrieving version major');
+      return null;
+    }
+    const vMajor: number = +vMajorRegEx[0];
+
+    // if we need the latest correct release of this oc version we need to retrieve the (major).(minor) of the version
+    if (latest) {
+      reg = new RegExp('\\d+\\.\\d+(?=\\.)');
+      const versionRegEx: RegExpExecArray = reg.exec(version);
+      if (!versionRegEx || versionRegEx.length === 0) {
+        tl.debug(
+          'Error retrieving version release - unable to find latest version'
+        );
+        return null;
+      }
+      const baseVersion: string = versionRegEx[0]; // e.g 3.11
+      if (!OPENSHIFT_LATEST_VERSION.has(baseVersion)) {
+        tl.debug(`Error retrieving latest patch for oc version ${baseVersion}`);
+        return null;
+      }
+      version = OPENSHIFT_LATEST_VERSION.get(baseVersion);
+    }
+
+    if (vMajor === 3) {
+      url = `${OPENSHIFT_V3_BASE_URL}/${version}/`;
+    } else if (vMajor === 4) {
+      url = `${OPENSHIFT_V4_BASE_URL}/${version}/`;
+    } else {
+      tl.debug('Invalid version');
+      return null;
+    }
+
+    const bundle = await InstallHandler.getOcBundleByOS(osType);
+    if (!bundle) {
+      tl.debug('Unable to find bundle url');
+      return null;
+    }
+
+    url += bundle;
+
+    tl.debug(`archive URL: ${url}`);
+    return url;
+  }
+
+  static async getOcBundleByOS(osType: string): Promise<string | null> {
+    let url: string = '';
+
+    // determine the bundle path based on the OS type
     switch (osType) {
       case 'Linux': {
-        expr = '^.*-linux-64bit.tar.gz$';
+        url += `${LINUX}/${OC_TAR_GZ}`;
         break;
       }
       case 'Darwin': {
-        expr = '^.*-mac.zip$';
+        url += `${MACOSX}/${OC_TAR_GZ}`;
         break;
       }
       case 'Windows_NT': {
-        expr = '^.*-windows.zip$';
+        url += `${WIN}/${OC_ZIP}`;
         break;
       }
       default: {
@@ -143,32 +207,6 @@ export class InstallHandler {
       }
     }
 
-    let url = await octokit.repos
-      .getReleaseByTag({
-        owner: 'openshift',
-        repo: 'origin',
-        tag: tag
-      })
-      .then((result: any) => {
-        if (result.data.length === 0) {
-          console.log('No tarball found');
-          return null;
-        }
-
-        let url: string;
-        for (let asset of result.data.assets) {
-          url = asset.browser_download_url;
-          if (url.match(new RegExp(expr))) {
-            return url;
-          }
-        }
-        return null;
-      })
-      .catch(function(e: any) {
-        tl.debug(`Error retrieving tagged release ${e}`);
-        return null;
-      });
-    tl.debug(`archive URL: ${url}`);
     return url;
   }
 
@@ -218,26 +256,24 @@ export class InstallHandler {
       expandDir = expandDir.replace('.tar', '');
     }
 
-    let expandPath = path.join(downloadDir, expandDir);
-    if (!tl.exist(expandPath)) {
-      tl.debug(`expanding ${archivePath} into ${expandPath}`);
+    tl.debug(`expanding ${archivePath} into ${downloadDir}`);
 
-      switch (archiveType) {
-        case '.zip': {
-          let zip = new Zip(archivePath);
-          zip.extractAllTo(expandPath);
-          break;
-        }
-        case '.tgz':
-        case '.tar.gz': {
-          await decompress(archivePath, downloadDir, {
-            plugins: [decompressTargz()]
-          });
-          break;
-        }
-        default: {
-          throw `unknown archive format ${archivePath}`;
-        }
+    switch (archiveType) {
+      case '.zip': {
+        let zip = new Zip(archivePath);
+        zip.extractAllTo(downloadDir);
+        break;
+      }
+      case '.tgz':
+      case '.tar.gz': {
+        await decompress(archivePath, downloadDir, {
+          filter: file => file.data.length > 0,
+          plugins: [decompressTargz()]
+        });
+        break;
+      }
+      default: {
+        throw `unknown archive format ${archivePath}`;
       }
     }
 
@@ -252,7 +288,7 @@ export class InstallHandler {
       }
     }
 
-    ocBinary = path.join(expandPath, ocBinary);
+    ocBinary = path.join(downloadDir, ocBinary);
     if (!tl.exist(ocBinary)) {
       return null;
     } else {
