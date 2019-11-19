@@ -154,16 +154,6 @@
                   "isRequired": true,
                   "dataType": "string"
                 }
-              },
-              {
-                "id": "certificateAuthorityFile",
-                "name": "Certificate Authority File",
-                "description": "The path to a certificate authority file to correctly and securely authenticates with an OpenShift server that uses HTTPS",
-                "inputMode": "textbox",
-                "validation": {
-                  "isRequired": false,
-                  "dataType": "string"
-                }
               }
             ]
           }

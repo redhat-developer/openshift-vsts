@@ -62,19 +62,22 @@ export async function createKubeConfig(
   // parameters:{"username":***,"password":***}, scheme:'UsernamePassword'
   // parameters:{"kubeconfig":***}, scheme:'None'
   let authType = endpoint.scheme;
-  let skip = skipTlsVerify(endpoint);
+  let useCertificateOrSkipTls = getCertificateAuthorityFile(endpoint);
+  if (useCertificateOrSkipTls === '') {
+    useCertificateOrSkipTls = skipTlsVerify(endpoint);
+  }
   switch (authType) {
     case BASIC_AUTHENTICATION:
       let username = endpoint.parameters['username'];
       let password = endpoint.parameters['password'];
       await oc.execOc(
         ocPath,
-        `login ${skip} -u ${username} -p ${password} ${endpoint.serverUrl}`
+        `login ${useCertificateOrSkipTls} -u ${username} -p ${password} ${endpoint.serverUrl}`
       );
       break;
     case TOKEN_AUTHENTICATION:
       let args =
-        `login ${skip} --token ${endpoint.parameters['apitoken']} ` +
+        `login ${useCertificateOrSkipTls} --token ${endpoint.parameters['apitoken']} ` +
         endpoint.serverUrl;
       await oc.execOc(ocPath, args);
       break;
@@ -86,6 +89,20 @@ export async function createKubeConfig(
   }
 
   exportKubeConfig(osType);
+}
+
+/**
+ * Determines whether certificate authority file should be used.
+ *
+ * @param endpoint the OpenShift endpoint.
+ * @return oc option for using a certificate authority file.
+ */
+function getCertificateAuthorityFile(endpoint: OpenShiftEndpoint): string {
+  let certificateFile = '';
+  if (endpoint.parameters['certificateAuthorityFile']) {
+    certificateFile = `--certificate-authority=${endpoint.parameters['certificateAuthorityFile']}`;
+  }
+  return certificateFile;
 }
 
 /**
