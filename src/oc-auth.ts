@@ -72,13 +72,16 @@ export async function createKubeConfig(
       let password = endpoint.parameters['password'];
       await oc.execOc(
         ocPath,
-        `login ${useCertificateOrSkipTls} -u ${username} -p ${password} ${endpoint.serverUrl}`
+        `login ${useCertificateOrSkipTls} -u ${username} -p ${password} ${
+          endpoint.serverUrl
+        }`
       );
       break;
     case TOKEN_AUTHENTICATION:
       let args =
-        `login ${useCertificateOrSkipTls} --token ${endpoint.parameters['apitoken']} ` +
-        endpoint.serverUrl;
+        `login ${useCertificateOrSkipTls} --token ${
+          endpoint.parameters['apitoken']
+        } ` + endpoint.serverUrl;
       await oc.execOc(ocPath, args);
       break;
     case NO_AUTHENTICATION:
@@ -100,7 +103,9 @@ export async function createKubeConfig(
 function getCertificateAuthorityFile(endpoint: OpenShiftEndpoint): string {
   let certificateFile = '';
   if (endpoint.parameters['certificateAuthorityFile']) {
-    certificateFile = `--certificate-authority=${endpoint.parameters['certificateAuthorityFile']}`;
+    certificateFile = `--certificate-authority=${
+      endpoint.parameters['certificateAuthorityFile']
+    }`;
   }
   return certificateFile;
 }
