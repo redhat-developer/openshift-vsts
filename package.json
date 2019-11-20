@@ -46,7 +46,7 @@
     "url": "https://github.com/redhat-developer/openshift-vsts.git"
   },
   "keywords": [],
-  "author": "Hardy Ferentschik",
+  "author": "Red Hat",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/redhat-developer/openshift-vsts/issues"
