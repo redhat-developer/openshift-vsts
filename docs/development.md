@@ -152,7 +152,7 @@ Just run:
 <a id="ci"></a>
 ## CI
 
-Currently there are two CI systems configured for this project. On on [Azure DevOps](https://dev.azure.com/hardy0575/openshift-vsts) and one on [TravisCI](https://travis-ci.org/redhat-developer/openshift-vsts).
+Currently there are two CI systems configured for this project. On on [Azure DevOps](https://dev.azure.com/redhat-developer/openshift-vsts) and one on [TravisCI](https://travis-ci.org/redhat-developer/openshift-vsts).
 
 <a id="references"></a>
 ## References
