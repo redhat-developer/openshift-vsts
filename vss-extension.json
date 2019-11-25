@@ -108,6 +108,7 @@
                 "name": "Certificate Authority File",
                 "description": "The path to a certificate authority file to correctly and securely authenticates with an OpenShift server that uses HTTPS",
                 "inputMode": "textbox",
+                "isConfidential": false,
                 "validation": {
                   "isRequired": false,
                   "dataType": "string"
@@ -134,6 +135,7 @@
                 "name": "Certificate Authority File",
                 "description": "The path to a certificate authority file to correctly and securely authenticates with an OpenShift server that uses HTTPS",
                 "inputMode": "textbox",
+                "isConfidential": false,
                 "validation": {
                   "isRequired": false,
                   "dataType": "string"
