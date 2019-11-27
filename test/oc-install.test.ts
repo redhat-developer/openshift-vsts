@@ -11,14 +11,12 @@ import * as validUrl from 'valid-url';
 import tl = require('vsts-task-lib/task');
 import { IExecSyncResult } from 'vsts-task-lib/toolrunner';
 import {
-  OPENSHIFT_V4_BASE_URL,
   LATEST,
   LINUX,
   OC_TAR_GZ,
   WIN,
   OC_ZIP,
-  MACOSX,
-  OPENSHIFT_V3_BASE_URL
+  MACOSX
 } from '../src/constants';
 
 describe('InstallHandler', function() {
@@ -102,7 +100,8 @@ describe('InstallHandler', function() {
         .stub(InstallHandler, 'getOcBundleByOS')
         .resolves('linux/oc.tar.gz');
       const res = await InstallHandler.latestStable('linux');
-      expect(res).equals(`${OPENSHIFT_V4_BASE_URL}/${LATEST}/linux/oc.tar.gz`);
+      const ocUtils = await InstallHandler.getOcUtils();
+      expect(res).equals(`${ocUtils['OPENSHIFT_V4_BASE_URL']}/${LATEST}/linux/oc.tar.gz`);
     });
   });
 
@@ -125,7 +124,8 @@ describe('InstallHandler', function() {
     it('should return correct url if oc version (v = 3) is valid', async function() {
       const bundle = 'linux/oc.tar.gz';
       const version = '3.11.0';
-      const url = `${OPENSHIFT_V3_BASE_URL}/${version}/${bundle}`;
+      const ocUtils = await InstallHandler.getOcUtils();
+      const url = `${ocUtils['OPENSHIFT_V3_BASE_URL']}/${version}/${bundle}`;
       sandbox.stub(InstallHandler, 'getOcBundleByOS').resolves(bundle);
       const res = await InstallHandler.ocBundleURL(version, 'Linux');
       expect(res).equals(url);
@@ -134,7 +134,8 @@ describe('InstallHandler', function() {
     it('should return correct url if oc version (v = 3) is valid', async function() {
       const bundle = 'linux/oc.tar.gz';
       const version = '4.11';
-      const url = `${OPENSHIFT_V4_BASE_URL}/${version}/${bundle}`;
+      const ocUtils = await InstallHandler.getOcUtils();
+      const url = `${ocUtils['OPENSHIFT_V4_BASE_URL']}/${version}/${bundle}`;
       sandbox.stub(InstallHandler, 'getOcBundleByOS').resolves(bundle);
       const res = await InstallHandler.ocBundleURL(version, 'Linux');
       expect(res).equals(url);

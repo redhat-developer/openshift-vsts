@@ -1,7 +1,7 @@
 'use strict';
 
 import tl = require('vsts-task-lib/task');
-import fs = require('fs');
+import * as fs from 'mz/fs';
 import path = require('path');
 import { ToolRunner, IExecSyncResult } from 'vsts-task-lib/toolrunner';
 import { execOcSync } from './oc-exec';
@@ -11,10 +11,7 @@ import {
   MACOSX,
   WIN,
   OC_ZIP,
-  OPENSHIFT_V3_BASE_URL,
-  OPENSHIFT_V4_BASE_URL,
-  LATEST,
-  OPENSHIFT_LATEST_VERSION
+  LATEST
 } from './constants';
 
 const validUrl = require('valid-url');
@@ -104,8 +101,8 @@ export class InstallHandler {
       tl.debug('Unable to find bundle url');
       return null;
     }
-
-    const url = `${OPENSHIFT_V4_BASE_URL}/${LATEST}/${bundle}`;
+    const ocUtils = await InstallHandler.getOcUtils();
+    const url = `${ocUtils['OPENSHIFT_V4_BASE_URL']}/${LATEST}/${bundle}`;
 
     tl.debug(`latest stable oc version: ${url}`);
     return url;
@@ -145,6 +142,7 @@ export class InstallHandler {
       return null;
     }
     const vMajor: number = +vMajorRegEx[0];
+    const ocUtils = await InstallHandler.getOcUtils();
 
     // if we need the latest correct release of this oc version we need to retrieve the (major).(minor) of the version
     if (latest) {
@@ -157,17 +155,17 @@ export class InstallHandler {
         return null;
       }
       const baseVersion: string = versionRegEx[0]; // e.g 3.11
-      if (!OPENSHIFT_LATEST_VERSION.has(baseVersion)) {
+      if (!ocUtils[`oc${baseVersion}`]) {
         tl.debug(`Error retrieving latest patch for oc version ${baseVersion}`);
         return null;
       }
-      version = OPENSHIFT_LATEST_VERSION.get(baseVersion);
+      version = ocUtils[`oc${baseVersion}`];
     }
 
     if (vMajor === 3) {
-      url = `${OPENSHIFT_V3_BASE_URL}/${version}/`;
+      url = `${ocUtils['OPENSHIFT_V3_BASE_URL']}/${version}/`;
     } else if (vMajor === 4) {
-      url = `${OPENSHIFT_V4_BASE_URL}/${version}/`;
+      url = `${ocUtils['OPENSHIFT_V4_BASE_URL']}/${version}/`;
     } else {
       tl.debug('Invalid version');
       return null;
@@ -372,5 +370,11 @@ export class InstallHandler {
     }
 
     return undefined;
+  }
+
+  static async getOcUtils(): Promise<{ [key: string]: string }> {    
+    const workFolder = tl.getVariable("Agent.Workfolder") || path.resolve(__dirname, '../../');
+    const rawData = await fs.readFile(path.join(workFolder, 'oc-utils.json'));
+    return JSON.parse(rawData);
   }
 }
