@@ -102,7 +102,7 @@ export class InstallHandler {
       return null;
     }
     const ocUtils = await InstallHandler.getOcUtils();
-    const url = `${ocUtils['OPENSHIFT_V4_BASE_URL']}/${LATEST}/${bundle}`;
+    const url = `${ocUtils['openshiftV4BaseUrl']}/${LATEST}/${bundle}`;
 
     tl.debug(`latest stable oc version: ${url}`);
     return url;
@@ -163,9 +163,9 @@ export class InstallHandler {
     }
 
     if (vMajor === 3) {
-      url = `${ocUtils['OPENSHIFT_V3_BASE_URL']}/${version}/`;
+      url = `${ocUtils['openshiftV3BaseUrl']}/${version}/`;
     } else if (vMajor === 4) {
-      url = `${ocUtils['OPENSHIFT_V4_BASE_URL']}/${version}/`;
+      url = `${ocUtils['openshiftV4BaseUrl']}/${version}/`;
     } else {
       tl.debug('Invalid version');
       return null;
@@ -372,9 +372,8 @@ export class InstallHandler {
     return undefined;
   }
 
-  static async getOcUtils(): Promise<{ [key: string]: string }> {    
-    const workFolder = tl.getVariable("Agent.Workfolder") || path.resolve(__dirname, '../../');
-    const rawData = await fs.readFile(path.join(workFolder, 'oc-utils.json'));
+  static async getOcUtils(): Promise<{ [key: string]: string }> {
+    const rawData = await fs.readFile(path.resolve(__dirname || '', "oc-utils.json"));
     return JSON.parse(rawData);
   }
 }
