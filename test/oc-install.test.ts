@@ -101,7 +101,9 @@ describe('InstallHandler', function() {
         .resolves('linux/oc.tar.gz');
       const res = await InstallHandler.latestStable('linux');
       const ocUtils = await InstallHandler.getOcUtils();
-      expect(res).equals(`${ocUtils['openshiftV4BaseUrl']}/${LATEST}/linux/oc.tar.gz`);
+      expect(res).equals(
+        `${ocUtils['openshiftV4BaseUrl']}/${LATEST}/linux/oc.tar.gz`
+      );
     });
   });
 

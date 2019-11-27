@@ -5,14 +5,7 @@ import * as fs from 'mz/fs';
 import path = require('path');
 import { ToolRunner, IExecSyncResult } from 'vsts-task-lib/toolrunner';
 import { execOcSync } from './oc-exec';
-import {
-  LINUX,
-  OC_TAR_GZ,
-  MACOSX,
-  WIN,
-  OC_ZIP,
-  LATEST
-} from './constants';
+import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
 
 const validUrl = require('valid-url');
 const decompress = require('decompress');
@@ -373,7 +366,9 @@ export class InstallHandler {
   }
 
   static async getOcUtils(): Promise<{ [key: string]: string }> {
-    const rawData = await fs.readFile(path.resolve(__dirname || '', "oc-utils.json"));
+    const rawData = await fs.readFile(
+      path.resolve(__dirname || '', 'oc-utils.json')
+    );
     return JSON.parse(rawData);
   }
 }
