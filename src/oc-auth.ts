@@ -4,11 +4,7 @@ import oc = require('./oc-exec');
 import task = require('vsts-task-lib/task');
 import tl = require('vsts-task-lib/task');
 import path = require('path');
-
-const OPENSHIFT_SERVICE_NAME = 'openshiftService';
-const BASIC_AUTHENTICATION = 'UsernamePassword';
-const TOKEN_AUTHENTICATION = 'Token';
-const NO_AUTHENTICATION = 'None';
+import { OPENSHIFT_SERVICE_NAME, BASIC_AUTHENTICATION, TOKEN_AUTHENTICATION, NO_AUTHENTICATION } from './constants';
 
 export interface OpenShiftEndpoint {
   /** URL to the OpenShiftServer */
