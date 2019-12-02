@@ -4,7 +4,12 @@ import oc = require('./oc-exec');
 import task = require('vsts-task-lib/task');
 import tl = require('vsts-task-lib/task');
 import path = require('path');
-import { OPENSHIFT_SERVICE_NAME, BASIC_AUTHENTICATION, TOKEN_AUTHENTICATION, NO_AUTHENTICATION } from './constants';
+import {
+  OPENSHIFT_SERVICE_NAME,
+  BASIC_AUTHENTICATION,
+  TOKEN_AUTHENTICATION,
+  NO_AUTHENTICATION
+} from './constants';
 
 export interface OpenShiftEndpoint {
   /** URL to the OpenShiftServer */
@@ -96,7 +101,9 @@ export async function createKubeConfig(
  * @param endpoint the OpenShift endpoint.
  * @return oc option for using a certificate authority file.
  */
-export function getCertificateAuthorityFile(endpoint: OpenShiftEndpoint): string {
+export function getCertificateAuthorityFile(
+  endpoint: OpenShiftEndpoint
+): string {
   let certificateFile = '';
   if (endpoint.parameters['certificateAuthorityFile']) {
     certificateFile = `--certificate-authority=${
