@@ -96,7 +96,7 @@ export async function createKubeConfig(
  * @param endpoint the OpenShift endpoint.
  * @return oc option for using a certificate authority file.
  */
-function getCertificateAuthorityFile(endpoint: OpenShiftEndpoint): string {
+export function getCertificateAuthorityFile(endpoint: OpenShiftEndpoint): string {
   let certificateFile = '';
   if (endpoint.parameters['certificateAuthorityFile']) {
     certificateFile = `--certificate-authority=${
