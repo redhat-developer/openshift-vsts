@@ -4,11 +4,12 @@ import oc = require('./oc-exec');
 import task = require('vsts-task-lib/task');
 import tl = require('vsts-task-lib/task');
 import path = require('path');
-
-const OPENSHIFT_SERVICE_NAME = 'openshiftService';
-const BASIC_AUTHENTICATION = 'UsernamePassword';
-const TOKEN_AUTHENTICATION = 'Token';
-const NO_AUTHENTICATION = 'None';
+import {
+  OPENSHIFT_SERVICE_NAME,
+  BASIC_AUTHENTICATION,
+  TOKEN_AUTHENTICATION,
+  NO_AUTHENTICATION
+} from './constants';
 
 export interface OpenShiftEndpoint {
   /** URL to the OpenShiftServer */
@@ -62,20 +63,26 @@ export async function createKubeConfig(
   // parameters:{"username":***,"password":***}, scheme:'UsernamePassword'
   // parameters:{"kubeconfig":***}, scheme:'None'
   let authType = endpoint.scheme;
-  let skip = skipTlsVerify(endpoint);
+  let useCertificateOrSkipTls = getCertificateAuthorityFile(endpoint);
+  if (useCertificateOrSkipTls === '') {
+    useCertificateOrSkipTls = skipTlsVerify(endpoint);
+  }
   switch (authType) {
     case BASIC_AUTHENTICATION:
       let username = endpoint.parameters['username'];
       let password = endpoint.parameters['password'];
       await oc.execOc(
         ocPath,
-        `login ${skip} -u ${username} -p ${password} ${endpoint.serverUrl}`
+        `login ${useCertificateOrSkipTls} -u ${username} -p ${password} ${
+          endpoint.serverUrl
+        }`
       );
       break;
     case TOKEN_AUTHENTICATION:
       let args =
-        `login ${skip} --token ${endpoint.parameters['apitoken']} ` +
-        endpoint.serverUrl;
+        `login ${useCertificateOrSkipTls} --token ${
+          endpoint.parameters['apitoken']
+        } ` + endpoint.serverUrl;
       await oc.execOc(ocPath, args);
       break;
     case NO_AUTHENTICATION:
@@ -86,6 +93,24 @@ export async function createKubeConfig(
   }
 
   exportKubeConfig(osType);
+}
+
+/**
+ * Determines whether certificate authority file should be used.
+ *
+ * @param endpoint the OpenShift endpoint.
+ * @return oc option for using a certificate authority file.
+ */
+export function getCertificateAuthorityFile(
+  endpoint: OpenShiftEndpoint
+): string {
+  let certificateFile = '';
+  if (endpoint.parameters['certificateAuthorityFile']) {
+    certificateFile = `--certificate-authority=${
+      endpoint.parameters['certificateAuthorityFile']
+    }`;
+  }
+  return certificateFile;
 }
 
 /**
