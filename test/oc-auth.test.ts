@@ -224,7 +224,7 @@ describe('oc-auth', function() {
         scheme: BASIC_AUTHENTICATION
       };
       const res = OcAuth.getCertificateAuthorityFile(endpoint);
-      expect(res).equals('--certificate-authority=path');
+      expect(res).equals('--certificate-authority="path"');
     });
   });
 

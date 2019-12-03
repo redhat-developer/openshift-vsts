@@ -45,9 +45,7 @@ export class InstallHandler {
     let downloadDir =
       process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + '/.download';
     if (!fs.existsSync(downloadDir)) {
-      let mkdir: ToolRunner = tl.tool('mkdir');
-      mkdir.arg('-p').arg(downloadDir);
-      await mkdir.exec();
+      tl.mkdirP(downloadDir);
     }
 
     let url: string | null;
