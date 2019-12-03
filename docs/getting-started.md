@@ -144,13 +144,11 @@ Add the _Execute oc command_ task to your pipeline using the _Add_ button.
 ![Adding Execute oc task](../images/adding_oc_cmd_task.png)
 
 
-The _Execute oc command_ has four configuration options.
+The _Execute oc command_ has five configuration options.
 
 ![Configuration of Execute oc task](../images/cmd_exec_config.png)
 
 <dl>
-  <dt>Display name</dt>
-  <dd>The name displayed in the task list, eg "Rollout".</dd>
   <dt>OpenShift service connection</dt>
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-the-openshift-service-connection">Configuring the OpenShift service connection</a>.</dd>
   <dt>Version of oc to use</dt>
@@ -198,8 +196,6 @@ The _Update ConfigMap_ task has six configuration options.
 ![Configuration of Update ConfigMap task](../images/configure_config_map_task.png)
 
 <dl>
-  <dt>Display name</dt>
-  <dd>The name displayed in the task list, eg "Rollout latest".</dd>
   <dt>OpenShift/Kubernetes service connection</dt>
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-the-openshift-service-connection">Configuring the OpenShift service connection</a>.</dd>
   <dt>Version of oc to use</dt>
