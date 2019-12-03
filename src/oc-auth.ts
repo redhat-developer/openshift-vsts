@@ -106,9 +106,9 @@ export function getCertificateAuthorityFile(
 ): string {
   let certificateFile = '';
   if (endpoint.parameters['certificateAuthorityFile']) {
-    certificateFile = `--certificate-authority=${
+    certificateFile = `--certificate-authority="${
       endpoint.parameters['certificateAuthorityFile']
-    }`;
+    }"`;
   }
   return certificateFile;
 }
