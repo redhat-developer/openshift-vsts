@@ -34,16 +34,20 @@ Select the OpenShift service connection and use one of the following methods to 
 ![Basic Authentication](../images/basic_authentication.png)
 
 <dl>
-  <dt>Connection Name</dt>
-  <dd>Required. The name you will use to refer to this service connection.</dd>
   <dt>Server URL</dt>
   <dd>Required. The URL of the Openshift cluster.</dd>
   <dt>Username</dt>
   <dd>Required. OpenShift username.</dd>
   <dt>Password</dt>
-  <dd>Required. Password for the specified user.</dd>    
+  <dd>Required. Password for the specified user.</dd>      
   <dt>Accept untrusted SSL certificates</dt>
   <dd>Whether it is ok to accept self-signed (untrusted) certificated.</dd>  
+  <dt>Certificate Authority File</dt>
+  <dd>The path where the certificate authority file is stored.</dd>
+  <dt>Service Connection Name</dt>
+  <dd>Required. The name you will use to refer to this service connection.</dd>
+  <dt>Grant Access permission to all pipelines</dt>
+  <dd>Allow all pipelines to use this connection. It allows YAML defined pipeline, which are not automatically authorized for service connections, to use this service connection.</dd>
 </dl>
 
 
@@ -53,14 +57,18 @@ Select the OpenShift service connection and use one of the following methods to 
 ![Token Authentication](../images/token_authentication.png)
 
 <dl>
-  <dt>Connection Name</dt>
-  <dd>Required. The name you will use to refer to this service connection.</dd>
   <dt>Server URL</dt>
-  <dd>Required. The URL of the Openshift cluster.</dd>
+  <dd>Required. The URL of the Openshift cluster.</dd> 
   <dt>Accept untrusted SSL certificates</dt>
   <dd>Whether it is ok to accept self-signed (untrusted) certificated.</dd>  
+  <dt>Certificate Authority File</dt>
+  <dd>The path where the certificate authority file is stored.</dd>
   <dt>API Token</dt>
   <dd>Required.The API token used for authentication.</dd>  
+  <dt>Service Connection Name</dt>
+  <dd>Required. The name you will use to refer to this service connection.</dd>
+  <dt>Grant Access permission to all pipelines</dt>
+  <dd>Allow all pipelines to use this connection. It allows YAML defined pipeline, which are not automatically authorized for service connections, to use this service connection.</dd>
 </dl>
 
 <a id="kubeconfig"></a>
@@ -69,12 +77,14 @@ Select the OpenShift service connection and use one of the following methods to 
 ![Kubeconfig Authentication](../images/kubeconfig_authentication.png)
 
 <dl>
-  <dt>Connection Name</dt>
-  <dd>Required. The name you will use to refer to this service connection.</dd>
   <dt>Server URL</dt>
-  <dd>Required. The URL of the Openshift cluster.</dd>
+  <dd>Required. The URL of the Openshift cluster.</dd> 
   <dt>Kubeconfig</dt>
-  <dd>The contents of the kubectl configuration file.</dd>  
+  <dd>The contents of the kubectl configuration file.</dd> 
+  <dt>Service Connection Name</dt>
+  <dd>Required. The name you will use to refer to this service connection.</dd>
+  <dt>Grant Access permission to all pipelines</dt>
+  <dd>Allow all pipelines to use this connection. It allows YAML defined pipeline, which are not automatically authorized for service connections, to use this service connection.</dd>
 </dl>
 
 ---
@@ -134,19 +144,21 @@ Add the _Execute oc command_ task to your pipeline using the _Add_ button.
 ![Adding Execute oc task](../images/adding_oc_cmd_task.png)
 
 
-The _Execute oc command_ has four configuration options.
+The _Execute oc command_ has five configuration options.
 
 ![Configuration of Execute oc task](../images/cmd_exec_config.png)
 
 <dl>
-  <dt>Display name</dt>
-  <dd>The name displayed in the task list, eg "Rollout".</dd>
   <dt>OpenShift service connection</dt>
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-the-openshift-service-connection">Configuring the OpenShift service connection</a>.</dd>
   <dt>Version of oc to use</dt>
   <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used. You can also specify a direct URL to the oc release bundle.</dd>  
   <dt>Command to run</dt>
   <dd>The actual oc command to run starting with the oc sub-command, eg "rollout latest dc/my-app -n production".</dd>
+  <dt>Ignore on success return value</dt>
+  <dd>It ignores non success return value from the current step and keep executing the pipeline if it fails. If you are executing a step which contains command like create/delete/patch but the resource has already been created/deleted/patched the pipeline could fail. By checking this option this error will be skipped and the execution will keep going.</dd>
+  <dt>Use local oc executable</dt>
+  <dd>It forces the extension to use, if present, the oc cli found in the machine where the agent is running. If no version is specified, the extension will use the local oc cli no matter its version is. If a version is specified then the extension will first check if the oc cli installed has the same version requested by the user, if not the correct oc cli will be downloaded.</dd>
 </dl>
 
 ---
@@ -184,8 +196,6 @@ The _Update ConfigMap_ task has six configuration options.
 ![Configuration of Update ConfigMap task](../images/configure_config_map_task.png)
 
 <dl>
-  <dt>Display name</dt>
-  <dd>The name displayed in the task list, eg "Rollout latest".</dd>
   <dt>OpenShift/Kubernetes service connection</dt>
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-the-openshift-service-connection">Configuring the OpenShift service connection</a>.</dd>
   <dt>Version of oc to use</dt>
@@ -195,7 +205,9 @@ The _Update ConfigMap_ task has six configuration options.
   <dt>Namespace of ConfigMap</dt>
   <dd>The namespace in which to find the ConfigMap. The current namespace is used if none is specified.</dd>
   <dt>ConfigMap Properties</dt>
-  <dd>The properties to set/update. Only the properties which need creating/updating need to be listed. Space separated values need to be surrounded by quotes ("). </dd>  
+  <dd>The properties to set/update. Only the properties which need creating/updating need to be listed. Space separated values need to be surrounded by quotes ("). </dd>
+  <dt>Use local oc executable</dt>
+  <dd>It forces the extension to use, if present, the oc cli found in the machine where the agent is running. If no version is specified, the extension will use the local oc cli no matter its version is. If a version is specified then the extension will first check if the oc cli installed has the same version requested by the user, if not the correct oc cli will be downloaded.</dd>
 </dl>
 
 ---
