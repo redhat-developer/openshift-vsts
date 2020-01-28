@@ -31,13 +31,13 @@ describe('oc-run', function() {
     });
 
     it('remove leading oc', function() {
-      expect(cmd.prepareOcArguments('oc get nodes'))
+      expect(cmd.prepareOcArguments('oc get nodes', true))
         .to.be.an('array')
         .that.include.ordered.members(['get', 'nodes']);
     });
 
     it('remove leading oc.exe', function() {
-      expect(cmd.prepareOcArguments('oc.exe get nodes'))
+      expect(cmd.prepareOcArguments('oc.exe get nodes', true))
         .to.be.an('array')
         .that.include.ordered.members(['get', 'nodes']);
     });
