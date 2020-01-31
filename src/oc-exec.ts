@@ -47,10 +47,11 @@ export async function execOc(
   const trs = createToolRunners(cmds, ocPath);
   let i = 0;
   let trResult: ToolRunner = trs[i];  
-  while (i + 1 < cmds.length) {
-    const sndCmd = cmds[i + 1];
-    if (sndCmd[0] === '|') {
-      trResult = trResult.pipeExecOutputToTool(trs[i + 1]);
+  while (++i< cmds.length) {
+    const fstCmd = cmds[i-1];
+    const sndCmd = cmds[i];
+    if (fstCmd[0] !== '|' && sndCmd[0] === '|') {
+      trResult = buildPipeToolRunner(cmds, trs, i);
     } else if (sndCmd[0] === '>') {
       trResult.on('stdout', (data) => {
         const path = sndCmd.substring(1).trim();
@@ -61,10 +62,29 @@ export async function execOc(
       });
       break;
     }
-    i++;
   }
   await trResult.exec(options);
   return;
+}
+
+function buildPipeToolRunner(cmds: string[], trs: ToolRunner[], index: number) {
+  const nextPipes: number[] = _getNextPipes(cmds, index);
+  let trPipeResult: ToolRunner = trs[nextPipes[nextPipes.length -1]];
+  for (let c = nextPipes.length - 2; c >= 0; c--) {
+    trPipeResult = trs[nextPipes[c]].pipeExecOutputToTool(trPipeResult);
+  }
+  return trs[index - 1].pipeExecOutputToTool(trPipeResult);
+}
+
+function _getNextPipes(cmds: string[], index: number) {
+  const cmdsWithPipe: number[] = [];
+  for (let i=index; i<cmds.length; i++) {
+    if (cmds[i][0] !== '|') {
+      break;
+    }
+    cmdsWithPipe.push(i);
+  }
+  return cmdsWithPipe;
 }
 
 /**
