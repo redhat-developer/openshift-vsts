@@ -1,4 +1,4 @@
-import { ToolRunner } from 'vsts-task-lib/toolrunner';
+import { ToolRunner } from 'azure-pipelines-task-lib/toolrunner';
 import sinon = require('sinon');
 
 export class UtilStubs {

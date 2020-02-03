@@ -1,9 +1,12 @@
 'use strict';
 
-import tl = require('vsts-task-lib/task');
-import * as fs from 'mz/fs';
+import tl = require('azure-pipelines-task-lib/task');
+import * as fs from 'fs';
 import path = require('path');
-import { ToolRunner, IExecSyncResult } from 'vsts-task-lib/toolrunner';
+import {
+  ToolRunner,
+  IExecSyncResult
+} from 'azure-pipelines-task-lib/toolrunner';
 import { execOcSync } from './oc-exec';
 import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
 
@@ -92,7 +95,7 @@ export class InstallHandler {
       tl.debug('Unable to find bundle url');
       return null;
     }
-    const ocUtils = await InstallHandler.getOcUtils();
+    const ocUtils = InstallHandler.getOcUtils();
     const url = `${ocUtils['openshiftV4BaseUrl']}/${LATEST}/${bundle}`;
 
     tl.debug(`latest stable oc version: ${url}`);
@@ -133,7 +136,7 @@ export class InstallHandler {
       return null;
     }
     const vMajor: number = +vMajorRegEx[0];
-    const ocUtils = await InstallHandler.getOcUtils();
+    const ocUtils = InstallHandler.getOcUtils();
 
     // if we need the latest correct release of this oc version we need to retrieve the (major).(minor) of the version
     if (latest) {
@@ -363,10 +366,11 @@ export class InstallHandler {
     return undefined;
   }
 
-  static async getOcUtils(): Promise<{ [key: string]: string }> {
-    const rawData = await fs.readFile(
-      path.resolve(__dirname || '', 'oc-utils.json')
+  static getOcUtils(): { [key: string]: string } {
+    const rawData = fs.readFileSync(
+      path.resolve(__dirname || '', 'oc-utils.json'),
+      'utf-8'
     );
-    return JSON.parse(rawData);
+    return JSON.parse(rawData.toString());
   }
 }

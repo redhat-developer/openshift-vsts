@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra';
+import * as fs from 'fs';
 import path = require('path');
 import * as sinon from 'sinon';
 import * as OcAuth from '../src/oc-auth';
@@ -28,13 +28,11 @@ describe('oc-auth', function() {
     });
 
     after(() => {
-      fs.remove(path.join(__dirname, '..', '..', 'out', '.kube'))
-        .then(() => {
-          console.log('success!');
-        })
-        .catch((err: any) => {
-          console.error(err);
-        });
+      try {
+        fs.rmdirSync(path.join(__dirname, '..', '..', 'out', '.kube'));
+      } catch (e) {
+        console.error(e);
+      }
       delete process.env['HOME'];
       delete process.env['KUBECONFIG'];
     });

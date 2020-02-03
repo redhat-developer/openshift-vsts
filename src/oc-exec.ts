@@ -1,12 +1,12 @@
 'use strict';
 
-import tl = require('vsts-task-lib/task');
+import tl = require('azure-pipelines-task-lib/task');
 import stream = require('stream');
 import {
   ToolRunner,
   IExecOptions,
   IExecSyncResult
-} from 'vsts-task-lib/toolrunner';
+} from 'azure-pipelines-task-lib/toolrunner';
 
 const sub = require('substituter');
 const split = require('argv-split');
