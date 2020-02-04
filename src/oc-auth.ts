@@ -1,8 +1,8 @@
 'use strict';
 
 import oc = require('./oc-exec');
-import task = require('vsts-task-lib/task');
-import tl = require('vsts-task-lib/task');
+import task = require('azure-pipelines-task-lib/task');
+import tl = require('azure-pipelines-task-lib/task');
 import path = require('path');
 import {
   OPENSHIFT_SERVICE_NAME,

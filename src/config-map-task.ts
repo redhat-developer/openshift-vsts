@@ -1,6 +1,6 @@
 'use strict';
 
-import task = require('vsts-task-lib/task');
+import task = require('azure-pipelines-task-lib/task');
 
 import * as oc from './oc-exec';
 import { InstallHandler } from './oc-install';

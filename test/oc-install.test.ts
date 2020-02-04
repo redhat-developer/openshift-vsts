@@ -8,8 +8,8 @@ import { InstallHandler } from '../src/oc-install';
 import * as ocExec from '../src/oc-exec';
 import * as validUrl from 'valid-url';
 
-import tl = require('vsts-task-lib/task');
-import { IExecSyncResult } from 'vsts-task-lib/toolrunner';
+import tl = require('azure-pipelines-task-lib/task');
+import { IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner';
 import {
   LATEST,
   LINUX,
@@ -100,7 +100,7 @@ describe('InstallHandler', function() {
         .stub(InstallHandler, 'getOcBundleByOS')
         .resolves('linux/oc.tar.gz');
       const res = await InstallHandler.latestStable('linux');
-      const ocUtils = await InstallHandler.getOcUtils();
+      const ocUtils = InstallHandler.getOcUtils();
       expect(res).equals(
         `${ocUtils['openshiftV4BaseUrl']}/${LATEST}/linux/oc.tar.gz`
       );
@@ -126,7 +126,7 @@ describe('InstallHandler', function() {
     it('should return correct url if oc version (v = 3) is valid', async function() {
       const bundle = 'linux/oc.tar.gz';
       const version = '3.11.0';
-      const ocUtils = await InstallHandler.getOcUtils();
+      const ocUtils = InstallHandler.getOcUtils();
       const url = `${ocUtils['openshiftV3BaseUrl']}/${version}/${bundle}`;
       sandbox.stub(InstallHandler, 'getOcBundleByOS').resolves(bundle);
       const res = await InstallHandler.ocBundleURL(version, 'Linux');
@@ -136,7 +136,7 @@ describe('InstallHandler', function() {
     it('should return correct url if oc version (v = 3) is valid', async function() {
       const bundle = 'linux/oc.tar.gz';
       const version = '4.11';
-      const ocUtils = await InstallHandler.getOcUtils();
+      const ocUtils = InstallHandler.getOcUtils();
       const url = `${ocUtils['openshiftV4BaseUrl']}/${version}/${bundle}`;
       sandbox.stub(InstallHandler, 'getOcBundleByOS').resolves(bundle);
       const res = await InstallHandler.ocBundleURL(version, 'Linux');

@@ -2,8 +2,8 @@ import * as chai from 'chai';
 const expect = chai.expect;
 // import sinon
 import * as sinon from 'sinon';
-import tl = require('vsts-task-lib/task');
-import { IExecSyncResult } from 'vsts-task-lib/toolrunner';
+import tl = require('azure-pipelines-task-lib/task');
+import { IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner';
 import { execOcSync } from '../src/oc-exec';
 import { UtilStubs } from './utilStubs';
 
