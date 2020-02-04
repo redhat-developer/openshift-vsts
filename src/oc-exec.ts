@@ -27,58 +27,112 @@ export async function execOc(
     ocPath = 'oc';
   }
 
-  let options: IExecOptions | undefined = undefined;
-  
-  if (ignoreFlag) {
-    tl.debug(`creating options`);
+  const options: IExecOptions | undefined = createExecOptions(
+    undefined,
+    ignoreFlag
+  );
+
+  // split cmd based on redirection operators
+  const cmds: string[] = argLine.split(/(?=2(?=>))|(?=[>\|])/);
+  const trs: ToolRunner[] = initToolRunners(cmds, ocPath);
+  const tr = createToolRunner(cmds, trs, options);
+  await tr.exec(options);
+  return;
+}
+
+/**
+ * Creating a resulting toolrunner to execute user command
+ *
+ * @param cmds list of commands
+ * @param trs list of toolrunners
+ */
+function createToolRunner(
+  cmds: string[],
+  trs: ToolRunner[],
+  options?: IExecOptions
+): ToolRunner {
+  let i = 0;
+  let trResult: ToolRunner = trs[i];
+  while (++i < cmds.length) {
+    const fstCmd: string = cmds[i - 1];
+    const sndCmd: string = cmds[i];
+    if (fstCmd[0] !== '|' && sndCmd[0] === '|') {
+      trResult = buildPipeToolRunner(cmds, trs, i);
+    } else if (sndCmd[0] === '>' && sndCmd.trim().length > 1) {
+      const event =
+        fstCmd[0] === '2'
+          ? (createExecOptions(options, undefined, true), 'stderr')
+          : 'stdout';
+      trResult.on(event, redirectCallback(sndCmd, fstCmd[0] === '>'));
+    }
+  }
+
+  return trResult;
+}
+
+function createExecOptions(
+  options?: IExecOptions,
+  ignoreReturnCode?: boolean,
+  failOnStdErr?: boolean
+) {
+  if (ignoreReturnCode === undefined && failOnStdErr === undefined) {
+    return options;
+  }
+
+  if (!options) {
     options = {
       cwd: process.cwd(),
       env: Object.assign({}, process.env) as { [key: string]: string },
       silent: false,
-      failOnStdErr: false,
-      ignoreReturnCode: true,
+      failOnStdErr: failOnStdErr !== undefined ? failOnStdErr : false,
+      ignoreReturnCode:
+        ignoreReturnCode !== undefined ? ignoreReturnCode : false,
       windowsVerbatimArguments: false,
       outStream: process.stdout as stream.Writable,
       errStream: process.stderr as stream.Writable
     };
+  } else {
+    options.ignoreReturnCode =
+      ignoreReturnCode !== undefined
+        ? ignoreReturnCode
+        : options.ignoreReturnCode;
+    options.failOnStdErr =
+      failOnStdErr !== undefined ? failOnStdErr : options.failOnStdErr;
   }
-  // split cmd based on redirection operators
-  const cmds = argLine.split(/(?=[>|\|])/);
-  const trs = createToolRunners(cmds, ocPath);
-  let i = 0;
-  let trResult: ToolRunner = trs[i];  
-  while (++i< cmds.length) {
-    const fstCmd = cmds[i-1];
-    const sndCmd = cmds[i];
-    if (fstCmd[0] !== '|' && sndCmd[0] === '|') {
-      trResult = buildPipeToolRunner(cmds, trs, i);
-    } else if (sndCmd[0] === '>') {
-      trResult.on('stdout', (data) => {
-        const path = sndCmd.substring(1).trim();
-        fs.writeFile(path, data, (err) => {
-          if (err) throw err;
-          console.log(`The file ${path} has been saved!`);
-        });
-      });
-      break;
-    }
-  }
-  await trResult.exec(options);
-  return;
+  return options;
 }
 
 function buildPipeToolRunner(cmds: string[], trs: ToolRunner[], index: number) {
   const nextPipes: number[] = _getNextPipes(cmds, index);
-  let trPipeResult: ToolRunner = trs[nextPipes[nextPipes.length -1]];
+  let trPipeResult: ToolRunner = trs[nextPipes[nextPipes.length - 1]];
   for (let c = nextPipes.length - 2; c >= 0; c--) {
     trPipeResult = trs[nextPipes[c]].pipeExecOutputToTool(trPipeResult);
   }
   return trs[index - 1].pipeExecOutputToTool(trPipeResult);
 }
 
+function redirectCallback(cmd: string, append: boolean) {
+  const callback = data => {
+    const path = cmd.substring(1).trim();
+    if (append) {
+      fs.appendFile(path, data, err => {
+        if (err) throw err;
+        console.log(`The file ${path} has been saved!`);
+      });
+    } else {
+      fs.writeFile(path, data, err => {
+        if (err) throw err;
+        console.log(`The file ${path} has been saved!`);
+        append = true;
+      });
+    }
+  };
+  return callback;
+}
+
 function _getNextPipes(cmds: string[], index: number) {
   const cmdsWithPipe: number[] = [];
-  for (let i=index; i<cmds.length; i++) {
+  for (let i = index; i < cmds.length; i++) {
     if (cmds[i][0] !== '|') {
       break;
     }
@@ -94,7 +148,10 @@ function _getNextPipes(cmds: string[], index: number) {
  * @param removeOc Flag to check if oc command is present in args and remove it
  * @return array of arguments with potential environment variables interpolated
  */
-export function prepareCmdArguments(argLine: string, removeOc?: boolean): string[] {
+export function prepareCmdArguments(
+  argLine: string,
+  removeOc?: boolean
+): string[] {
   let interpolatedArgs = sub(argLine, process.env);
   let args = split(interpolatedArgs);
   if (removeOc && (args[0] === 'oc' || args[0] === 'oc.exe')) {
@@ -103,46 +160,55 @@ export function prepareCmdArguments(argLine: string, removeOc?: boolean): string
   return args;
 }
 
+/**
+ * Build up a toolrunner based on the command to be executed
+ *
+ * @param cmd command to be executed
+ * @param ocPath path oc cli tool
+ */
 function prepareToolRunner(cmd: string, ocPath: string): ToolRunner {
   // first element in each command, without considering redirection operator, has to be the tool needed to execute it (e.g. oc, grep, findstr, ...)
   let tr: ToolRunner;
-  if (cmd[0] === '>') {
+  if (cmd[0] === '>' || cmd[0] === '2') {
     return tr;
   }
 
   cmd = cmd[0] === '|' ? cmd.substring(1).trim() : cmd.trim();
   const arg = prepareCmdArguments(cmd);
+  // add tool to exec
   if (arg[0] === 'oc' || arg[0] === 'oc.exe') {
     tr = tl.tool(ocPath);
   } else {
+    // if user wants to use a different tool (e.g grep) to work with previous oc command output
     tr = tl.tool(tl.which(arg[0], true));
-  } 
+  }
+  // add args to toolrunner
   for (let argN of arg.slice(1)) {
     tr.arg(argN);
   }
   return tr;
 }
 
-function createToolRunners(cmds: string[], ocPath: string): ToolRunner[] {
+/**
+ * Initialize all toolrunners for the list of commands specified
+ *
+ * @param cmds list of commands to be executed
+ * @param ocPath path oc cli tool
+ */
+function initToolRunners(cmds: string[], ocPath: string): ToolRunner[] {
   if (!cmds) {
-    return null;
+    return [];
   }
-  const trs: ToolRunner[] = [];
-  // first cmd in list is oc cmd for sure and user can omit "oc"
-  if (cmds[0].length < 2 || cmds[0].substring(0, 2) !== 'oc') {
+  // first cmd in list has to be oc cmd and user can omit "oc"
+  if (cmds[0].substring(0, 2) !== 'oc') {
     cmds[0] = `oc ${cmds[0]}`;
   }
 
+  const trs: ToolRunner[] = [];
   // loop through concatenated commands
-  for (let cmd of cmds) { 
-    const tr: ToolRunner = prepareToolRunner(cmd, ocPath);
-    if (!tr) {
-      trs.push(null);
-    } else {
-      trs.push(tr);
-    }
+  for (let cmd of cmds) {
+    trs.push(prepareToolRunner(cmd, ocPath));
   }
-
   return trs;
 }
 
