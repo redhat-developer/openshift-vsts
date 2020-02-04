@@ -140,7 +140,7 @@ export class InstallHandler {
 
     // if we need the latest correct release of this oc version we need to retrieve the (major).(minor) of the version
     if (latest) {
-      reg = new RegExp('\\d+\\.\\d+(?=\\.)');
+      reg = new RegExp('\\d+\\.\\d+(?=\\.)*');
       const versionRegEx: RegExpExecArray = reg.exec(version);
       if (!versionRegEx || versionRegEx.length === 0) {
         tl.debug(
