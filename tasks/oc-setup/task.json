@@ -34,6 +34,14 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
+    },
+    {
+      "name": "proxy",
+      "type": "string",
+      "label": "Use proxy to download oc executable",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "make use of a proxy to download oc executable"
     }
   ],
   "execution": {

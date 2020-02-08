@@ -8,8 +8,8 @@ import * as auth from './oc-auth';
 async function run() {
   let version = task.getInput('version');
   let agentOS = task.osType();
-
-  let ocPath = await InstallHandler.installOc(version, agentOS, false);
+  const proxy: string = task.getInput('proxy');
+  let ocPath = await InstallHandler.installOc(version, agentOS, false, proxy);
   if (ocPath === null) {
     throw new Error('no oc binary found');
   }
