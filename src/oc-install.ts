@@ -9,11 +9,9 @@ import {
 } from 'azure-pipelines-task-lib/toolrunner';
 import { execOcSync } from './oc-exec';
 import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
+import { unzipArchive } from './utils/utils';
 
 const validUrl = require('valid-url');
-const decompress = require('decompress');
-const decompressTargz = require('decompress-targz');
-const Zip = require('adm-zip');
 const fetch = require('node-fetch');
 
 export class InstallHandler {
@@ -257,24 +255,7 @@ export class InstallHandler {
 
     tl.debug(`expanding ${archivePath} into ${downloadDir}`);
 
-    switch (archiveType) {
-      case '.zip': {
-        let zip = new Zip(archivePath);
-        zip.extractAllTo(downloadDir);
-        break;
-      }
-      case '.tgz':
-      case '.tar.gz': {
-        await decompress(archivePath, downloadDir, {
-          filter: file => file.data.length > 0,
-          plugins: [decompressTargz()]
-        });
-        break;
-      }
-      default: {
-        throw `unknown archive format ${archivePath}`;
-      }
-    }
+    unzipArchive(archiveType, archivePath, downloadDir);
 
     let ocBinary: string;
     switch (osType) {
