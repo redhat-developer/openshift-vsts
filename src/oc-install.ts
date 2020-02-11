@@ -255,7 +255,7 @@ export class InstallHandler {
 
     tl.debug(`expanding ${archivePath} into ${downloadDir}`);
 
-    unzipArchive(archiveType, archivePath, downloadDir);
+    await unzipArchive(archiveType, archivePath, downloadDir);
 
     let ocBinary: string;
     switch (osType) {
