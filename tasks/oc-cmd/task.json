@@ -58,6 +58,14 @@
       "defaultValue": "false",
       "required": false,
       "helpMarkDown": "Check if oc is already installed in the machine and use that if available"
+    },
+    {
+      "name": "proxy",
+      "type": "string",
+      "label": "Use proxy to download oc executable",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "make use of a proxy to download oc executable"
     }
   ],
   "execution": {

@@ -9,11 +9,9 @@ import {
 } from 'azure-pipelines-task-lib/toolrunner';
 import { execOcSync } from './oc-exec';
 import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
+import { unzipArchive } from './utils/utils';
 
 const validUrl = require('valid-url');
-const decompress = require('decompress');
-const decompressTargz = require('decompress-targz');
-const Zip = require('adm-zip');
 const fetch = require('node-fetch');
 
 export class InstallHandler {
@@ -23,12 +21,15 @@ export class InstallHandler {
    *
    * @param downloadVersion the version of `oc` to install.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'. See https://nodejs.org/api/os.html#os_os_type
+   * @param useLocalOc if user prefer to use the current oc cli already installed in his machine
+   * @param proxy proxy to use to download oc
    * @return the full path to the installed executable or null if the install failed.
    */
   static async installOc(
     downloadVersion: string,
     osType: string,
-    useLocalOc: boolean
+    useLocalOc: boolean,
+    proxy: string
   ): Promise<string | null> {
     if (useLocalOc) {
       const localOcPath = InstallHandler.getLocalOcPath(downloadVersion);
@@ -73,7 +74,8 @@ export class InstallHandler {
     let ocBinary = await InstallHandler.downloadAndExtract(
       url,
       downloadDir,
-      osType
+      osType,
+      proxy
     );
     if (ocBinary === null) {
       return Promise.reject('Unable to download or extract oc binary.');
@@ -208,12 +210,14 @@ export class InstallHandler {
    * @param url the oc release download URL.
    * @param downloadDir the directory into which to extract the archive.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
+   * @param proxy proxy to use to download oc
    * It is the responsibility of the caller to ensure that the directory exist.
    */
   static async downloadAndExtract(
     url: string,
     downloadDir: string,
-    osType: string
+    osType: string,
+    proxy: string
   ): Promise<string | null> {
     if (!url) {
       return null;
@@ -233,6 +237,7 @@ export class InstallHandler {
       let curl: ToolRunner = tl.tool('curl');
       curl
         .arg('-s')
+        .argIf(!!proxy, ['-x', proxy])
         .arg('-L')
         .arg('-o')
         .arg(archivePath)
@@ -250,24 +255,7 @@ export class InstallHandler {
 
     tl.debug(`expanding ${archivePath} into ${downloadDir}`);
 
-    switch (archiveType) {
-      case '.zip': {
-        let zip = new Zip(archivePath);
-        zip.extractAllTo(downloadDir);
-        break;
-      }
-      case '.tgz':
-      case '.tar.gz': {
-        await decompress(archivePath, downloadDir, {
-          filter: file => file.data.length > 0,
-          plugins: [decompressTargz()]
-        });
-        break;
-      }
-      default: {
-        throw `unknown archive format ${archivePath}`;
-      }
-    }
+    await unzipArchive(archiveType, archivePath, downloadDir);
 
     let ocBinary: string;
     switch (osType) {

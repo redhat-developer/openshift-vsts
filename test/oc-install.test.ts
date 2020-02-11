@@ -5,7 +5,9 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 
 import { InstallHandler } from '../src/oc-install';
+//import * as ocinstall from '../src/oc-install';
 import * as ocExec from '../src/oc-exec';
+import path = require('path');
 import * as validUrl from 'valid-url';
 
 import tl = require('azure-pipelines-task-lib/task');
@@ -19,12 +21,17 @@ import {
   MACOSX
 } from '../src/constants';
 
+import { ToolRunnerStub } from './toolrunnerStub';
+import * as utils from '../src/utils/utils';
+
 describe('InstallHandler', function() {
   let sandbox: sinon.SinonSandbox;
+  let stubs: ToolRunnerStub;
   const testOutDir = `${__dirname}/../out/test/ocInstall`;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    stubs = new ToolRunnerStub(sandbox);
     process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] = testOutDir;
   });
 
@@ -41,14 +48,14 @@ describe('InstallHandler', function() {
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(InstallHandler, 'ocBundleURL').resolves('url');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      await InstallHandler.installOc('', 'Darwin', false);
+      await InstallHandler.installOc('', 'Darwin', false, '');
       expect(latestStub.calledOnce).to.be.true;
     });
 
     it('return error if lastest version is not found', async function() {
       sandbox.stub(InstallHandler, 'latestStable').resolves(null);
       try {
-        await InstallHandler.installOc('', 'Darwin', false);
+        await InstallHandler.installOc('', 'Darwin', false, '');
         expect.fail();
       } catch (ex) {
         expect(ex).equals('Unable to determine latest oc download URL');
@@ -62,7 +69,8 @@ describe('InstallHandler', function() {
       await InstallHandler.installOc(
         'https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip',
         'Darwin',
-        false
+        false,
+        ''
       );
       expect(ocBundleStub.calledOnce).to.be.false;
     });
@@ -72,7 +80,7 @@ describe('InstallHandler', function() {
       sandbox.stub(validUrl, 'isWebUri').returns('path');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves(null);
       try {
-        await InstallHandler.installOc('path', 'Darwin', false);
+        await InstallHandler.installOc('path', 'Darwin', false, '');
         expect.fail();
       } catch (ex) {
         expect(ex).equals('Unable to download or extract oc binary.');
@@ -83,7 +91,12 @@ describe('InstallHandler', function() {
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(validUrl, 'isWebUri').returns('path');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      const result = await InstallHandler.installOc('path', 'Darwin', false);
+      const result = await InstallHandler.installOc(
+        'path',
+        'Darwin',
+        false,
+        ''
+      );
       expect(result).equals('path');
     });
   });
@@ -166,6 +179,137 @@ describe('InstallHandler', function() {
       const version = '3.17';
       const res = await InstallHandler.ocBundleURL(version, 'Linux', true);
       expect(res).equals(null);
+    });
+  });
+
+  describe('#downloadAndExtract', function() {
+    it('return null if url is not valid', async function() {
+      const res = await InstallHandler.downloadAndExtract(
+        '',
+        'path',
+        'Linux',
+        'ip:port'
+      );
+      expect(res).to.be.null;
+    });
+
+    it('throw error if download dir no exists', async function() {
+      const normalizeStub = sandbox.stub(path, 'normalize').returns('path');
+      sandbox.stub(tl, 'exist').returns(false);
+      try {
+        await InstallHandler.downloadAndExtract(
+          'url',
+          'path',
+          'Linux',
+          'ip:port'
+        );
+        normalizeStub.calledOnce;
+        expect.fail();
+      } catch (err) {
+        expect(err).equals('path does not exist.');
+      }
+    });
+
+    it('curl is called if archive path no exists', async function() {
+      sandbox.stub(path, 'normalize').returns('path');
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(false);
+      const toolStub = sandbox.stub(tl, 'tool').returns(stubs.tr);
+      try {
+        await InstallHandler.downloadAndExtract('url', 'path', 'Linux', '');
+      } catch (ex) {}
+      sinon.assert.calledWith(toolStub, 'curl');
+      expect(stubs.args.length).equals(5);
+    });
+
+    it('curl is called with -x arg if proxy is valid', async function() {
+      sandbox.stub(path, 'normalize').returns('path');
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(false);
+      sandbox.stub(tl, 'tool').returns(stubs.tr);
+      try {
+        await InstallHandler.downloadAndExtract(
+          'url',
+          'path',
+          'Linux',
+          'ip:port'
+        );
+      } catch (ex) {}
+
+      expect(stubs.args.length).equals(7);
+    });
+
+    it('null if oc path no exists', async function() {
+      sandbox.stub(path, 'normalize').returns('path');
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(true)
+        .onThirdCall()
+        .returns(false);
+      sandbox.stub(utils, 'unzipArchive');
+      const res = await InstallHandler.downloadAndExtract(
+        'url',
+        'path',
+        'Linux',
+        'ip:port'
+      );
+      expect(res).equals(null);
+    });
+
+    it('check if correct oc path for Windows', async function() {
+      sandbox.stub(path, 'normalize').returns('path');
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(true)
+        .onThirdCall()
+        .returns(true);
+      sandbox.stub(utils, 'unzipArchive');
+      sandbox.stub(path, 'join').returns('path/oc.exe');
+      sandbox.stub(fs, 'chmodSync');
+      const res = await InstallHandler.downloadAndExtract(
+        'url',
+        'path',
+        'Windows_NT',
+        'ip:port'
+      );
+      expect(res).equals('path/oc.exe');
+    });
+
+    it('check if correct oc path for Linux/Mac', async function() {
+      sandbox.stub(path, 'normalize').returns('path');
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(true)
+        .onThirdCall()
+        .returns(true);
+      sandbox.stub(utils, 'unzipArchive');
+      sandbox.stub(path, 'join').returns('path/oc');
+      const chmod = sandbox.stub(fs, 'chmodSync');
+      const res = await InstallHandler.downloadAndExtract(
+        'url',
+        'path',
+        'Linux',
+        'ip:port'
+      );
+      expect(res).equals('path/oc');
+      sinon.assert.calledWith(chmod, 'path/oc', '0755');
     });
   });
 
