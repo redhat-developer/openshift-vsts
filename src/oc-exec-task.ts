@@ -14,7 +14,12 @@ async function run() {
   const proxy: string = task.getInput('proxy');
   let agentOS = task.osType();
 
-  let ocPath = await InstallHandler.installOc(version, agentOS, useLocalOc, proxy);
+  let ocPath = await InstallHandler.installOc(
+    version,
+    agentOS,
+    useLocalOc,
+    proxy
+  );
   if (ocPath === null) {
     throw new Error('no oc binary found');
   }

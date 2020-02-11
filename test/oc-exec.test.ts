@@ -27,7 +27,7 @@ describe('oc-exec', function() {
       stderr: undefined,
       stdout: 'xxxxxx xxxxxx xxxxxxx xxxxxx'
     };
-    
+
     it('check tl.tool is called with right param if ocPath input is passed to execOcSync', function() {
       stubs.tr.execSync = () => execRes;
       const toolStub = sandbox.stub(tl, 'tool').returns(stubs.tr);

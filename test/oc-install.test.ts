@@ -91,7 +91,12 @@ describe('InstallHandler', function() {
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(validUrl, 'isWebUri').returns('path');
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      const result = await InstallHandler.installOc('path', 'Darwin', false, '');
+      const result = await InstallHandler.installOc(
+        'path',
+        'Darwin',
+        false,
+        ''
+      );
       expect(result).equals('path');
     });
   });
@@ -178,8 +183,13 @@ describe('InstallHandler', function() {
   });
 
   describe('#downloadAndExtract', function() {
-    it('return null if url inìs not valid', async function() {
-      const res = await InstallHandler.downloadAndExtract('', 'path', 'Linux', 'ip:port');
+    it('return null if url is not valid', async function() {
+      const res = await InstallHandler.downloadAndExtract(
+        '',
+        'path',
+        'Linux',
+        'ip:port'
+      );
       expect(res).to.be.null;
     });
 
@@ -187,7 +197,12 @@ describe('InstallHandler', function() {
       const normalizeStub = sandbox.stub(path, 'normalize').returns('path');
       sandbox.stub(tl, 'exist').returns(false);
       try {
-        await InstallHandler.downloadAndExtract('url', 'path', 'Linux', 'ip:port');
+        await InstallHandler.downloadAndExtract(
+          'url',
+          'path',
+          'Linux',
+          'ip:port'
+        );
         normalizeStub.calledOnce;
         expect.fail();
       } catch (err) {
@@ -197,59 +212,102 @@ describe('InstallHandler', function() {
 
     it('curl is called if archive path no exists', async function() {
       sandbox.stub(path, 'normalize').returns('path');
-      sandbox.stub(tl, 'exist').onFirstCall().returns(true)
-                               .onSecondCall().returns(false);
-      sandbox.stub(tl, 'tool').returns(stubs.tr);
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(false);
+      const toolStub = sandbox.stub(tl, 'tool').returns(stubs.tr);
       try {
         await InstallHandler.downloadAndExtract('url', 'path', 'Linux', '');
       } catch (ex) {}
-      
+      sinon.assert.calledWith(toolStub, 'curl');
       expect(stubs.args.length).equals(5);
     });
 
     it('curl is called with -x arg if proxy is valid', async function() {
       sandbox.stub(path, 'normalize').returns('path');
-      sandbox.stub(tl, 'exist').onFirstCall().returns(true)
-                               .onSecondCall().returns(false);
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(false);
       sandbox.stub(tl, 'tool').returns(stubs.tr);
       try {
-        await InstallHandler.downloadAndExtract('url', 'path', 'Linux', 'ip:port');
+        await InstallHandler.downloadAndExtract(
+          'url',
+          'path',
+          'Linux',
+          'ip:port'
+        );
       } catch (ex) {}
-      
+
       expect(stubs.args.length).equals(7);
     });
 
     it('null if oc path no exists', async function() {
       sandbox.stub(path, 'normalize').returns('path');
-      sandbox.stub(tl, 'exist').onFirstCall().returns(true)
-                               .onSecondCall().returns(true)
-                               .onThirdCall().returns(false);
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(true)
+        .onThirdCall()
+        .returns(false);
       sandbox.stub(utils, 'unzipArchive');
-      const res = await InstallHandler.downloadAndExtract('url', 'path', 'Linux', 'ip:port');
+      const res = await InstallHandler.downloadAndExtract(
+        'url',
+        'path',
+        'Linux',
+        'ip:port'
+      );
       expect(res).equals(null);
     });
 
     it('check if correct oc path for Windows', async function() {
       sandbox.stub(path, 'normalize').returns('path');
-      sandbox.stub(tl, 'exist').onFirstCall().returns(true)
-                               .onSecondCall().returns(true)
-                               .onThirdCall().returns(true);
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(true)
+        .onThirdCall()
+        .returns(true);
       sandbox.stub(utils, 'unzipArchive');
       sandbox.stub(path, 'join').returns('path/oc.exe');
       sandbox.stub(fs, 'chmodSync');
-      const res = await InstallHandler.downloadAndExtract('url', 'path', 'Windows_NT', 'ip:port');
+      const res = await InstallHandler.downloadAndExtract(
+        'url',
+        'path',
+        'Windows_NT',
+        'ip:port'
+      );
       expect(res).equals('path/oc.exe');
     });
 
     it('check if correct oc path for Linux/Mac', async function() {
       sandbox.stub(path, 'normalize').returns('path');
-      sandbox.stub(tl, 'exist').onFirstCall().returns(true)
-                               .onSecondCall().returns(true)
-                               .onThirdCall().returns(true);
+      sandbox
+        .stub(tl, 'exist')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(true)
+        .onThirdCall()
+        .returns(true);
       sandbox.stub(utils, 'unzipArchive');
       sandbox.stub(path, 'join').returns('path/oc');
       const chmod = sandbox.stub(fs, 'chmodSync');
-      const res = await InstallHandler.downloadAndExtract('url', 'path', 'Linux', 'ip:port');
+      const res = await InstallHandler.downloadAndExtract(
+        'url',
+        'path',
+        'Linux',
+        'ip:port'
+      );
       expect(res).equals('path/oc');
       sinon.assert.calledWith(chmod, 'path/oc', '0755');
     });
