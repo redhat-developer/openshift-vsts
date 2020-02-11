@@ -6,7 +6,7 @@ import * as fs from 'fs';
 
 import { InstallHandler } from '../src/oc-install';
 //import * as ocinstall from '../src/oc-install';
-import * as ocExec from '../src/oc-exec';
+import { RunnerHandler } from '../src/oc-exec';
 import path = require('path');
 import * as validUrl from 'valid-url';
 
@@ -428,7 +428,7 @@ describe('InstallHandler', function() {
     let execOcStub: sinon.SinonStub;
 
     beforeEach(function() {
-      execOcStub = sandbox.stub(ocExec, 'execOcSync');
+      execOcStub = sandbox.stub(RunnerHandler, 'execOcSync');
     });
 
     it('check if correct version is returned if oc version > 4', function() {

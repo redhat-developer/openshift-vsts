@@ -7,7 +7,7 @@ import {
   ToolRunner,
   IExecSyncResult
 } from 'azure-pipelines-task-lib/toolrunner';
-import { execOcSync } from './oc-exec';
+import { RunnerHandler } from './oc-exec';
 import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
 import { unzipArchive } from './utils/utils';
 
@@ -327,7 +327,7 @@ export class InstallHandler {
   }
 
   static getOcVersion(ocPath: string) {
-    let result: IExecSyncResult | undefined = execOcSync(
+    let result: IExecSyncResult | undefined = RunnerHandler.execOcSync(
       ocPath,
       'version --short=true --client=true'
     );
@@ -335,7 +335,7 @@ export class InstallHandler {
     if (!result || result.stderr) {
       tl.debug(`error ${result && result.stderr ? result.stderr : ''}`);
       // if oc version failed we're dealing with oc < 4.1
-      result = execOcSync(ocPath, 'version');
+      result = RunnerHandler.execOcSync(ocPath, 'version');
     }
 
     if (!result || !result.stdout) {

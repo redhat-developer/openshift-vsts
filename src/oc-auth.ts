@@ -1,6 +1,6 @@
 'use strict';
 
-import oc = require('./oc-exec');
+import { RunnerHandler } from './oc-exec';
 import task = require('azure-pipelines-task-lib/task');
 import tl = require('azure-pipelines-task-lib/task');
 import path = require('path');
@@ -71,7 +71,7 @@ export async function createKubeConfig(
     case BASIC_AUTHENTICATION:
       let username = endpoint.parameters['username'];
       let password = endpoint.parameters['password'];
-      await oc.execOc(
+      await RunnerHandler.execOc(
         ocPath,
         `login ${useCertificateOrSkipTls} -u ${username} -p ${password} ${
           endpoint.serverUrl
@@ -83,7 +83,7 @@ export async function createKubeConfig(
         `login ${useCertificateOrSkipTls} --token ${
           endpoint.parameters['apitoken']
         } ` + endpoint.serverUrl;
-      await oc.execOc(ocPath, args);
+      await RunnerHandler.execOc(ocPath, args);
       break;
     case NO_AUTHENTICATION:
       authKubeConfig(endpoint.parameters['kubeconfig'], osType);
