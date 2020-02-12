@@ -49,10 +49,19 @@ describe('oc-exec', function() {
 
     it('check unifyToolRunners is called with correct params', async function() {
       sandbox.stub(RunnerHandler, 'createExecOptions');
-      sandbox.stub(RunnerHandler, 'initToolRunners').returns([stubs.tr, stubs.tr]);
-      const unifyStub = sandbox.stub(RunnerHandler, 'unifyToolRunners').returns(stubs.tr);
+      sandbox
+        .stub(RunnerHandler, 'initToolRunners')
+        .returns([stubs.tr, stubs.tr]);
+      const unifyStub = sandbox
+        .stub(RunnerHandler, 'unifyToolRunners')
+        .returns(stubs.tr);
       await RunnerHandler.execOc(null, 'cmd1 > cmd2', false);
-      sinon.assert.calledWith(unifyStub, ['cmd1 ', '> cmd2'], [stubs.tr, stubs.tr], undefined);
+      sinon.assert.calledWith(
+        unifyStub,
+        ['cmd1 ', '> cmd2'],
+        [stubs.tr, stubs.tr],
+        undefined
+      );
     });
   });
 
@@ -66,7 +75,10 @@ describe('oc-exec', function() {
     it('check if createExecOptions is called fstCmd is a 2', async function() {
       const pipeStub = sandbox.stub(RunnerHandler, 'buildPipeToolRunner');
       const createExecStub = sandbox.stub(RunnerHandler, 'createExecOptions');
-      RunnerHandler.unifyToolRunners(['cmd1', '2', '> cmd2'], [stubs.tr, undefined, stubs.tr]);
+      RunnerHandler.unifyToolRunners(
+        ['cmd1', '2', '> cmd2'],
+        [stubs.tr, undefined, stubs.tr]
+      );
       sinon.assert.notCalled(pipeStub);
       sinon.assert.calledOnce(createExecStub);
     });
@@ -74,7 +86,10 @@ describe('oc-exec', function() {
     it('check if createExecOptions is not called if fstCmd is not a 2 but >', async function() {
       const pipeStub = sandbox.stub(RunnerHandler, 'buildPipeToolRunner');
       const createExecStub = sandbox.stub(RunnerHandler, 'createExecOptions');
-      RunnerHandler.unifyToolRunners(['cmd1', '> cmd2'], [stubs.tr, undefined, stubs.tr]);
+      RunnerHandler.unifyToolRunners(
+        ['cmd1', '> cmd2'],
+        [stubs.tr, undefined, stubs.tr]
+      );
       sinon.assert.notCalled(pipeStub);
       sinon.assert.notCalled(createExecStub);
     });
@@ -105,7 +120,9 @@ describe('oc-exec', function() {
       const res = RunnerHandler.createExecOptions(undefined, true, true);
       expect(options.failOnStdErr).equals(res.failOnStdErr);
       expect(options.ignoreReturnCode).equals(res.ignoreReturnCode);
-      expect(options.windowsVerbatimArguments).equals(res.windowsVerbatimArguments);
+      expect(options.windowsVerbatimArguments).equals(
+        res.windowsVerbatimArguments
+      );
     });
 
     it('check if options are changed correctly when requested', async function() {
@@ -166,10 +183,12 @@ describe('oc-exec', function() {
       const res = RunnerHandler.prepareToolRunner('2> cmd1', 'path');
       expect(res).equal(undefined);
     });
-    
+
     it('check if pipe is trimmed if it is in first pos', async function() {
       sandbox.stub(tl, 'tool');
-      const prepareCmdArgumentsStub = sandbox.stub(RunnerHandler, 'prepareCmdArguments').returns(['oc']);
+      const prepareCmdArgumentsStub = sandbox
+        .stub(RunnerHandler, 'prepareCmdArguments')
+        .returns(['oc']);
       RunnerHandler.prepareToolRunner('| cmd1', 'path');
       sinon.assert.calledWith(prepareCmdArgumentsStub, 'cmd1');
     });
@@ -200,8 +219,13 @@ describe('oc-exec', function() {
     });
 
     it('check prepareToolRunner is called n times where n are the commands', async function() {
-      const prepareToolRunnerStub = sandbox.stub(RunnerHandler, 'prepareToolRunner').returns(stubs.tr); 
-      const res = RunnerHandler.initToolRunners(['cmd1', 'cmd2', 'cmd3'], 'path');
+      const prepareToolRunnerStub = sandbox
+        .stub(RunnerHandler, 'prepareToolRunner')
+        .returns(stubs.tr);
+      const res = RunnerHandler.initToolRunners(
+        ['cmd1', 'cmd2', 'cmd3'],
+        'path'
+      );
       sinon.assert.calledThrice(prepareToolRunnerStub);
       expect(res.length).equals(3);
     });

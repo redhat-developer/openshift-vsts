@@ -13,13 +13,12 @@ const sub = require('substituter');
 const split = require('argv-split');
 
 export class RunnerHandler {
-
- /**
- * Prepares oc for execution and runs the specified command.
- *
- * @param ocPath absolute path to the oc binary. If null is passed the binary is determined by running 'which oc'.
- * @param argLine the command to run
- */
+  /**
+   * Prepares oc for execution and runs the specified command.
+   *
+   * @param ocPath absolute path to the oc binary. If null is passed the binary is determined by running 'which oc'.
+   * @param argLine the command to run
+   */
   static async execOc(
     ocPath: string | null,
     argLine: string,
@@ -37,6 +36,10 @@ export class RunnerHandler {
     // split cmd based on redirection operators
     const cmds: string[] = argLine.split(/(?=2(?=>))|(?=[>\|])/);
     const trs: ToolRunner[] = RunnerHandler.initToolRunners(cmds, ocPath);
+    if (trs === []) {
+      tl.debug(`Unable to create any ToolRunner by ${argLine}`);
+      return;
+    }
     const tr: ToolRunner = RunnerHandler.unifyToolRunners(cmds, trs, options);
     await tr.exec(options);
     return;
@@ -63,9 +66,13 @@ export class RunnerHandler {
       } else if (sndCmd[0] === '>' && sndCmd.trim().length > 1) {
         const event =
           fstCmd[0] === '2'
-            ? (RunnerHandler.createExecOptions(options, undefined, true), 'stderr')
+            ? (RunnerHandler.createExecOptions(options, undefined, true),
+              'stderr')
             : 'stdout';
-        trResult.on(event, RunnerHandler.writeAfterCommandExecution(sndCmd, fstCmd[0] === '>'));
+        trResult.on(
+          event,
+          RunnerHandler.writeAfterCommandExecution(sndCmd, fstCmd[0] === '>')
+        );
       }
     }
 
@@ -150,10 +157,7 @@ export class RunnerHandler {
    * @param removeOc Flag to check if oc command is present in args and remove it
    * @return array of arguments with potential environment variables interpolated
    */
-  static prepareCmdArguments(
-    argLine: string,
-    removeOc?: boolean
-  ): string[] {
+  static prepareCmdArguments(argLine: string, removeOc?: boolean): string[] {
     let interpolatedArgs = sub(argLine, process.env);
     let args = split(interpolatedArgs);
     if (removeOc && (args[0] === 'oc' || args[0] === 'oc.exe')) {
@@ -238,5 +242,4 @@ export class RunnerHandler {
 
     return undefined;
   }
-
 }
