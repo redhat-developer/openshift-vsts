@@ -2,7 +2,7 @@
 
 import task = require('azure-pipelines-task-lib/task');
 
-import * as oc from './oc-exec';
+import { RunnerHandler } from './oc-exec';
 import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
 import { ConfigMap } from './config-map';
@@ -28,7 +28,7 @@ async function run() {
   let configMap = new ConfigMap(configMapName, properties);
 
   await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
-  await oc.execOc(ocPath, configMap.patchCmd(namespace));
+  await RunnerHandler.execOc(ocPath, configMap.patchCmd(namespace));
 }
 
 run()

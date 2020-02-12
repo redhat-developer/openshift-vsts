@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import path = require('path');
 import * as sinon from 'sinon';
 import * as OcAuth from '../src/oc-auth';
-import * as OcExec from '../src/oc-exec';
+import { RunnerHandler } from '../src/oc-exec';
 import { BASIC_AUTHENTICATION, TOKEN_AUTHENTICATION } from '../src/constants';
 let chai = require('chai');
 chai.use(require('chai-fs'));
@@ -120,7 +120,7 @@ describe('oc-auth', function() {
       const certificateStub = sandbox
         .stub(OcAuth, 'getCertificateAuthorityFile')
         .returns('flag');
-      sandbox.stub(OcExec, 'execOc');
+      sandbox.stub(RunnerHandler, 'execOc');
       try {
         await OcAuth.createKubeConfig(endpoint, 'path', 'OS');
         sinon.assert.calledWith(certificateStub, endpoint);
@@ -130,7 +130,7 @@ describe('oc-auth', function() {
     it('check if skipTlsVerify is called with correct endpoint if getCertificateAuthorityFile returns no flag', async () => {
       sandbox.stub(OcAuth, 'getCertificateAuthorityFile').returns('');
       const skipTlsStub = sandbox.stub(OcAuth, 'skipTlsVerify').returns('');
-      sandbox.stub(OcExec, 'execOc');
+      sandbox.stub(RunnerHandler, 'execOc');
       sandbox.stub(OcAuth, 'exportKubeConfig');
       try {
         await OcAuth.createKubeConfig(endpoint, 'path', 'OS');
@@ -141,7 +141,7 @@ describe('oc-auth', function() {
     it('check if skipTlsVerify is NOT called if getCertificateAuthorityFile returns valid flag', async () => {
       sandbox.stub(OcAuth, 'getCertificateAuthorityFile').returns('flag');
       const skipTlsStub = sandbox.stub(OcAuth, 'skipTlsVerify').returns('');
-      sandbox.stub(OcExec, 'execOc');
+      sandbox.stub(RunnerHandler, 'execOc');
       sandbox.stub(OcAuth, 'exportKubeConfig');
       try {
         await OcAuth.createKubeConfig(endpoint, 'path', 'OS');
@@ -156,7 +156,7 @@ describe('oc-auth', function() {
 
       sandbox.stub(OcAuth, 'getCertificateAuthorityFile').returns('');
       sandbox.stub(OcAuth, 'skipTlsVerify').returns('');
-      const commandStub = sandbox.stub(OcExec, 'execOc');
+      const commandStub = sandbox.stub(RunnerHandler, 'execOc');
       sandbox.stub(OcAuth, 'exportKubeConfig');
       try {
         await OcAuth.createKubeConfig(endpoint, 'path', 'OS');
@@ -175,7 +175,7 @@ describe('oc-auth', function() {
 
       sandbox.stub(OcAuth, 'getCertificateAuthorityFile').returns('');
       sandbox.stub(OcAuth, 'skipTlsVerify').returns('');
-      const commandStub = sandbox.stub(OcExec, 'execOc');
+      const commandStub = sandbox.stub(RunnerHandler, 'execOc');
       sandbox.stub(OcAuth, 'exportKubeConfig');
       try {
         await OcAuth.createKubeConfig(endpoint, 'path', 'OS');

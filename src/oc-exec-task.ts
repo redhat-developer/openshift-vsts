@@ -1,7 +1,7 @@
 'use strict';
 
 import task = require('azure-pipelines-task-lib/task');
-import oc = require('./oc-exec');
+import { RunnerHandler } from './oc-exec';
 
 import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
@@ -25,7 +25,7 @@ async function run() {
   }
 
   await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
-  await oc.execOc(ocPath, argLine, ignoreFlag);
+  await RunnerHandler.execOc(ocPath, argLine, ignoreFlag);
 }
 
 run()
