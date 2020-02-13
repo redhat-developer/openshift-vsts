@@ -1,8 +1,8 @@
-'use strict';
-
-import tl = require('azure-pipelines-task-lib/task');
+/*-----------------------------------------------------------------------------------------------
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *-----------------------------------------------------------------------------------------------*/
 import * as fs from 'fs';
-import path = require('path');
 import {
   ToolRunner,
   IExecSyncResult
@@ -11,8 +11,10 @@ import { RunnerHandler } from './oc-exec';
 import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
 import { unzipArchive } from './utils/utils';
 
-const validUrl = require('valid-url');
-const fetch = require('node-fetch');
+import tl = require('azure-pipelines-task-lib/task');
+import path = require('path');
+import validUrl = require('valid-url');
+import fetch = require('node-fetch');
 
 export class InstallHandler {
   /**
@@ -39,15 +41,15 @@ export class InstallHandler {
     }
 
     if (!downloadVersion) {
-      downloadVersion = await InstallHandler.latestStable(osType);
+      downloadVersion = InstallHandler.latestStable(osType);
       if (downloadVersion === null) {
-        return Promise.reject('Unable to determine latest oc download URL');
+        return Promise.reject(new Error('Unable to determine latest oc download URL'));
       }
     }
 
     tl.debug('creating download directory');
-    let downloadDir =
-      process.env['SYSTEM_DEFAULTWORKINGDIRECTORY'] + '/.download';
+    const downloadDir =
+      `${process.env.SYSTEM_DEFAULTWORKINGDIRECTORY  }/.download`;
     if (!fs.existsSync(downloadDir)) {
       tl.mkdirP(downloadDir);
     }
@@ -56,29 +58,29 @@ export class InstallHandler {
     if (validUrl.isWebUri(downloadVersion)) {
       url = downloadVersion;
     } else {
-      url = await InstallHandler.ocBundleURL(downloadVersion, osType, false);
+      url = InstallHandler.ocBundleURL(downloadVersion, osType, false);
       // check if url is valid otherwise take the latest stable oc cli for this version
       const response = await fetch(url, {
         method: 'HEAD'
       });
       if (!response.ok) {
-        url = await InstallHandler.ocBundleURL(downloadVersion, osType, true);
+        url = InstallHandler.ocBundleURL(downloadVersion, osType, true);
       }
     }
 
     if (url === null) {
-      return Promise.reject('Unable to determine oc download URL.');
+      return Promise.reject(new Error('Unable to determine oc download URL.'));
     }
 
     tl.debug(`downloading: ${url}`);
-    let ocBinary = await InstallHandler.downloadAndExtract(
+    const ocBinary = await InstallHandler.downloadAndExtract(
       url,
       downloadDir,
       osType,
       proxy
     );
     if (ocBinary === null) {
-      return Promise.reject('Unable to download or extract oc binary.');
+      return Promise.reject(new Error('Unable to download or extract oc binary.'));
     }
 
     return ocBinary;
@@ -89,16 +91,16 @@ export class InstallHandler {
    *
    * @return the url of the latest OpenShift CLI on mirror.openshift.
    */
-  static async latestStable(osType: string): Promise<string | null> {
+  static latestStable(osType: string): string | null {
     tl.debug('determining latest oc version');
 
-    const bundle = await InstallHandler.getOcBundleByOS(osType);
+    const bundle = InstallHandler.getOcBundleByOS(osType);
     if (!bundle) {
       tl.debug('Unable to find bundle url');
       return null;
     }
     const ocUtils = InstallHandler.getOcUtils();
-    const url = `${ocUtils['openshiftV4BaseUrl']}/${LATEST}/${bundle}`;
+    const url = `${ocUtils.openshiftV4BaseUrl}/${LATEST}/${bundle}`;
 
     tl.debug(`latest stable oc version: ${url}`);
     return url;
@@ -113,11 +115,7 @@ export class InstallHandler {
    * @returns {Promise} Promise string representing the URL to the tarball. null is returned
    * if no matching URL can be determined for the given tag.
    */
-  static async ocBundleURL(
-    version: string,
-    osType: string,
-    latest?: boolean
-  ): Promise<string | null> {
+  static ocBundleURL(version: string, osType: string, latest?: boolean): string | null {
     tl.debug(`determining tarball URL for version ${version}`);
 
     if (!version) {
@@ -129,7 +127,7 @@ export class InstallHandler {
       version = version.substr(1);
     }
 
-    let url: string = '';
+    let url = '';
     // determine the base_url based on version
     let reg = new RegExp('\\d+(?=\\.)');
     const vMajorRegEx: RegExpExecArray = reg.exec(version);
@@ -159,15 +157,15 @@ export class InstallHandler {
     }
 
     if (vMajor === 3) {
-      url = `${ocUtils['openshiftV3BaseUrl']}/${version}/`;
+      url = `${ocUtils.openshiftV3BaseUrl}/${version}/`;
     } else if (vMajor === 4) {
-      url = `${ocUtils['openshiftV4BaseUrl']}/${version}/`;
+      url = `${ocUtils.openshiftV4BaseUrl}/${version}/`;
     } else {
       tl.debug('Invalid version');
       return null;
     }
 
-    const bundle = await InstallHandler.getOcBundleByOS(osType);
+    const bundle = InstallHandler.getOcBundleByOS(osType);
     if (!bundle) {
       tl.debug('Unable to find bundle url');
       return null;
@@ -179,8 +177,8 @@ export class InstallHandler {
     return url;
   }
 
-  static async getOcBundleByOS(osType: string): Promise<string | null> {
-    let url: string = '';
+  static getOcBundleByOS(osType: string): string | null {
+    let url = '';
 
     // determine the bundle path based on the OS type
     switch (osType) {
@@ -226,15 +224,15 @@ export class InstallHandler {
     downloadDir = path.normalize(downloadDir);
 
     if (!tl.exist(downloadDir)) {
-      throw `${downloadDir} does not exist.`;
+      return Promise.reject(new Error(`${downloadDir} does not exist.`));
     }
 
-    let parts = url.split('/');
-    let archive = parts[parts.length - 1];
-    let archivePath = path.join(downloadDir, archive);
+    const parts = url.split('/');
+    const archive = parts[parts.length - 1];
+    const archivePath = path.join(downloadDir, archive);
 
     if (!tl.exist(archivePath)) {
-      let curl: ToolRunner = tl.tool('curl');
+      const curl: ToolRunner = tl.tool('curl');
       curl
         .arg('-s')
         .argIf(!!proxy, ['-x', proxy])
@@ -248,7 +246,7 @@ export class InstallHandler {
     let archiveType = path.extname(archive);
     let expandDir = archive.replace(archiveType, '');
     // handle tar.gz explicitly
-    if (path.extname(expandDir) == '.tar') {
+    if (path.extname(expandDir) === '.tar') {
       archiveType = '.tar.gz';
       expandDir = expandDir.replace('.tar', '');
     }
@@ -271,10 +269,10 @@ export class InstallHandler {
     ocBinary = path.join(downloadDir, ocBinary);
     if (!tl.exist(ocBinary)) {
       return null;
-    } else {
-      fs.chmodSync(ocBinary, '0755');
-      return ocBinary;
     }
+
+    fs.chmodSync(ocBinary, '0755');
+    return ocBinary;
   }
 
   /**
@@ -283,17 +281,17 @@ export class InstallHandler {
    * @param ocPath the full path to the oc binary. Must be a non null.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
    */
-  static async addOcToPath(ocPath: string, osType: string) {
+  static addOcToPath(ocPath: string, osType: string): void{
     if (ocPath === null || ocPath === '') {
       throw new Error('path cannot be null or empty');
     }
 
-    if (osType == 'Windows_NT') {
-      let dir = ocPath.substr(0, ocPath.lastIndexOf('\\'));
-      tl.setVariable('PATH', dir + ';' + tl.getVariable('PATH'));
+    if (osType === 'Windows_NT') {
+      const dir = ocPath.substr(0, ocPath.lastIndexOf('\\'));
+      tl.setVariable('PATH', `${dir  };${  tl.getVariable('PATH')}`);
     } else {
-      let dir = ocPath.substr(0, ocPath.lastIndexOf('/'));
-      tl.setVariable('PATH', dir + ':' + tl.getVariable('PATH'));
+      const dir = ocPath.substr(0, ocPath.lastIndexOf('/'));
+      tl.setVariable('PATH', `${dir  }:${  tl.getVariable('PATH')}`);
     }
   }
 
@@ -304,12 +302,12 @@ export class InstallHandler {
    * @return the full path to the installed executable or undefined if the oc CLI version requested is not found.
    */
   static getLocalOcPath(version?: string): string | undefined {
-    let ocPath: string | undefined = undefined;
+    let ocPath: string | undefined;
     try {
       ocPath = tl.which('oc', true);
       tl.debug(`ocPath ${ocPath}`);
     } catch (ex) {
-      tl.debug('Oc has not been found on this machine. Err ' + ex);
+      tl.debug(`Oc has not been found on this machine. Err ${  ex}`);
     }
 
     if (version && ocPath) {
@@ -326,7 +324,7 @@ export class InstallHandler {
     return ocPath;
   }
 
-  static getOcVersion(ocPath: string) {
+  static getOcVersion(ocPath: string): string {
     let result: IExecSyncResult | undefined = RunnerHandler.execOcSync(
       ocPath,
       'version --short=true --client=true'

@@ -1,15 +1,19 @@
-const decompress = require('decompress');
-const decompressTargz = require('decompress-targz');
-const Zip = require('adm-zip');
+/*-----------------------------------------------------------------------------------------------
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *-----------------------------------------------------------------------------------------------*/
+import decompress = require('decompress');
+import decompressTargz = require('decompress-targz');
+import Zip = require('adm-zip');
 
 export async function unzipArchive(
   archiveType: string,
   archivePath: string,
   downloadDir: string
-) {
+): Promise<void> {
   switch (archiveType) {
     case '.zip': {
-      let zip = new Zip(archivePath);
+      const zip = new Zip(archivePath);
       zip.extractAllTo(downloadDir);
       break;
     }
@@ -22,7 +26,7 @@ export async function unzipArchive(
       break;
     }
     default: {
-      throw `unknown archive format ${archivePath}`;
+      return Promise.reject(new Error(`unknown archive format ${archivePath}`));
     }
   }
 }

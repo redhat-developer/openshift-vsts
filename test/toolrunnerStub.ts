@@ -1,10 +1,16 @@
+/*-----------------------------------------------------------------------------------------------
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *-----------------------------------------------------------------------------------------------*/
 import { ToolRunner } from 'azure-pipelines-task-lib/toolrunner';
 
 export class ToolRunnerStub {
   public toolrunnerStub: sinon.SinonStubbedInstance<ToolRunner>;
+
   public get tr(): ToolRunner {
     return (this.toolrunnerStub as unknown) as ToolRunner;
   }
+
   public args: string[] = [];
 
   constructor(sandbox: sinon.SinonSandbox) {
