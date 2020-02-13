@@ -73,10 +73,20 @@
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.12.7",
     "@types/sinon": "^7.0.13",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
     "chai": "^4.2.0",
     "chai-fs": "^2.0.0",
     "commit-message-validator": "^0.1.6",
     "copy-node-modules": "^1.1.1",
+    "eslint": "^6.7.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-import-resolver-typescript": "^2.0.0",
+    "eslint-plugin-header": "^3.0.0",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-json": "^2.0.1",
+    "eslint-plugin-prettier": "^3.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "mocha-jenkins-reporter": "^0.4.1",
@@ -87,6 +97,6 @@
     "sinon": "^7.4.2",
     "ts-mocha": "^2.0.0",
     "ts-node": "^7.0.1",
-    "typescript": "^3.1.2"
+    "typescript": "^3.7.2"
   }
 }
