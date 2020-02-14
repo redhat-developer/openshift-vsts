@@ -128,6 +128,8 @@ Once added, you need to edit the following configuration options:
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-the-openshift-service-connection">Configuring the OpenShift service connection</a>.</dd>
   <dt>Version of oc to use</dt>
   <dd>Allows to specify the version of oc to use, eg v3.10.0. If left blank the latest stable version is used. You can also specify a direct URL to a oc release bundle.</dd>  
+  <dt>Proxy</dt>
+  <dd>Allows to specify a proxy (host:port) to use to download oc cli</dd>
 </dl>
 
 ---
@@ -159,6 +161,8 @@ The _Execute oc command_ has five configuration options.
   <dd>It ignores non success return value from the current step and keep executing the pipeline if it fails. If you are executing a step which contains command like create/delete/patch but the resource has already been created/deleted/patched the pipeline could fail. By checking this option this error will be skipped and the execution will keep going.</dd>
   <dt>Use local oc executable</dt>
   <dd>It forces the extension to use, if present, the oc cli found in the machine where the agent is running. If no version is specified, the extension will use the local oc cli no matter its version is. If a version is specified then the extension will first check if the oc cli installed has the same version requested by the user, if not the correct oc cli will be downloaded.</dd>
+  <dt>Proxy</dt>
+  <dd>Allows to specify a proxy (host:port) to use to download oc cli</dd>
 </dl>
 
 ---
@@ -174,8 +178,27 @@ apply -f ${SYSTEM_DEFAULTWORKINGDIRECTORY}/_my_sources/my-openshift-config.yaml
 
 ---
 
-_**Note:** In case you are reaching the GitHub API rate limit, you can set GITHUB_ACCESS_TOKEN as a pipeline variable.
-To create a GitHub access token refer to [Creating a personal access token for the command line](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line)._
+_**Note:** The extension supports pipe (|) operators. Due to the limitation of Azure library the extension only support one single pipe per command. The pipe operator also allow to use a different ToolRunner than oc (i.e grep - the tool must be visible to the extension).
+
+```
+oc describe pod/nodejs-ex | grep kubernetes
+```
+
+---
+
+---
+
+_**Note:** The extension supports redirector (>, >>, 2>) operators. The redirector operator expect a valid path as argument. 
+
+<dl>
+  <dd>> (write): create the file if it does not exist and write on it. If it exists, its content will be overwritten.</dd>
+  <dd>>> (append): append text to the file</dd>
+  <dd>2> (write stderr): redirect stderr to a file</dd>
+</dl>
+
+```
+oc describe pod/nodejs-ex | grep kubernetes > /path/log.txt
+```
 
 ---
 
@@ -208,6 +231,8 @@ The _Update ConfigMap_ task has six configuration options.
   <dd>The properties to set/update. Only the properties which need creating/updating need to be listed. Space separated values need to be surrounded by quotes ("). </dd>
   <dt>Use local oc executable</dt>
   <dd>It forces the extension to use, if present, the oc cli found in the machine where the agent is running. If no version is specified, the extension will use the local oc cli no matter its version is. If a version is specified then the extension will first check if the oc cli installed has the same version requested by the user, if not the correct oc cli will be downloaded.</dd>
+  <dt>Proxy</dt>
+  <dd>Allows to specify a proxy (host:port) to use to download oc cli</dd>
 </dl>
 
 ---
