@@ -1,7 +1,7 @@
-'use strict';
-
-import tl = require('azure-pipelines-task-lib/task');
-import stream = require('stream');
+/*-----------------------------------------------------------------------------------------------
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *-----------------------------------------------------------------------------------------------*/
 import {
   ToolRunner,
   IExecOptions,
@@ -9,8 +9,10 @@ import {
 } from 'azure-pipelines-task-lib/toolrunner';
 import * as fs from 'fs';
 
-const sub = require('substituter');
-const split = require('argv-split');
+import split = require('argv-split');
+import tl = require('azure-pipelines-task-lib/task');
+import stream = require('stream');
+import sub = require('substituter');
 
 export class RunnerHandler {
   /**
@@ -19,22 +21,15 @@ export class RunnerHandler {
    * @param ocPath absolute path to the oc binary. If null is passed the binary is determined by running 'which oc'.
    * @param argLine the command to run
    */
-  static async execOc(
-    ocPath: string | null,
-    argLine: string,
-    ignoreFlag?: boolean
-  ): Promise<void> {
-    if (ocPath === null) {
-      ocPath = 'oc';
-    }
-
+  static async execOc(path: string | null, argLine: string, ignoreFlag?: boolean): Promise<void> {
+    const ocPath = path === null ? 'oc' : path;
     const options: IExecOptions | undefined = RunnerHandler.createExecOptions(
       undefined,
       ignoreFlag
     );
 
     // split cmd based on redirection operators
-    const cmds: string[] = argLine.split(/(?=2(?=>))|(?=[>\|])/);
+    const cmds: string[] = argLine.split(/(?=2(?=>))|(?=[>|])/);
     const trs: ToolRunner[] = RunnerHandler.initToolRunners(cmds, ocPath);
     if (trs === []) {
       tl.debug(`Unable to create any ToolRunner by ${argLine}`);
@@ -42,7 +37,7 @@ export class RunnerHandler {
     }
     const tr: ToolRunner = RunnerHandler.unifyToolRunners(cmds, trs, options);
     await tr.exec(options);
-    return;
+
   }
 
   /**
@@ -51,27 +46,23 @@ export class RunnerHandler {
    * @param cmds list of commands
    * @param trs list of toolrunners
    */
-  static unifyToolRunners(
-    cmds: string[],
-    trs: ToolRunner[],
-    options?: IExecOptions
-  ): ToolRunner {
+  static unifyToolRunners(cmds: string[], trs: ToolRunner[], options?: IExecOptions): ToolRunner {
     let i = 0;
     let trResult: ToolRunner = trs[i];
     while (++i < cmds.length) {
       const fstCmd: string = cmds[i - 1];
       const sndCmd: string = cmds[i];
-      if (fstCmd[0] !== '|' && sndCmd[0] === '|') {
+      if (!fstCmd.startsWith('|') && sndCmd.startsWith('|')) {
         trResult = RunnerHandler.buildPipeToolRunner(cmds, trs, i);
-      } else if (sndCmd[0] === '>' && sndCmd.trim().length > 1) {
+      } else if (sndCmd.startsWith('>') && sndCmd.trim().length > 1) {
         const event =
-          fstCmd[0] === '2'
+          fstCmd.startsWith('2')
             ? (RunnerHandler.createExecOptions(options, undefined, true),
               'stderr')
             : 'stdout';
         trResult.on(
           event,
-          RunnerHandler.writeAfterCommandExecution(sndCmd, fstCmd[0] === '>')
+          RunnerHandler.writeAfterCommandExecution(sndCmd, fstCmd.startsWith('>'))
         );
       }
     }
@@ -79,11 +70,7 @@ export class RunnerHandler {
     return trResult;
   }
 
-  static createExecOptions(
-    options?: IExecOptions,
-    ignoreReturnCode?: boolean,
-    failOnStdErr?: boolean
-  ) {
+  static createExecOptions(options?: IExecOptions, ignoreReturnCode?: boolean, failOnStdErr?: boolean): IExecOptions {
     if (ignoreReturnCode === undefined && failOnStdErr === undefined) {
       return options;
     }
@@ -91,7 +78,7 @@ export class RunnerHandler {
     if (!options) {
       options = {
         cwd: process.cwd(),
-        env: Object.assign({}, process.env) as { [key: string]: string },
+        env: ({ ...process.env}) as { [key: string]: string },
         silent: false,
         failOnStdErr: failOnStdErr !== undefined ? failOnStdErr : false,
         ignoreReturnCode:
@@ -111,7 +98,7 @@ export class RunnerHandler {
     return options;
   }
 
-  static buildPipeToolRunner(cmds: string[], trs: ToolRunner[], index: number) {
+  static buildPipeToolRunner(cmds: string[], trs: ToolRunner[], index: number): ToolRunner {
     const nextPipes: number[] = RunnerHandler._getNextPipes(cmds, index);
     let trPipeResult: ToolRunner = trs[nextPipes[nextPipes.length - 1]];
     for (let c = nextPipes.length - 2; c >= 0; c--) {
@@ -120,7 +107,7 @@ export class RunnerHandler {
     return trs[index - 1].pipeExecOutputToTool(trPipeResult);
   }
 
-  static writeAfterCommandExecution(cmd: string, append: boolean) {
+  static writeAfterCommandExecution(cmd: string, append: boolean): (data: any) => void {
     const writeAfterCommandsExecution = data => {
       const path = cmd.substring(1).trim();
       if (append) {
@@ -139,10 +126,10 @@ export class RunnerHandler {
     return writeAfterCommandsExecution;
   }
 
-  static _getNextPipes(cmds: string[], index: number) {
+  static _getNextPipes(cmds: string[], index: number): number[] {
     const cmdsWithPipe: number[] = [];
     for (let i = index; i < cmds.length; i++) {
-      if (cmds[i][0] !== '|') {
+      if (!cmds[i].startsWith('|')) {
         break;
       }
       cmdsWithPipe.push(i);
@@ -158,7 +145,7 @@ export class RunnerHandler {
    * @return array of arguments with potential environment variables interpolated
    */
   static prepareCmdArguments(argLine: string, removeOc?: boolean): string[] {
-    let interpolatedArgs = sub(argLine, process.env);
+    const interpolatedArgs = sub(argLine, process.env);
     let args = split(interpolatedArgs);
     if (removeOc && (args[0] === 'oc' || args[0] === 'oc.exe')) {
       args = args.slice(1);
@@ -175,11 +162,11 @@ export class RunnerHandler {
   static prepareToolRunner(cmd: string, ocPath: string): ToolRunner {
     // first element in each command, without considering redirection operator, has to be the tool needed to execute it (e.g. oc, grep, findstr, ...)
     let tr: ToolRunner;
-    if (cmd[0] === '>' || cmd[0] === '2') {
+    if (cmd.startsWith('>') || cmd.startsWith('2')) {
       return tr;
     }
 
-    cmd = cmd[0] === '|' ? cmd.substring(1).trim() : cmd.trim();
+    cmd = cmd.startsWith('|') ? cmd.substring(1).trim() : cmd.trim();
     const arg = RunnerHandler.prepareCmdArguments(cmd);
     // add tool to exec
     if (arg[0] === 'oc' || arg[0] === 'oc.exe') {
@@ -189,7 +176,7 @@ export class RunnerHandler {
       tr = tl.tool(tl.which(arg[0], true));
     }
     // add args to toolrunner
-    for (let argN of arg.slice(1)) {
+    for (const argN of arg.slice(1)) {
       tr.arg(argN);
     }
     return tr;
@@ -212,7 +199,7 @@ export class RunnerHandler {
 
     const trs: ToolRunner[] = [];
     // loop through concatenated commands
-    for (let cmd of cmds) {
+    for (const cmd of cmds) {
       trs.push(RunnerHandler.prepareToolRunner(cmd, ocPath));
     }
     return trs;
@@ -226,8 +213,8 @@ export class RunnerHandler {
       ocPath = 'oc';
     }
 
-    let oc: ToolRunner = tl.tool(ocPath);
-    for (let arg of RunnerHandler.prepareCmdArguments(argLine, true)) {
+    const oc: ToolRunner = tl.tool(ocPath);
+    for (const arg of RunnerHandler.prepareCmdArguments(argLine, true)) {
       oc.arg(arg);
     }
 

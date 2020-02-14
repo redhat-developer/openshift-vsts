@@ -1,0 +1,9 @@
+tasks
+scripts
+out
+node_modules
+images
+docs
+ci
+test
+header.js

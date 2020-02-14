@@ -1,14 +1,21 @@
+/*-----------------------------------------------------------------------------------------------
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *-----------------------------------------------------------------------------------------------*/
 import * as fs from 'fs';
-import path = require('path');
 import * as sinon from 'sinon';
 import * as OcAuth from '../src/oc-auth';
 import { RunnerHandler } from '../src/oc-exec';
 import { BASIC_AUTHENTICATION, TOKEN_AUTHENTICATION } from '../src/constants';
-let chai = require('chai');
-chai.use(require('chai-fs'));
-let expect = chai.expect;
 
-describe('oc-auth', function() {
+import path = require('path');
+
+const chai = require('chai');
+chai.use(require('chai-fs'));
+
+const {expect} = chai;
+
+describe('oc-auth', () => {
   let sandbox: sinon.SinonSandbox;
 
   beforeEach(() => {
@@ -19,9 +26,9 @@ describe('oc-auth', function() {
     sandbox.restore();
   });
 
-  describe('#writeKubeConfig', function() {
+  describe('#writeKubeConfig', () => {
     before(() => {
-      let testOutDir = path.join(__dirname, '..', '..', 'out');
+      const testOutDir = path.join(__dirname, '..', '..', 'out');
       if (!fs.existsSync(testOutDir)) {
         fs.mkdirSync(testOutDir);
       }
@@ -33,14 +40,14 @@ describe('oc-auth', function() {
       } catch (e) {
         console.error(e);
       }
-      delete process.env['HOME'];
-      delete process.env['KUBECONFIG'];
+      delete process.env.HOME;
+      delete process.env.KUBECONFIG;
     });
 
-    it('writes kubeconfig', function() {
-      let testWorkingDir = path.join(__dirname, '..', '..', 'out');
-      process.env['HOME'] = testWorkingDir;
-      let endpoint: OcAuth.OpenShiftEndpoint = {
+    it('writes kubeconfig', () => {
+      const testWorkingDir = path.join(__dirname, '..', '..', 'out');
+      process.env.HOME = testWorkingDir;
+      const endpoint: OcAuth.OpenShiftEndpoint = {
         serverUrl: 'https://openshift.example.com',
         parameters: {
           kubeconfig: 'my dummy kube config'
@@ -53,7 +60,7 @@ describe('oc-auth', function() {
           expect(fs.existsSync(path.join(testWorkingDir, '.kube', 'config'))).to
             .be.true;
 
-          let kubeconfig = process.env['KUBECONFIG'];
+          const kubeconfig = process.env.KUBECONFIG;
           if (kubeconfig === undefined) {
             expect.fail('PATH not set');
           } else {
@@ -65,8 +72,8 @@ describe('oc-auth', function() {
       );
     });
 
-    it('null endpoint throws error', function() {
-      process.env['HOME'] = path.join(__dirname, '..', '..', 'out');
+    it('null endpoint throws error', () => {
+      process.env.HOME = path.join(__dirname, '..', '..', 'out');
       return OcAuth.createKubeConfig(null, 'oc', 'Linux')
         .then(() => {
           expect.fail('call should not succeed');
@@ -77,26 +84,26 @@ describe('oc-auth', function() {
     });
   });
 
-  describe('#userHome', function() {
-    it('returns the USERPROFILE directory for Windows', function() {
-      process.env['USERPROFILE'] = 'C:\\Users\\john';
-      process.env['HOME'] = '/Users/john';
+  describe('#userHome', () => {
+    it('returns the USERPROFILE directory for Windows', () => {
+      process.env.USERPROFILE = 'C:\\Users\\john';
+      process.env.HOME = '/Users/john';
       expect(OcAuth.userHome('Windows_NT')).eq('C:\\Users\\john');
     });
 
-    it('returns the HOME directory for Linux and Darwin', function() {
-      process.env['USERPROFILE'] = 'C:\\Users\\john';
-      process.env['HOME'] = '/Users/john';
+    it('returns the HOME directory for Linux and Darwin', () => {
+      process.env.USERPROFILE = 'C:\\Users\\john';
+      process.env.HOME = '/Users/john';
       expect(OcAuth.userHome('Linux')).eq('/Users/john');
     });
 
-    it('returns the HOME directory for Darwin', function() {
-      process.env['USERPROFILE'] = 'C:\\Users\\john';
-      process.env['HOME'] = '/Users/john';
+    it('returns the HOME directory for Darwin', () => {
+      process.env.USERPROFILE = 'C:\\Users\\john';
+      process.env.HOME = '/Users/john';
       expect(OcAuth.userHome('Darwin')).eq('/Users/john');
     });
 
-    it('throws error for unknown OS type', function() {
+    it('throws error for unknown OS type', () => {
       expect(() => OcAuth.userHome('')).to.throw();
     });
   });

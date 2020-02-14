@@ -1,16 +1,21 @@
-const split = require('argv-split');
-const sub = require('substituter');
+/*-----------------------------------------------------------------------------------------------
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *-----------------------------------------------------------------------------------------------*/
+import split = require('argv-split');
+import sub = require('substituter');
 
 class ConfigMap {
   readonly _name: string;
+
   readonly _properties: Map<string, string>;
 
   constructor(name: string, properties: string) {
     this._name = name;
     this._properties = new Map<string, string>();
-    let keyValuePairs = split(properties);
-    for (let i = 0; i < keyValuePairs.length; i = i + 2) {
-      let key = keyValuePairs[i].replace(/^-/, '');
+    const keyValuePairs = split(properties);
+    for (let i = 0; i < keyValuePairs.length; i += 2) {
+      const key = keyValuePairs[i].replace(/^-/, '');
       let value = keyValuePairs[i + 1];
       value = sub(value, process.env);
       this._properties.set(key, value);
@@ -25,15 +30,15 @@ class ConfigMap {
     let cmd = `patch configmap ${this.name} -p '{"data":{`;
     let i = 0;
     this._properties.forEach((value: string, key: string) => {
-      cmd = cmd + `"${key}": "${value}"`;
+      cmd = `${cmd  }"${key}": "${value}"`;
       if (i < this._properties.size - 1) {
-        cmd = cmd + ', ';
+        cmd = `${cmd  }, `;
       }
       i++;
     });
-    cmd = cmd + "}}'";
+    cmd = `${cmd  }}}'`;
     if (namespace) {
-      cmd = cmd + ` -n ${namespace}`;
+      cmd = `${cmd  } -n ${namespace}`;
     }
     return cmd;
   }
