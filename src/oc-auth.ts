@@ -147,7 +147,10 @@ export function exportKubeConfig(osType: string): void {
  * @param ocPath fully qualified path to the oc binary.
  * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
  */
-export async function createKubeConfigFromServiceConnection(ocPath: string, osType: string) {
+export async function createKubeConfigFromServiceConnection(
+  ocPath: string,
+  osType: string
+): Promise<void> {
   const endpoint = getOpenShiftEndpoint();
   if (endpoint === null) {
     throw new Error('null endpoint is not allowed');
