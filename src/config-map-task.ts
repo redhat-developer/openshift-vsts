@@ -24,7 +24,7 @@ async function run(): Promise<void> {
   const properties = task.getInput('properties');
   const configMap = new ConfigMap(configMapName, properties);
 
-  await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
+  await auth.createKubeConfig(ocPath, agentOS);
   await RunnerHandler.execOc(ocPath, configMap.patchCmd(namespace));
 }
 

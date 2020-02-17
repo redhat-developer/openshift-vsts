@@ -2,12 +2,17 @@
  *  Copyright (c) Red Hat, Inc. All rights reserved.
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
+import * as fs from 'fs';
 import { RunnerHandler } from './oc-exec';
 import {
-  OPENSHIFT_SERVICE_NAME,
   BASIC_AUTHENTICATION,
+  CONNECTION_TYPE_SELECTION,
+  FILE_CONFIGURATION_OPTION,
+  INLINE_CONFIGURATION_OPTION,
+  NO_AUTHENTICATION,
+  OPENSHIFT_SERVICE_NAME,
+  OPENSHIFT_SERVICE_OPTION,
   TOKEN_AUTHENTICATION,
-  NO_AUTHENTICATION
 } from './constants';
 
 import task = require('azure-pipelines-task-lib/task');
@@ -111,7 +116,7 @@ export function userHome(osType: string): string {
  * @param config The cluster auth config to write to disk
  * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
  */
-export function authKubeConfig(config: string, osType: string): void {
+export function writeKubeConfigToFile(config: string, osType: string): void {
   if (config === null || config === '') {
     throw new Error('empty or null kubeconfig is not allowed');
   }
@@ -123,7 +128,6 @@ export function authKubeConfig(config: string, osType: string): void {
 
   const kubeConfig = path.join(kubeConfigDir, 'config');
   tl.writeFile(kubeConfig, config);
-  tl.setVariable('KUBECONFIG', kubeConfig);
 }
 
 /**
@@ -140,15 +144,11 @@ export function exportKubeConfig(osType: string): void {
  * Creates the kubeconfig based on the endpoint authorization retrieved
  * from the OpenShift service connection.
  *
- * @param endpoint The OpenShift endpoint.
  * @param ocPath fully qualified path to the oc binary.
  * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
  */
-export async function createKubeConfig(
-  endpoint: OpenShiftEndpoint,
-  ocPath: string,
-  osType: string
-): Promise<void> {
+export async function createKubeConfigFromServiceConnection(ocPath: string, osType: string) {
+  const endpoint = getOpenShiftEndpoint();
   if (endpoint === null) {
     throw new Error('null endpoint is not allowed');
   }
@@ -179,12 +179,56 @@ export async function createKubeConfig(
       break;
     }
     case NO_AUTHENTICATION: {
-      authKubeConfig(endpoint.parameters.kubeconfig, osType);
+      writeKubeConfigToFile(endpoint.parameters.kubeconfig, osType);
       break;
     }
     default:
       throw new Error(`unknown authentication type '${authType}'`);
   }
+}
 
-  exportKubeConfig(osType);
+/**
+ * Verifies existence of the config file and sets KUBECONFIG environment variable.
+ *
+ * @param configPath The OpenShift endpoint.
+ */
+export function exportKubeConfigToPath(configPath) {
+  try {
+    if (fs.statSync(configPath).isFile()) {
+      tl.setVariable('KUBECONFIG', configPath);
+    }
+  } catch (ex) {
+    throw new Error(`Provided kubeconfig path does not exist: ${configPath}`);
+  }
+}
+
+/**
+ * Creates the kubeconfig based on the connectionType selected by the user
+ *
+ * @param ocPath fully qualified path to the oc binary.
+ * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
+ */
+export async function createKubeConfig(
+  ocPath: string,
+  osType: string,
+): Promise<void> {
+  const connectionType: string = task.getInput(CONNECTION_TYPE_SELECTION);
+  const configPath = task.getPathInput('configurationPath', false);
+  const inlineConfig = task.getInput('inlineConfig', false);
+
+  switch (connectionType) {
+    case OPENSHIFT_SERVICE_OPTION:
+      await createKubeConfigFromServiceConnection(ocPath, osType);
+      exportKubeConfig(osType);
+      break;
+    case FILE_CONFIGURATION_OPTION:
+      exportKubeConfigToPath(configPath);
+      break;
+    case INLINE_CONFIGURATION_OPTION:
+      writeKubeConfigToFile(inlineConfig, osType);
+      exportKubeConfig(osType);
+      break;
+    default:
+      break;
+  }
 }
