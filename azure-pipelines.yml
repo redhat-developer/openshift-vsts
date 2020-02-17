@@ -32,9 +32,7 @@ jobs:
       - task: PublishTestResults@2
         inputs:
           testResultsFiles: '**/test-report.xml'
-          testRunTitle: 'Test results'  
-      - script: npm run prettier:check
-        displayName: Syntax check
+          testRunTitle: 'Test results'
   - job: macOS
     pool:
       name: Hosted macOS
@@ -63,9 +61,7 @@ jobs:
       - task: PublishTestResults@2
         inputs:
           testResultsFiles: '**/test-report.xml'
-          testRunTitle: 'Test results'  
-      - script: npm run prettier:check
-        displayName: Syntax check
+          testRunTitle: 'Test results'
   - job: Linux
     pool:
       name: Hosted Ubuntu 1604
@@ -93,6 +89,4 @@ jobs:
       - task: PublishTestResults@2
         inputs:
           testResultsFiles: '**/test-report.xml'
-          testRunTitle: 'Test results'  
-      - script: npm run prettier:check
-        displayName: Syntax check
+          testRunTitle: 'Test results'
