@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.5.0 (February 17, 2019)
+
+* [#135](https://github.com/redhat-developer/openshift-vsts/issues/135) Added proxy support
+* [#130](https://github.com/redhat-developer/openshift-vsts/issues/130) Added support for pipes and redirector operators
+* [#136](https://github.com/redhat-developer/openshift-vsts/issues/136) Fixed issue when typing oc version in format x.xx
+* [#142](https://github.com/redhat-developer/openshift-vsts/issues/142) Moved to eslint
+
 ## 1.4.2 (December 3, 2019)
 
 This release brings to you: 
