@@ -15,11 +15,10 @@ The extension is distributed via the [Azure DevOps Marketplace](https://marketpl
 
 Below you can find a collection of resources to better undestand how the extension works.
 
-<dl>
-    <dt>[Getting Started](./docs/getting-started.md)</dt>
-    <dt>[Blog on developers.redhat.com](https://developers.redhat.com/blog/2019/12/05/introduction-to-the-red-hat-openshift-deployment-extension-for-microsoft-azure-devops/)</dt>
-    <dt>[Demo Video](https://www.youtube.com/watch?v=RBwpedmkvow)</dt>
-</dl>
+* [Getting Started](./docs/getting-started.md)
+* [Blog on developers.redhat.com](https://developers.redhat.com/blog/2019/12/05/introduction-to-the-red-hat-openshift-deployment-extension-for-microsoft-azure-devops/)
+* [Demo Video](https://www.youtube.com/watch?v=RBwpedmkvow)
+
 
 ## How to contribute
 
