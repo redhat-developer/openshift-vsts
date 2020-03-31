@@ -7,6 +7,8 @@ import {
   ToolRunner,
   IExecSyncResult
 } from 'azure-pipelines-task-lib/toolrunner';
+import * as toolLib from 'azure-pipelines-tool-lib/tool';
+import * as semver from 'semver';
 import { RunnerHandler } from './oc-exec';
 import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
 import { unzipArchive } from './utils/utils';
@@ -18,12 +20,11 @@ import fetch = require('node-fetch');
 
 export class InstallHandler {
   /**
-   * Downloads the specified version of the oc CLI and returns the full path to
-   * the executable.
+   * Downloads the requested oc CLI and returns the full path to the executable.
    *
-   * @param downloadVersion the version of `oc` to install.
+   * @param downloadVersion the version or url of `oc` to install.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'. See https://nodejs.org/api/os.html#os_os_type
-   * @param useLocalOc if user prefer to use the current oc cli already installed in his machine
+   * @param useLocalOc to use the current oc cli already installed in machine
    * @param proxy proxy to use to download oc
    * @return the full path to the installed executable or null if the install failed.
    */
@@ -33,7 +34,13 @@ export class InstallHandler {
     useLocalOc: boolean,
     proxy: string
   ): Promise<string | null> {
-    if (useLocalOc) {
+    // N.B: downloadVersion can have three different values:
+    //       - number version (e.g. 3.11)
+    //       - url where to download oc cli
+    //       - undefined, if want to use latest oc version or whatever oc cli is installed in machine
+    let validUri = '';
+    if (downloadVersion) validUri = validUrl.isWebUri(downloadVersion);
+    if (!validUri && useLocalOc) {
       const localOcPath = InstallHandler.getLocalOcPath(downloadVersion);
       if (localOcPath) {
         return localOcPath;
@@ -45,24 +52,35 @@ export class InstallHandler {
       if (downloadVersion === null) {
         return Promise.reject(new Error('Unable to determine latest oc download URL'));
       }
+      validUri = validUrl.isWebUri(downloadVersion);
+    }
+
+    // if not a url, check if oc version requested exists in cache
+    let versionToCache;
+    if (!validUri) {
+      versionToCache = InstallHandler.versionToCache(downloadVersion);
+      let cachePath: string;
+      if (versionToCache) {
+        cachePath = toolLib.findLocalTool('oc', versionToCache);
+      }
+      if (cachePath) {
+        return path.join(cachePath, InstallHandler.ocBinaryByOS(osType));
+      }
     }
 
     tl.debug('creating download directory');
-    const downloadDir =
-      `${process.env.SYSTEM_DEFAULTWORKINGDIRECTORY  }/.download`;
+    const downloadDir = `${process.env.SYSTEM_DEFAULTWORKINGDIRECTORY  }/.download`;
     if (!fs.existsSync(downloadDir)) {
       tl.mkdirP(downloadDir);
     }
 
     let url: string | null;
-    if (validUrl.isWebUri(downloadVersion)) {
+    if (validUri) {
       url = downloadVersion;
     } else {
       url = InstallHandler.ocBundleURL(downloadVersion, osType, false);
-      // check if url is valid otherwise take the latest stable oc cli for this version
-      const response = await fetch(url, {
-        method: 'HEAD'
-      });
+      // check if url exists otherwise take the latest stable oc cli for this version
+      const response = await fetch(url, { method: 'HEAD' });
       if (!response.ok) {
         url = InstallHandler.ocBundleURL(downloadVersion, osType, true);
       }
@@ -77,6 +95,7 @@ export class InstallHandler {
       url,
       downloadDir,
       osType,
+      versionToCache,
       proxy
     );
     if (ocBinary === null) {
@@ -208,6 +227,7 @@ export class InstallHandler {
    * @param url the oc release download URL.
    * @param downloadDir the directory into which to extract the archive.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
+   * @param version version of oc cli to download
    * @param proxy proxy to use to download oc
    * It is the responsibility of the caller to ensure that the directory exist.
    */
@@ -215,6 +235,7 @@ export class InstallHandler {
     url: string,
     downloadDir: string,
     osType: string,
+    versionToCache: string,
     proxy: string
   ): Promise<string | null> {
     if (!url) {
@@ -255,16 +276,7 @@ export class InstallHandler {
 
     await unzipArchive(archiveType, archivePath, downloadDir);
 
-    let ocBinary: string;
-    switch (osType) {
-      case 'Windows_NT': {
-        ocBinary = 'oc.exe';
-        break;
-      }
-      default: {
-        ocBinary = 'oc';
-      }
-    }
+    let ocBinary = InstallHandler.ocBinaryByOS(osType);
 
     ocBinary = path.join(downloadDir, ocBinary);
     if (!tl.exist(ocBinary)) {
@@ -272,6 +284,7 @@ export class InstallHandler {
     }
 
     fs.chmodSync(ocBinary, '0755');
+    if (versionToCache) await toolLib.cacheFile(ocBinary, 'oc', 'oc', versionToCache);
     return ocBinary;
   }
 
@@ -311,7 +324,7 @@ export class InstallHandler {
     }
 
     if (version && ocPath) {
-      const localOcVersion = InstallHandler.getOcVersion(ocPath);
+      const localOcVersion = InstallHandler.getVersionFromExecutable(ocPath);
       tl.debug(`localOcVersion ${localOcVersion} vs ${version}`);
       if (
         !localOcVersion ||
@@ -324,7 +337,7 @@ export class InstallHandler {
     return ocPath;
   }
 
-  static getOcVersion(ocPath: string): string {
+  static getVersionFromExecutable(ocPath: string): string {
     let result: IExecSyncResult | undefined = RunnerHandler.execOcSync(
       ocPath,
       'version --short=true --client=true'
@@ -358,5 +371,16 @@ export class InstallHandler {
       'utf-8'
     );
     return JSON.parse(rawData.toString());
+  }
+
+  private static versionToCache(version: string): string {
+    const sanitizedVersion: semver.SemVer = semver.coerce(version);
+    if (!sanitizedVersion) return undefined;
+    return sanitizedVersion.version;
+  }
+
+  private static ocBinaryByOS(osType: string): string {
+    if (osType === 'Windows_NT') return 'oc.exe';
+    return 'oc';
   }
 }
