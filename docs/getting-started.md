@@ -99,6 +99,10 @@ If you want to you keep using this service connection you need to select the 1.*
 
 The following paragraphs describe each of the provided pipeline tasks and their use. 
 
+Based on the options used, a task could need CURL to download the oc bundle requested. 
+Each task assumes that cURL is already installed on the Agent that is running the build. 
+If cURL is not located on the Agent, an error will be thrown, and the task will fail.
+
 <a id="install-and-setup-oc"></a>
 ### Install and setup oc
 
