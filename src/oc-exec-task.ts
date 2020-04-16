@@ -26,7 +26,7 @@ async function run(): Promise<void> {
     throw new Error('no oc binary found');
   }
 
-  await auth.createKubeConfig(auth.getOpenShiftEndpoint(), ocPath, agentOS);
+  await auth.createKubeConfig(ocPath, agentOS);
   await RunnerHandler.execOc(ocPath, argLine, ignoreFlag);
 }
 

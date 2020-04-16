@@ -12,20 +12,73 @@
   ],
   "preview": true,
   "demands": [],
+  "groups": [
+    {
+      "name": "openshiftCluster",
+      "displayName": "OpenShift Cluster",
+      "isExpanded": true
+    },
+    {
+      "name": "commands",
+      "displayName": "Commands",
+      "isExpanded": true
+    }
+  ],
   "version": {
     "Major": 2,
     "Minor": 0,
-    "Patch": 12
+    "Patch": 13
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "config-map $(message)",
   "inputs": [
     {
+      "name": "connectionType",
+      "type": "pickList",
+      "label": "Service connection type",
+      "defaultValue": "OpenShift Connection Service",
+      "required": true,
+      "options": {
+        "OpenShift Connection Service": "OpenShift Connection Service",
+        "File Configuration": "File Configuration",
+        "Inline Configuration": "Inline Configuration"
+      },
+      "groupName": "openshiftCluster",
+      "helpMarkDown": "Select a service connection type."
+    },
+    {
       "name": "openshiftService",
       "type": "connectedService:openshift",
       "label": "OpenShift service connection",
+      "visibleRule": "connectionType = OpenShift Connection Service",
+      "helpMarkDown": "Select OpenShift service connection to use.",
+      "groupName": "openshiftCluster",
+      "required": true
+    },
+    {
+      "name": "configurationPath",
+      "type": "filePath",
+      "label": "File path",
+      "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Select OpenShift service connection to use."
+      "helpMarkDown": "Filename, directory, or URL to the kubeconfig file that will be used with the commands.",
+      "groupName": "openshiftCluster",
+      "visibleRule": "connectionType = File Configuration"
+    },
+    {
+      "name": "inlineConfig",
+      "type": "multiLine",
+      "properties": {
+        "resizable": "true",
+        "rows": "10",
+        "maxLength": "5000"
+      },
+      "required": true,
+      "defaultValue": "",
+      "label": "Inline configuration",
+      "helpMarkDown": "Inline kubeconfig for oc command",
+      "groupName": "openshiftCluster",
+      "visibleRule": "connectionType = Inline Configuration"
     },
     {
       "name": "version",
@@ -33,6 +86,7 @@
       "label": "Version of oc",
       "defaultValue": "",
       "required": false,
+      "groupName": "commands",
       "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
     },
     {
@@ -41,6 +95,7 @@
       "label": "Name of the ConfigMap",
       "defaultValue": "",
       "required": true,
+      "groupName": "commands",
       "helpMarkDown": "Name of the ConfigMap to which to apply the properties."
     },
     {
@@ -49,6 +104,7 @@
       "label": "Namespace of ConfigMap",
       "defaultValue": "",
       "required": false,
+      "groupName": "commands",
       "helpMarkDown": "Specify the namespace of the ConfigName. If none is specified the current namespace is used."
     },
     {
@@ -58,6 +114,7 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "To view the ConfigMap parameters in a grid, click on “…” next to the textbox.",
+      "groupName": "commands",
       "properties": {
         "editorExtension": "ms.vss-services-azure.parameters-grid"
       }
@@ -68,6 +125,7 @@
       "label": "Use local oc executable",
       "defaultValue": "false",
       "required": false,
+      "groupName": "commands",
       "helpMarkDown": "Check if oc is already installed in the machine and use that if available"
     },
     {
@@ -76,6 +134,7 @@
       "label": "Use proxy to download oc executable",
       "defaultValue": "",
       "required": false,
+      "groupName": "commands",
       "helpMarkDown": "make use of a proxy to download oc executable"
     }
   ],
