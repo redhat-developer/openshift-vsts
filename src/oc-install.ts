@@ -262,12 +262,13 @@ export class InstallHandler {
     }
 
     let url = InstallHandler.ocBundleURL(version.value, osType, false);
-    if (!url) {
-      return undefined;
+    let findURLofLatest = !url;
+    if (url) {
+      // check if url is valid otherwise take the latest stable oc cli for this version
+      const response = await fetch(url, { method: 'HEAD' });
+      findURLofLatest = !response.ok;
     }
-    // check if url is valid otherwise take the latest stable oc cli for this version
-    const response = await fetch(url, { method: 'HEAD' });
-    if (!response.ok) {
+    if (findURLofLatest) {
       url = InstallHandler.ocBundleURL(version.value, osType, true);
     }
     return url;
