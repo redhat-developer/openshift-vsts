@@ -38,29 +38,22 @@ describe('InstallHandler', () => {
       const latestStub = sandbox.stub(InstallHandler, 'latestStable').returns({ valid: true, type: 'url', value: 'http://url.com/ocbundle'});
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves({ found: true, path: 'path' });
-      await InstallHandler.installOc({ valid: false }, 'Darwin', false, '');
+      await InstallHandler.installOc({ valid: false, reason: '' }, 'Darwin', false, '');
       expect(latestStub.calledOnce).to.be.true;
     });
 
-    it('return error if lastest version is not found', async () => {
-      sandbox.stub(InstallHandler, 'latestStable').returns({ valid: false });
-      try {
-        await InstallHandler.installOc({ valid: false }, 'Darwin', false, '');
-        expect.fail();
-      } catch (ex) {
-        expect(ex.message).equals('Unable to determine latest oc download URL');
-      }
+    it('return correct error message if lastest version is not found', async () => {
+      sandbox.stub(InstallHandler, 'latestStable').returns({ valid: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' });
+      const res = await InstallHandler.installOc({ valid: false, reason: '' }, 'Darwin', false, '');
+      expect(res).deep.equals({ found: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' });
+      
     });
 
-    it('check if task fails if downloadAndExtract doesnt return a valid ocBinary', async () => {
+    it('return correct error message if task fails when downloadAndExtract doesnt return a valid ocBinary', async () => {
       sandbox.stub(fs, 'existsSync').returns(true);
       sandbox.stub(InstallHandler, 'downloadAndExtract').resolves({ found: false });
-      try {
-        await InstallHandler.installOc({ valid: true, type: 'url', value: 'path' }, 'Darwin', false, '');
-        expect.fail();
-      } catch (ex) {
-        expect(ex.message).equals('Unable to download or extract oc binary.');
-      }
+      const res = await InstallHandler.installOc({ valid: true, type: 'url', value: 'path' }, 'Darwin', false, '');
+      expect(res).deep.equals({ found: false, reason: 'Unable to download or extract oc binary.' });      
     });
 
     it('check if value returned by downloadAndExtract is returned when valid', async () => {
@@ -80,7 +73,7 @@ describe('InstallHandler', () => {
     it('check if binary not found returned if osType input is not valid', () => {
       sandbox.stub(InstallHandler, 'getOcBundleByOS').returns(undefined);
       const res = InstallHandler.latestStable('fakeOS');
-      expect(res).deep.equals({ valid: false });
+      expect(res).deep.equals({ valid: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' });
     });
 
     it('check if url returned is valid based on OSType input', () => {
@@ -363,7 +356,7 @@ describe('InstallHandler', () => {
   describe('#getLocalOcBinary', () => {
     it('returns path found by which if no error occurs and there is no version as input', () => {
       const whichStub = sandbox.stub(tl, 'which').returns('path');
-      const res = InstallHandler.getLocalOcBinary({ valid: false });
+      const res = InstallHandler.getLocalOcBinary({ valid: false, reason: '' });
       sinon.assert.calledWith(whichStub, 'oc');
       expect(res).deep.equals({ found: true, path: 'path' });
     });
@@ -378,7 +371,7 @@ describe('InstallHandler', () => {
       sandbox.stub(tl, 'which').returns('path');
       const getOcStub = sandbox        
         .stub(InstallHandler, 'getOcVersion')
-        .returns({ valid: false });
+        .returns({ valid: false, reason: '' });
       const res = InstallHandler.getLocalOcBinary({ valid: true, type: 'number', value: '1.1' });
       sinon.assert.calledWith(getOcStub, 'path');
       expect(res).deep.equals({ found: false });
@@ -432,14 +425,14 @@ describe('InstallHandler', () => {
       expect(res).deep.equals({ valid: true, type: 'number', value: 'v3.2.0' });
     });
 
-    it('returns undefined if both oc calls fail', () => {
+    it('returns correct message if both oc calls fail', () => {
       execOcStub
         .onFirstCall()
         .returns(undefined)
         .onSecondCall()
         .returns(undefined);
       const res = InstallHandler.getOcVersion('path');
-      expect(res).deep.equals({ valid: false });
+      expect(res).deep.equals({ valid: false, reason: 'An error occured when retrieving version of oc CLI in path' });
     });
 
     it('returns undefined if second call stdout is empty', () => {
@@ -450,14 +443,14 @@ describe('InstallHandler', () => {
         .onSecondCall()
         .returns(versionRes);
       const res = InstallHandler.getOcVersion('path');
-      expect(res).deep.equals({ valid: false });
+      expect(res).deep.equals({ valid: false, reason: 'An error occured when retrieving version of oc CLI in path' });
     });
 
     it('returns undefined if execOcSync returns a not empty stdout without a valid version in it', () => {
       versionRes.stdout = 'xxxxx xxxxx xxxxxx xxxxxx xxxxx';
       execOcStub.returns(versionRes);
       const res = InstallHandler.getOcVersion('path');
-      expect(res).deep.equals({ valid: false });
+      expect(res).deep.equals({ valid: false, reason: 'The version of oc CLI in path is in an unknown format.' });
     });
   });
 });

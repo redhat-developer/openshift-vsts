@@ -40,8 +40,8 @@ export class InstallHandler {
     if (!versionToUse.valid) {
       // dopo aver trovato la versione bisogna vedere se è nella cache
       versionToUse = InstallHandler.latestStable(osType);
-      if (!versionToUse.valid) {
-        return Promise.reject(new Error('Unable to determine latest oc download URL'));
+      if (versionToUse.valid === false) {
+        return { found: false, reason: versionToUse.reason };
       }
     }
 
@@ -65,14 +65,14 @@ export class InstallHandler {
     }
 
     const url: string = await InstallHandler.getOcURLToDownload(versionToUse, osType);
-    if (url === null) {
-      return Promise.reject(new Error('Unable to determine oc download URL.'));
+    if (!url) {
+      return { found: false, reason: 'Unable to determine URL where to download oc executable.' };
     }
 
     tl.debug(`downloading: ${url}`);
     const ocBinary: FindBinaryStatus = await InstallHandler.downloadAndExtract(url, downloadDir, osType, versionToCache, proxy);
     if (!ocBinary.found) {
-      return Promise.reject(new Error('Unable to download or extract oc binary.'));
+      return { found: false, reason: 'Unable to download or extract oc binary.' };
     }
 
     return ocBinary;
@@ -88,13 +88,12 @@ export class InstallHandler {
 
     const bundle = InstallHandler.getOcBundleByOS(osType);
     if (!bundle) {
-      tl.debug('Unable to find bundle url');
-      return { valid: false };
+      return { valid: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' };
     }
     const ocUtils = InstallHandler.getOcUtils();
     const url = `${ocUtils.openshiftV4BaseUrl}/${LATEST}/${bundle}`;
-
     tl.debug(`latest stable oc version: ${url}`);
+
     return { valid: true, type: 'url', value: url };
   }
 
@@ -255,7 +254,7 @@ export class InstallHandler {
    */
   static async getOcURLToDownload(version: BinaryVersion, osType: string): Promise<string> {
     if (!version.valid) {
-      return null;
+      return undefined;
     }
 
     if (version.valid && version.type === 'url') {
@@ -263,6 +262,9 @@ export class InstallHandler {
     }
 
     let url = InstallHandler.ocBundleURL(version.value, osType, false);
+    if (!url) {
+      return undefined;
+    }
     // check if url is valid otherwise take the latest stable oc cli for this version
     const response = await fetch(url, { method: 'HEAD' });
     if (!response.ok) {
@@ -336,7 +338,7 @@ export class InstallHandler {
     }
 
     if (!result || !result.stdout) {
-      return { valid: false };
+      return { valid: false, reason: `An error occured when retrieving version of oc CLI in ${ocPath}` };
     }
 
     tl.debug(`stdout ${result.stdout}`);
@@ -347,7 +349,7 @@ export class InstallHandler {
       return { valid: true, type: 'number', value: versionObj[0]};
     }
 
-    return { valid: false };
+    return { valid: false, reason: `The version of oc CLI in ${ocPath} is in an unknown format.`};
   }
 
   static getOcUtils(): { [key: string]: string } {
