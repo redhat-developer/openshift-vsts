@@ -5,6 +5,7 @@
 import { RunnerHandler } from './oc-exec';
 import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
+import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus } from './utils/exec_helper';
 
 import task = require('azure-pipelines-task-lib/task');
 
@@ -16,18 +17,14 @@ async function run(): Promise<void> {
   const proxy: string = task.getInput('proxy');
   const agentOS = task.osType();
 
-  const ocPath = await InstallHandler.installOc(
-    version,
-    agentOS,
-    useLocalOc,
-    proxy
-  );
-  if (ocPath === null) {
-    throw new Error('no oc binary found');
+  const binaryVersion: BinaryVersion = convertStringToBinaryVersion(version);
+  const ocBinary: FindBinaryStatus = await InstallHandler.installOc(binaryVersion, agentOS, useLocalOc, proxy);
+  if (!ocBinary.found) {
+    throw new Error('No Oc binary found');
   }
 
-  await auth.createKubeConfig(ocPath, agentOS);
-  await RunnerHandler.execOc(ocPath, argLine, ignoreFlag);
+  await auth.createKubeConfig(ocBinary.path, agentOS);
+  await RunnerHandler.execOc(ocBinary.path, argLine, ignoreFlag);
 }
 
 run()

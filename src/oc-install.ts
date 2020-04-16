@@ -3,102 +3,75 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 import * as fs from 'fs';
-import {
-  ToolRunner,
-  IExecSyncResult
-} from 'azure-pipelines-task-lib/toolrunner';
+import { ToolRunner, IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as semver from 'semver';
 import { RunnerHandler } from './oc-exec';
 import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
-import { unzipArchive } from './utils/utils';
+import { unzipArchive } from './utils/zip_helper';
+import { FindBinaryStatus, BinaryVersion } from './utils/exec_helper';
 
 import tl = require('azure-pipelines-task-lib/task');
 import path = require('path');
-import validUrl = require('valid-url');
 import fetch = require('node-fetch');
 
 export class InstallHandler {
   /**
    * Downloads the requested oc CLI and returns the full path to the executable.
    *
-   * @param downloadVersion the version or url of `oc` to install.
+   * @param versionToUse the version of `oc` to install.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'. See https://nodejs.org/api/os.html#os_os_type
    * @param useLocalOc to use the current oc cli already installed in machine
    * @param proxy proxy to use to download oc
    * @return the full path to the installed executable or null if the install failed.
    */
-  static async installOc(
-    downloadVersion: string,
-    osType: string,
-    useLocalOc: boolean,
-    proxy: string
-  ): Promise<string | null> {
+  static async installOc(versionToUse: BinaryVersion, osType: string, useLocalOc: boolean, proxy: string): Promise<FindBinaryStatus> {
     // N.B: downloadVersion can have three different values:
     //       - number version (e.g. 3.11)
     //       - url where to download oc cli
     //       - undefined, if want to use latest oc version or whatever oc cli is installed in machine
-    let validUri = '';
-    if (downloadVersion) validUri = validUrl.isWebUri(downloadVersion);
-    if (!validUri && useLocalOc) {
-      const localOcPath = InstallHandler.getLocalOcPath(downloadVersion);
-      if (localOcPath) {
-        return localOcPath;
+    if (useLocalOc) {
+      const localOcBinary: FindBinaryStatus = InstallHandler.getLocalOcBinary(versionToUse);
+      if (localOcBinary.found) {
+        return localOcBinary;
       }
     }
 
-    if (!downloadVersion) {
-      downloadVersion = InstallHandler.latestStable(osType);
-      if (downloadVersion === null) {
+    if (!versionToUse.valid) {
+      // dopo aver trovato la versione bisogna vedere se è nella cache
+      versionToUse = InstallHandler.latestStable(osType);
+      if (!versionToUse.valid) {
         return Promise.reject(new Error('Unable to determine latest oc download URL'));
       }
-      validUri = validUrl.isWebUri(downloadVersion);
     }
 
-    // if not a url, check if oc version requested exists in cache
+    // check if oc version requested exists in cache
     let versionToCache;
-    if (!validUri) {
-      versionToCache = InstallHandler.versionToCache(downloadVersion);
+    if (versionToUse.type === 'number') {
+      versionToCache = InstallHandler.versionToCache(versionToUse.value);
       let cachePath: string;
       if (versionToCache) {
         cachePath = toolLib.findLocalTool('oc', versionToCache);
       }
       if (cachePath) {
-        return path.join(cachePath, InstallHandler.ocBinaryByOS(osType));
+        return { found: true, path: path.join(cachePath, InstallHandler.ocBinaryByOS(osType)) };
       }
     }
 
     tl.debug('creating download directory');
-    const downloadDir = `${process.env.SYSTEM_DEFAULTWORKINGDIRECTORY  }/.download`;
+    const downloadDir = `${process.env.SYSTEM_DEFAULTWORKINGDIRECTORY}/.download`;
     if (!fs.existsSync(downloadDir)) {
       tl.mkdirP(downloadDir);
     }
 
-    let url: string | null;
-    if (validUri) {
-      url = downloadVersion;
-    } else {
-      url = InstallHandler.ocBundleURL(downloadVersion, osType, false);
-      // check if url exists otherwise take the latest stable oc cli for this version
-      const response = await fetch(url, { method: 'HEAD' });
-      if (!response.ok) {
-        url = InstallHandler.ocBundleURL(downloadVersion, osType, true);
-      }
-    }
-
+    const url: string = await InstallHandler.getOcURLToDownload(versionToUse, osType);
     if (url === null) {
       return Promise.reject(new Error('Unable to determine oc download URL.'));
     }
 
     tl.debug(`downloading: ${url}`);
-    const ocBinary = await InstallHandler.downloadAndExtract(
-      url,
-      downloadDir,
-      osType,
-      versionToCache,
-      proxy
-    );
-    if (ocBinary === null) {
+    const ocBinary: FindBinaryStatus = await InstallHandler.downloadAndExtract(url, downloadDir, osType, versionToCache, proxy);
+    if (!ocBinary.found) {
       return Promise.reject(new Error('Unable to download or extract oc binary.'));
     }
 
@@ -108,21 +81,21 @@ export class InstallHandler {
   /**
    * Determines the latest stable version of the OpenShift CLI on mirror.openshift.
    *
-   * @return the url of the latest OpenShift CLI on mirror.openshift.
+   * @return the version of the latest OpenShift CLI on mirror.openshift.
    */
-  static latestStable(osType: string): string | null {
+  static latestStable(osType: string): BinaryVersion {
     tl.debug('determining latest oc version');
 
     const bundle = InstallHandler.getOcBundleByOS(osType);
     if (!bundle) {
       tl.debug('Unable to find bundle url');
-      return null;
+      return { valid: false };
     }
     const ocUtils = InstallHandler.getOcUtils();
     const url = `${ocUtils.openshiftV4BaseUrl}/${LATEST}/${bundle}`;
 
     tl.debug(`latest stable oc version: ${url}`);
-    return url;
+    return { valid: true, type: 'url', value: url };
   }
 
   /**
@@ -231,19 +204,12 @@ export class InstallHandler {
    * @param proxy proxy to use to download oc
    * It is the responsibility of the caller to ensure that the directory exist.
    */
-  static async downloadAndExtract(
-    url: string,
-    downloadDir: string,
-    osType: string,
-    versionToCache: string,
-    proxy: string
-  ): Promise<string | null> {
+  static async downloadAndExtract(url: string, downloadDir: string, osType: string, versionToCache: string, proxy: string): Promise<FindBinaryStatus> {
     if (!url) {
-      return null;
+      return { found: false };
     }
 
     downloadDir = path.normalize(downloadDir);
-
     if (!tl.exist(downloadDir)) {
       return Promise.reject(new Error(`${downloadDir} does not exist.`));
     }
@@ -280,12 +246,36 @@ export class InstallHandler {
 
     ocBinary = path.join(downloadDir, ocBinary);
     if (!tl.exist(ocBinary)) {
-      return null;
+      return { found: false };
     }
 
     fs.chmodSync(ocBinary, '0755');
     if (versionToCache) await toolLib.cacheFile(ocBinary, 'oc', 'oc', versionToCache);
-    return ocBinary;
+    return { found: true, path: ocBinary };
+  }
+
+  /**
+   * Returns the url to download oc binary
+   *
+   * @param version the version to download
+   * @param osType The OS of the agent. One of 'Linux', 'Darwin' or 'Windows_NT'.
+   */
+  static async getOcURLToDownload(version: BinaryVersion, osType: string): Promise<string> {
+    if (!version.valid) {
+      return null;
+    }
+
+    if (version.valid && version.type === 'url') {
+      return version.value;
+    }
+
+    let url = InstallHandler.ocBundleURL(version.value, osType, false);
+    // check if url is valid otherwise take the latest stable oc cli for this version
+    const response = await fetch(url, { method: 'HEAD' });
+    if (!response.ok) {
+      url = InstallHandler.ocBundleURL(version.value, osType, true);
+    }
+    return url;
   }
 
   /**
@@ -309,39 +299,42 @@ export class InstallHandler {
   }
 
   /**
-   * Retrieve the path of the oc CLI installed in the machine.
+   * Retrieve the oc CLI installed in the machine.
    *
    * @param version the version of `oc` to be used. If not specified any `oc` version, if found, will be used.
-   * @return the full path to the installed executable or undefined if the oc CLI version requested is not found.
+   * @return the installed executable
    */
-  static getLocalOcPath(version?: string): string | undefined {
+  static getLocalOcBinary(version: BinaryVersion): FindBinaryStatus {
+    let ocBinaryStatus: FindBinaryStatus;
     let ocPath: string | undefined;
     try {
       ocPath = tl.which('oc', true);
+      ocBinaryStatus = { found: true, path: ocPath };
       tl.debug(`ocPath ${ocPath}`);
     } catch (ex) {
+      ocBinaryStatus = { found: false };
       tl.debug(`Oc has not been found on this machine. Err ${  ex}`);
     }
 
-    if (version && ocPath) {
-      const localOcVersion = InstallHandler.getVersionFromExecutable(ocPath);
-      tl.debug(`localOcVersion ${localOcVersion} vs ${version}`);
-      if (
-        !localOcVersion ||
-        localOcVersion.toLowerCase() !== version.toLowerCase()
-      ) {
-        return undefined;
+    if (version.valid && version.type === 'number' && ocPath) {
+      const localOcVersion: BinaryVersion = InstallHandler.getOcVersion(ocPath);
+      tl.debug(`localOcVersion ${localOcVersion} vs ${version.value}`);
+      if (!localOcVersion.valid || localOcVersion.value.toLowerCase() !== version.value.toLowerCase()) {
+        ocBinaryStatus = { found: false };
       }
     }
 
-    return ocPath;
+    return ocBinaryStatus;
   }
 
-  static getVersionFromExecutable(ocPath: string): string {
-    let result: IExecSyncResult | undefined = RunnerHandler.execOcSync(
-      ocPath,
-      'version --short=true --client=true'
-    );
+  /**
+   * Retrieve the version of the oc CLI found in path.
+   *
+   * @param ocPath the path of `oc` to be used
+   * @return the version of oc
+   */
+  static getOcVersion(ocPath: string): BinaryVersion {
+    let result: IExecSyncResult | undefined = RunnerHandler.execOcSync(ocPath, 'version --short=true --client=true');
 
     if (!result || result.stderr) {
       tl.debug(`error ${result && result.stderr ? result.stderr : ''}`);
@@ -350,8 +343,7 @@ export class InstallHandler {
     }
 
     if (!result || !result.stdout) {
-      tl.debug('stdout empty');
-      return undefined;
+      return { valid: false };
     }
 
     tl.debug(`stdout ${result.stdout}`);
@@ -359,17 +351,14 @@ export class InstallHandler {
     const versionObj = regexVersion.exec(result.stdout);
 
     if (versionObj && versionObj.length > 0) {
-      return versionObj[0];
+      return { valid: true, type: 'number', value: versionObj[0]};
     }
 
-    return undefined;
+    return { valid: false };
   }
 
   static getOcUtils(): { [key: string]: string } {
-    const rawData = fs.readFileSync(
-      path.resolve(__dirname || '', 'oc-utils.json'),
-      'utf-8'
-    );
+    const rawData = fs.readFileSync(path.resolve(__dirname || '', 'oc-utils.json'), 'utf-8');
     return JSON.parse(rawData.toString());
   }
 

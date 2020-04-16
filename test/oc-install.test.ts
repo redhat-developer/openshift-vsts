@@ -22,7 +22,7 @@ import {
 } from '../src/constants';
 
 import { ToolRunnerStub } from './toolrunnerStub';
-import * as utils from '../src/utils/utils';
+import * as utils from '../src/utils/zip_helper';
 
 const {expect} = chai;
 import path = require('path');
