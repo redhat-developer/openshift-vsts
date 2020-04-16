@@ -9,7 +9,7 @@ import * as semver from 'semver';
 import { RunnerHandler } from './oc-exec';
 import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
 import { unzipArchive } from './utils/zip_helper';
-import { FindBinaryStatus, BinaryVersion } from './utils/exec_helper';
+import { BinaryVersion, FindBinaryStatus } from './utils/exec_helper';
 
 import tl = require('azure-pipelines-task-lib/task');
 import path = require('path');
@@ -71,8 +71,8 @@ export class InstallHandler {
 
     tl.debug(`downloading: ${url}`);
     const ocBinary: FindBinaryStatus = await InstallHandler.downloadAndExtract(url, downloadDir, osType, versionToCache, proxy);
-    if (!ocBinary.found) {
-      return { found: false, reason: 'Unable to download or extract oc binary.' };
+    if (ocBinary.found === false) {
+      return { found: false, reason: ocBinary.reason};
     }
 
     return ocBinary;
@@ -198,12 +198,12 @@ export class InstallHandler {
    */
   static async downloadAndExtract(url: string, downloadDir: string, osType: string, versionToCache: string, proxy: string): Promise<FindBinaryStatus> {
     if (!url) {
-      return { found: false };
+      return { found: false, reason: 'URL where to download oc is not valid.' };
     }
 
     downloadDir = path.normalize(downloadDir);
     if (!tl.exist(downloadDir)) {
-      return Promise.reject(new Error(`${downloadDir} does not exist.`));
+      return { found: false, reason: `Unable to extract Oc executable from archive. Directory ${downloadDir} does not exist.` };
     }
 
     const parts = url.split('/');
@@ -238,7 +238,7 @@ export class InstallHandler {
 
     ocBinary = path.join(downloadDir, ocBinary);
     if (!tl.exist(ocBinary)) {
-      return { found: false };
+      return { found: false, reason: `Oc binary path ${ocBinary} doesn't exist.` };
     }
 
     fs.chmodSync(ocBinary, '0755');

@@ -51,9 +51,9 @@ describe('InstallHandler', () => {
 
     it('return correct error message if task fails when downloadAndExtract doesnt return a valid ocBinary', async () => {
       sandbox.stub(fs, 'existsSync').returns(true);
-      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves({ found: false });
+      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves({ found: false, reason: 'URL where to download oc is not valid.' });
       const res = await InstallHandler.installOc({ valid: true, type: 'url', value: 'path' }, 'Darwin', false, '');
-      expect(res).deep.equals({ found: false, reason: 'Unable to download or extract oc binary.' });      
+      expect(res).deep.equals({ found: false, reason: 'URL where to download oc is not valid.' });      
     });
 
     it('check if value returned by downloadAndExtract is returned when valid', async () => {
@@ -151,7 +151,7 @@ describe('InstallHandler', () => {
   });
 
   describe('#downloadAndExtract', () => {
-    it('return null if url is not valid', async () => {
+    it('return correct error message if url is not valid', async () => {
       const res = await InstallHandler.downloadAndExtract(
         '',
         'path',
@@ -159,25 +159,15 @@ describe('InstallHandler', () => {
         '',
         'ip:port'
       );
-      expect(res).deep.equals({ found: false });
+      expect(res).deep.equals({ found: false, reason: 'URL where to download oc is not valid.' });
     });
 
-    it('throw error if download dir no exists', async () => {
+    it('return correct error message if download dir no exists', async () => {
       const normalizeStub = sandbox.stub(path, 'normalize').returns('path');
       sandbox.stub(tl, 'exist').returns(false);
-      try {
-        await InstallHandler.downloadAndExtract(
-          'url',
-          'path',
-          'Linux',
-          '',
-          'ip:port'
-        );
-        normalizeStub.calledOnce;
-        expect.fail();
-      } catch (err) {
-        expect(err.message).equals('path does not exist.');
-      }
+      const ret = await InstallHandler.downloadAndExtract('url', 'path', 'Linux', '', 'ip:port');
+      sinon.assert.calledOnce(normalizeStub)
+      expect(ret).deep.equals({ found: false, reason: `Unable to extract Oc executable from archive. Directory path does not exist.` });      
     });
 
     it('curl is called if archive path no exists', async () => {
@@ -236,7 +226,7 @@ describe('InstallHandler', () => {
         '',
         'ip:port'
       );
-      expect(res).deep.equals({ found: false });
+      expect(res).deep.equals({ found: false, reason: 'Oc binary path path doesn\'t exist.' });
     });
 
     it('check if correct oc path for Windows', async () => {
@@ -410,7 +400,7 @@ describe('InstallHandler', () => {
         .returns(undefined)
         .onSecondCall()
         .returns(undefined);
-      InstallHandler.getVersionFromExecutable('path');
+      InstallHandler.getOcVersion('path');
       sinon.assert.calledTwice(execOcStub);
     });
 
