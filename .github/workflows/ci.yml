@@ -1,0 +1,68 @@
+ 
+# -----------------------------------------------------------------------------------------------
+#  Copyright (c) Red Hat, Inc. All rights reserved.
+#  Licensed under the MIT License. See LICENSE file in the project root for license information.
+# ----------------------------------------------------------------------------------------------- 
+
+name: OpenShift VSTS CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  Linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ '10', '8', '6' ]
+    name: Node ${{ matrix.node }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v1.4.1
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm run setup
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+
+  Windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v1.4.1
+        with:
+          node-version: '10.x'
+      - run: npm run setup
+      - run: npm install
+      - run: npm run build
+      - run: npm run test:report:ci
+      - uses: actions/upload-artifact@v1
+        with:
+          name: test-results
+          path: test/reports
+
+  MacOS:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v1.4.1
+        with:
+          node-version: '10.x'
+      - run: npm run setup
+      - run: npm install
+      - run: npm run build
+      - run: npm run test:report:ci
+      - uses: actions/upload-artifact@v1
+        with:
+          name: test-results
+          path: test/reports

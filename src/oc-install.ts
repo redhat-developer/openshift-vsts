@@ -104,14 +104,14 @@ export class InstallHandler {
    *
    * @param {string} version Oc version.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
-   * @returns {Promise} Promise string representing the URL to the tarball. null is returned
+   * @returns {Promise} Promise string representing the URL to the tarball. undefined is returned
    * if no matching URL can be determined for the given tag.
    */
-  static ocBundleURL(version: string, osType: string, latest?: boolean): string | null {
+  static ocBundleURL(version: string, osType: string, latest?: boolean): string {
     tl.debug(`determining tarball URL for version ${version}`);
 
     if (!version) {
-      return null;
+      return undefined;
     }
 
     // remove char v if present to ensure old pipelines keep working when the extension will be updated
@@ -125,7 +125,7 @@ export class InstallHandler {
     const vMajorRegEx: RegExpExecArray = reg.exec(version);
     if (!vMajorRegEx || vMajorRegEx.length === 0) {
       tl.debug('Error retrieving version major');
-      return null;
+      return undefined;
     }
     const vMajor: number = +vMajorRegEx[0];
     const ocUtils = InstallHandler.getOcUtils();
@@ -138,12 +138,12 @@ export class InstallHandler {
         tl.debug(
           'Error retrieving version release - unable to find latest version'
         );
-        return null;
+        return undefined;
       }
       const baseVersion: string = versionRegEx[0]; // e.g 3.11
       if (!ocUtils[`oc${baseVersion}`]) {
         tl.debug(`Error retrieving latest patch for oc version ${baseVersion}`);
-        return null;
+        return undefined;
       }
       version = ocUtils[`oc${baseVersion}`];
     }
@@ -154,13 +154,13 @@ export class InstallHandler {
       url = `${ocUtils.openshiftV4BaseUrl}/${version}/`;
     } else {
       tl.debug('Invalid version');
-      return null;
+      return undefined;
     }
 
     const bundle = InstallHandler.getOcBundleByOS(osType);
     if (!bundle) {
       tl.debug('Unable to find bundle url');
-      return null;
+      return undefined;
     }
 
     url += bundle;
@@ -169,29 +169,22 @@ export class InstallHandler {
     return url;
   }
 
-  static getOcBundleByOS(osType: string): string | null {
-    let url = '';
-
+  static getOcBundleByOS(osType: string): string {
     // determine the bundle path based on the OS type
     switch (osType) {
       case 'Linux': {
-        url += `${LINUX}/${OC_TAR_GZ}`;
-        break;
+        return `${LINUX}/${OC_TAR_GZ}`;
       }
       case 'Darwin': {
-        url += `${MACOSX}/${OC_TAR_GZ}`;
-        break;
+        return `${MACOSX}/${OC_TAR_GZ}`;
       }
       case 'Windows_NT': {
-        url += `${WIN}/${OC_ZIP}`;
-        break;
+        return `${WIN}/${OC_ZIP}`;
       }
       default: {
-        return null;
+        return undefined;
       }
     }
-
-    return url;
   }
 
   /**
@@ -284,7 +277,7 @@ export class InstallHandler {
    * @param ocPath the full path to the oc binary. Must be a non null.
    * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
    */
-  static addOcToPath(ocPath: string, osType: string): void{
+  static addOcToPath(ocPath: string, osType: string): void {
     if (ocPath === null || ocPath === '') {
       throw new Error('path cannot be null or empty');
     }
