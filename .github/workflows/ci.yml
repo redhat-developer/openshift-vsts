@@ -28,7 +28,7 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm run setup
       - run: npm install
-      - run: npm run build
+      - run: npm run compile
       - run: npm test
 
   Windows:
@@ -43,11 +43,7 @@ jobs:
       - run: npm run setup
       - run: npm install
       - run: npm run build
-      - run: npm run test:report:ci
-      - uses: actions/upload-artifact@v1
-        with:
-          name: test-results
-          path: test/reports
+      - run: npm test
 
   MacOS:
     runs-on: macos-latest
@@ -61,4 +57,4 @@ jobs:
       - run: npm run setup
       - run: npm install
       - run: npm run build
-      - run: npm run test
+      - run: npm test

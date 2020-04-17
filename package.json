@@ -13,6 +13,7 @@
     "all": "npm install && npm run build && npm run test",
     "setup": "npm install -g tfx-cli typescript json del-cli copy-node-modules markserv ts-mocha mocha mocha-junit-reporter",
     "clean": "del-cli **/out **/node_modules **/.taskkey",
+    "compile": "tsc -b .",
     "build": "npm run lint && tsc -b . && npm run copy-utils-file",
     "build:watch": "tsc -b tsconfig.json -w",
     "docs": "markserv .",
