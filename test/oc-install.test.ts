@@ -3,30 +3,18 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 import * as chai from 'chai';
-// import sinon
 import * as sinon from 'sinon';
 import * as fs from 'fs';
 
-import * as validUrl from 'valid-url';
 import { IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner';
 import { InstallHandler } from '../src/oc-install';
-// import * as ocinstall from '../src/oc-install';
 import { RunnerHandler } from '../src/oc-exec';
-import {
-  LATEST,
-  LINUX,
-  OC_TAR_GZ,
-  WIN,
-  OC_ZIP,
-  MACOSX
-} from '../src/constants';
-
+import { LATEST, LINUX, MACOSX, OC_TAR_GZ,  OC_ZIP, WIN } from '../src/constants';
 import { ToolRunnerStub } from './toolrunnerStub';
-import * as utils from '../src/utils/utils';
+import * as utils from '../src/utils/zip_helper';
 
 const {expect} = chai;
 import path = require('path');
-
 import tl = require('azure-pipelines-task-lib/task');
 
 describe('InstallHandler', () => {
@@ -47,94 +35,73 @@ describe('InstallHandler', () => {
 
   describe('#ocInstall', () => {
     it('check if latestStable method is called if no ocVersion is passed', async () => {
-      const latestStub = sandbox.stub(InstallHandler, 'latestStable').returns('http://url.com/ocbundle');
+      const latestStub = sandbox.stub(InstallHandler, 'latestStable').returns({ valid: true, type: 'url', value: 'http://url.com/ocbundle'});
       sandbox.stub(fs, 'existsSync').returns(true);
-      sandbox.stub(InstallHandler, 'ocBundleURL').returns('url');
-      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      await InstallHandler.installOc('', 'Darwin', false, '');
+      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves({ found: true, path: 'path' });
+      await InstallHandler.installOc({ valid: false, reason: '' }, 'Darwin', false, '');
       expect(latestStub.calledOnce).to.be.true;
     });
 
-    it('return error if lastest version is not found', async () => {
-      sandbox.stub(InstallHandler, 'latestStable').returns(null);
-      try {
-        await InstallHandler.installOc('', 'Darwin', false, '');
-        expect.fail();
-      } catch (ex) {
-        expect(ex.message).equals('Unable to determine latest oc download URL');
-      }
+    it('return correct error message if lastest version is not found', async () => {
+      sandbox.stub(InstallHandler, 'latestStable').returns({ valid: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' });
+      const res = await InstallHandler.installOc({ valid: false, reason: '' }, 'Darwin', false, '');
+      expect(res).deep.equals({ found: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' });
+      
     });
 
-    it('check if ocBundle is not called if uri is valid', async () => {
+    it('return correct error message if task fails when downloadAndExtract doesnt return a valid ocBinary', async () => {
       sandbox.stub(fs, 'existsSync').returns(true);
-      const ocBundleStub = sandbox.stub(InstallHandler, 'ocBundleURL');
-      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
-      await InstallHandler.installOc(
-        'https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip',
-        'Darwin',
-        false,
-        ''
-      );
-      expect(ocBundleStub.calledOnce).to.be.false;
+      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves({ found: false, reason: 'URL where to download oc is not valid.' });
+      const res = await InstallHandler.installOc({ valid: true, type: 'url', value: 'path' }, 'Darwin', false, '');
+      expect(res).deep.equals({ found: false, reason: 'URL where to download oc is not valid.' });      
     });
 
-    it('check if task fails if downloadAndExtract doesnt return a valid ocBinary', async () => {
+    it('check if value returned by downloadAndExtract is returned when valid', async () => {
       sandbox.stub(fs, 'existsSync').returns(true);
-      sandbox.stub(validUrl, 'isWebUri').returns('path');
-      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves(null);
-      try {
-        await InstallHandler.installOc('path', 'Darwin', false, '');
-        expect.fail();
-      } catch (ex) {
-        expect(ex.message).equals('Unable to download or extract oc binary.');
-      }
-    });
-
-    it('check if value returned by downloadAndExtract if valid is returned', async () => {
-      sandbox.stub(fs, 'existsSync').returns(true);
-      sandbox.stub(validUrl, 'isWebUri').returns('path');
-      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves('path');
+      sandbox.stub(InstallHandler, 'downloadAndExtract').resolves({ found: true, path: 'path' });
       const result = await InstallHandler.installOc(
-        'path',
+        { valid: true, type: 'url', value: 'path' },
         'Darwin',
         false,
         ''
       );
-      expect(result).equals('path');
+      expect(result).deep.equals({ found: true, path: 'path' });
     });
   });
 
   describe('#latestStable', () => {
-    it('check if null value returned if osType input is not valid', () => {
-      sandbox.stub(InstallHandler, 'getOcBundleByOS').returns(null);
+    it('check if binary not found returned if osType input is not valid', () => {
+      sandbox.stub(InstallHandler, 'getOcBundleByOS').returns(undefined);
       const res = InstallHandler.latestStable('fakeOS');
-      expect(res).equals(null);
+      expect(res).deep.equals({ valid: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' });
     });
 
     it('check if url returned is valid based on OSType input', () => {
       sandbox.stub(InstallHandler, 'getOcBundleByOS').returns('linux/oc.tar.gz');
       const res = InstallHandler.latestStable('linux');
       const ocUtils = InstallHandler.getOcUtils();
-      expect(res).equals(
-        `${ocUtils.openshiftV4BaseUrl}/${LATEST}/linux/oc.tar.gz`
-      );
+      expect(res).deep.equals({ 
+        valid: true, 
+        type: 'url', 
+        value: `${ocUtils.openshiftV4BaseUrl}/${LATEST}/linux/oc.tar.gz` 
+      });
     });
   });
 
   describe('#ocBundleURL', () => {
     it('should return null when no version is passed', () => {
       const result = InstallHandler.ocBundleURL('', 'Linux');
-      expect(result).to.be.null;
+      expect(result).to.be.undefined;
     });
 
     it('should return null when the version passed is null', () => {
-      const result = InstallHandler.ocBundleURL(null, 'Linux');
-      expect(result).to.be.null;
+      const result = InstallHandler.ocBundleURL(undefined, 'Linux');
+      expect(result).to.be.undefined;
     });
 
     it('should return null if no valid version is passed', () => {
       const result = InstallHandler.ocBundleURL('version', 'Linux');
-      expect(result).to.be.null;
+      expect(result).to.be.undefined;
     });
 
     it('should return correct url if oc version (v = 3) is valid', () => {
@@ -160,31 +127,31 @@ describe('InstallHandler', () => {
     it('should return null if oc version requested is different from the versions supported (3 and 4)', () => {
       const version = '5.1.0';
       const res = InstallHandler.ocBundleURL(version, 'Linux');
-      expect(res).equals(null);
+      expect(res).to.be.undefined;
     });
 
     it('should return null if no oc bundle url is found', () => {
       const version = '4.11';
       sandbox.stub(InstallHandler, 'getOcBundleByOS').returns(null);
       const res = InstallHandler.ocBundleURL(version, 'Linux');
-      expect(res).equals(null);
+      expect(res).to.be.undefined;
     });
 
     it('should return null if latest version is requestd but version passed as param is invalid', () => {
       const version = '3';
       const res = InstallHandler.ocBundleURL(version, 'Linux', true);
-      expect(res).equals(null);
+      expect(res).to.be.undefined;
     });
 
     it('should return null if latest version is requestd but version passed as param dont have a latest version', () => {
       const version = '3.17';
       const res = InstallHandler.ocBundleURL(version, 'Linux', true);
-      expect(res).equals(null);
+      expect(res).to.be.undefined;
     });
   });
 
   describe('#downloadAndExtract', () => {
-    it('return null if url is not valid', async () => {
+    it('return correct error message if url is not valid', async () => {
       const res = await InstallHandler.downloadAndExtract(
         '',
         'path',
@@ -192,25 +159,15 @@ describe('InstallHandler', () => {
         '',
         'ip:port'
       );
-      expect(res).to.be.null;
+      expect(res).deep.equals({ found: false, reason: 'URL where to download oc is not valid.' });
     });
 
-    it('throw error if download dir no exists', async () => {
+    it('return correct error message if download dir no exists', async () => {
       const normalizeStub = sandbox.stub(path, 'normalize').returns('path');
       sandbox.stub(tl, 'exist').returns(false);
-      try {
-        await InstallHandler.downloadAndExtract(
-          'url',
-          'path',
-          'Linux',
-          '',
-          'ip:port'
-        );
-        normalizeStub.calledOnce;
-        expect.fail();
-      } catch (err) {
-        expect(err.message).equals('path does not exist.');
-      }
+      const ret = await InstallHandler.downloadAndExtract('url', 'path', 'Linux', '', 'ip:port');
+      sinon.assert.calledOnce(normalizeStub)
+      expect(ret).deep.equals({ found: false, reason: `Unable to extract Oc executable from archive. Directory path does not exist.` });      
     });
 
     it('curl is called if archive path no exists', async () => {
@@ -269,7 +226,7 @@ describe('InstallHandler', () => {
         '',
         'ip:port'
       );
-      expect(res).equals(null);
+      expect(res).deep.equals({ found: false, reason: 'Oc binary path path doesn\'t exist.' });
     });
 
     it('check if correct oc path for Windows', async () => {
@@ -292,7 +249,7 @@ describe('InstallHandler', () => {
         '',
         'ip:port'
       );
-      expect(res).equals('path/oc.exe');
+      expect(res).deep.equals({ found: true, path: 'path/oc.exe' });
     });
 
     it('check if correct oc path for Linux/Mac', async () => {
@@ -315,7 +272,7 @@ describe('InstallHandler', () => {
         '',
         'ip:port'
       );
-      expect(res).equals('path/oc');
+      expect(res).deep.equals({ found: true, path: 'path/oc' });
       sinon.assert.calledWith(chmod, 'path/oc', '0755');
     });
   });
@@ -338,7 +295,7 @@ describe('InstallHandler', () => {
 
     it('return null if osType is neither linux nor macosx nor windows', () => {
       const res = InstallHandler.getOcBundleByOS('fakeOS');
-      expect(res).equals(null);
+      expect(res).to.be.undefined;
     });
   });
 
@@ -386,35 +343,35 @@ describe('InstallHandler', () => {
     });
   });
 
-  describe('#getlocalOcPath', () => {
+  describe('#getLocalOcBinary', () => {
     it('returns path found by which if no error occurs and there is no version as input', () => {
       const whichStub = sandbox.stub(tl, 'which').returns('path');
-      const res = InstallHandler.getLocalOcPath();
+      const res = InstallHandler.getLocalOcBinary({ valid: false, reason: '' });
       sinon.assert.calledWith(whichStub, 'oc');
-      expect(res).equals('path');
+      expect(res).deep.equals({ found: true, path: 'path' });
     });
 
     it('returns undefined if which fails retrieving oc path', () => {
       sandbox.stub(tl, 'which').throws();
-      const res = InstallHandler.getLocalOcPath('1.1');
-      expect(res).equals(undefined);
+      const res = InstallHandler.getLocalOcBinary({ valid: true, type: 'number', value: '1.1' });
+      expect(res).deep.equals({ found: false });
     });
 
     it('returns nothing if oc path exists but oc version cannot be retrieved', () => {
       sandbox.stub(tl, 'which').returns('path');
-      const getOcStub = sandbox
-        .stub(InstallHandler, 'getVersionFromExecutable')
-        .returns(undefined);
-      const res = InstallHandler.getLocalOcPath('1.1');
+      const getOcStub = sandbox        
+        .stub(InstallHandler, 'getOcVersion')
+        .returns({ valid: false, reason: '' });
+      const res = InstallHandler.getLocalOcBinary({ valid: true, type: 'number', value: '1.1' });
       sinon.assert.calledWith(getOcStub, 'path');
-      expect(res).equals(undefined);
+      expect(res).deep.equals({ found: false });
     });
 
     it('returns nothing if version found locally is not the one user wants to use', () => {
       sandbox.stub(tl, 'which').returns('path');
-      sandbox.stub(InstallHandler, 'getVersionFromExecutable').returns('2.1');
-      const res = InstallHandler.getLocalOcPath('1.1');
-      expect(res).equals(undefined);
+      sandbox.stub(InstallHandler, 'getOcVersion').returns({ valid: true, type: 'number', value: '2.1' });
+      const res = InstallHandler.getLocalOcBinary({ valid: true, type: 'number', value: '1.1' });
+      expect(res).deep.equals({ found: false });
     });
   });
 
@@ -433,8 +390,8 @@ describe('InstallHandler', () => {
 
     it('check if correct version is returned if oc version > 4', () => {
       execOcStub.returns(versionRes);
-      const res = InstallHandler.getVersionFromExecutable('path');
-      expect(res).equals('v4.1.0');
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).deep.equals({ valid: true, type: 'number', value: 'v4.1.0' });
     });
 
     it('check if execOcSync is called twice if first call returns nothing', () => {
@@ -443,7 +400,7 @@ describe('InstallHandler', () => {
         .returns(undefined)
         .onSecondCall()
         .returns(undefined);
-      InstallHandler.getVersionFromExecutable('path');
+      InstallHandler.getOcVersion('path');
       sinon.assert.calledTwice(execOcStub);
     });
 
@@ -454,18 +411,18 @@ describe('InstallHandler', () => {
         .returns(undefined)
         .onSecondCall()
         .returns(versionRes);
-      const res = InstallHandler.getVersionFromExecutable('path');
-      expect(res).equals('v3.2.0');
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).deep.equals({ valid: true, type: 'number', value: 'v3.2.0' });
     });
 
-    it('returns undefined if both oc calls fail', () => {
+    it('returns correct message if both oc calls fail', () => {
       execOcStub
         .onFirstCall()
         .returns(undefined)
         .onSecondCall()
         .returns(undefined);
-      const res = InstallHandler.getVersionFromExecutable('path');
-      expect(res).equals(undefined);
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).deep.equals({ valid: false, reason: 'An error occured when retrieving version of oc CLI in path' });
     });
 
     it('returns undefined if second call stdout is empty', () => {
@@ -475,15 +432,15 @@ describe('InstallHandler', () => {
         .returns(undefined)
         .onSecondCall()
         .returns(versionRes);
-      const res = InstallHandler.getVersionFromExecutable('path');
-      expect(res).equals(undefined);
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).deep.equals({ valid: false, reason: 'An error occured when retrieving version of oc CLI in path' });
     });
 
     it('returns undefined if execOcSync returns a not empty stdout without a valid version in it', () => {
       versionRes.stdout = 'xxxxx xxxxx xxxxxx xxxxxx xxxxx';
       execOcStub.returns(versionRes);
-      const res = InstallHandler.getVersionFromExecutable('path');
-      expect(res).equals(undefined);
+      const res = InstallHandler.getOcVersion('path');
+      expect(res).deep.equals({ valid: false, reason: 'The version of oc CLI in path is in an unknown format.' });
     });
   });
 });
