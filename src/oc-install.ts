@@ -26,10 +26,6 @@ export class InstallHandler {
    * @return the full path to the installed executable or null if the install failed.
    */
   static async installOc(versionToUse: BinaryVersion, osType: string, useLocalOc: boolean, proxy: string): Promise<FindBinaryStatus> {
-    // N.B: downloadVersion can have three different values:
-    //       - number version (e.g. 3.11)
-    //       - url where to download oc cli
-    //       - undefined, if want to use latest oc version or whatever oc cli is installed in machine
     if (useLocalOc) {
       const localOcBinary: FindBinaryStatus = InstallHandler.getLocalOcBinary(versionToUse);
       if (localOcBinary.found) {
@@ -38,7 +34,6 @@ export class InstallHandler {
     }
 
     if (!versionToUse.valid) {
-      // dopo aver trovato la versione bisogna vedere se è nella cache
       versionToUse = InstallHandler.latestStable(osType);
       if (versionToUse.valid === false) {
         return { found: false, reason: versionToUse.reason };
@@ -46,15 +41,12 @@ export class InstallHandler {
     }
 
     // check if oc version requested exists in cache
-    let versionToCache;
+    let versionToCache: string;
     if (versionToUse.type === 'number') {
       versionToCache = InstallHandler.versionToCache(versionToUse.value);
-      let cachePath: string;
-      if (versionToCache) {
-        cachePath = toolLib.findLocalTool('oc', versionToCache);
-      }
-      if (cachePath) {
-        return { found: true, path: path.join(cachePath, InstallHandler.ocBinaryByOS(osType)) };
+      const toolCached: FindBinaryStatus = InstallHandler.versionInCache(versionToCache, osType);
+      if (toolCached.found) {
+        return toolCached;
       }
     }
 
@@ -351,6 +343,23 @@ export class InstallHandler {
     }
 
     return { valid: false, reason: `The version of oc CLI in ${ocPath} is in an unknown format.`};
+  }
+
+  /**
+   * Retrieve the version of oc CLI in cache
+   *
+   * @param versionToCache version to search in cache
+   * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
+   */
+  static versionInCache(version: string, osType: string): FindBinaryStatus {
+    let cachePath: string;
+    if (version) {
+      cachePath = toolLib.findLocalTool('oc', version);
+      if (cachePath) {
+        return { found: true, path: path.join(cachePath, InstallHandler.ocBinaryByOS(osType)) };
+      }
+    }
+    return { found: false };
   }
 
   static getOcUtils(): { [key: string]: string } {
