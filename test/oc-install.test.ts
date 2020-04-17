@@ -189,6 +189,7 @@ describe('InstallHandler', () => {
         '',
         'path',
         'Linux',
+        '',
         'ip:port'
       );
       expect(res).to.be.null;
@@ -202,6 +203,7 @@ describe('InstallHandler', () => {
           'url',
           'path',
           'Linux',
+          '',
           'ip:port'
         );
         normalizeStub.calledOnce;
@@ -221,7 +223,7 @@ describe('InstallHandler', () => {
         .returns(false);
       const toolStub = sandbox.stub(tl, 'tool').returns(stubs.tr);
       try {
-        await InstallHandler.downloadAndExtract('url', 'path', 'Linux', '');
+        await InstallHandler.downloadAndExtract('url', 'path', 'Linux', '', '');
       } catch (ex) {}
       sinon.assert.calledWith(toolStub, 'curl');
       expect(stubs.args.length).equals(5);
@@ -241,6 +243,7 @@ describe('InstallHandler', () => {
           'url',
           'path',
           'Linux',
+          '',
           'ip:port'
         );
       } catch (ex) {}
@@ -263,6 +266,7 @@ describe('InstallHandler', () => {
         'url',
         'path',
         'Linux',
+        '',
         'ip:port'
       );
       expect(res).equals(null);
@@ -285,6 +289,7 @@ describe('InstallHandler', () => {
         'url',
         'path',
         'Windows_NT',
+        '',
         'ip:port'
       );
       expect(res).equals('path/oc.exe');
@@ -307,6 +312,7 @@ describe('InstallHandler', () => {
         'url',
         'path',
         'Linux',
+        '',
         'ip:port'
       );
       expect(res).equals('path/oc');
@@ -397,7 +403,7 @@ describe('InstallHandler', () => {
     it('returns nothing if oc path exists but oc version cannot be retrieved', () => {
       sandbox.stub(tl, 'which').returns('path');
       const getOcStub = sandbox
-        .stub(InstallHandler, 'getOcVersion')
+        .stub(InstallHandler, 'getVersionFromExecutable')
         .returns(undefined);
       const res = InstallHandler.getLocalOcPath('1.1');
       sinon.assert.calledWith(getOcStub, 'path');
@@ -406,13 +412,13 @@ describe('InstallHandler', () => {
 
     it('returns nothing if version found locally is not the one user wants to use', () => {
       sandbox.stub(tl, 'which').returns('path');
-      sandbox.stub(InstallHandler, 'getOcVersion').returns('2.1');
+      sandbox.stub(InstallHandler, 'getVersionFromExecutable').returns('2.1');
       const res = InstallHandler.getLocalOcPath('1.1');
       expect(res).equals(undefined);
     });
   });
 
-  describe('#getOcVersion', () => {
+  describe('#getVersionFromExecutable', () => {
     const versionRes: IExecSyncResult = {
       code: 1,
       error: undefined,
@@ -427,7 +433,7 @@ describe('InstallHandler', () => {
 
     it('check if correct version is returned if oc version > 4', () => {
       execOcStub.returns(versionRes);
-      const res = InstallHandler.getOcVersion('path');
+      const res = InstallHandler.getVersionFromExecutable('path');
       expect(res).equals('v4.1.0');
     });
 
@@ -437,7 +443,7 @@ describe('InstallHandler', () => {
         .returns(undefined)
         .onSecondCall()
         .returns(undefined);
-      InstallHandler.getOcVersion('path');
+      InstallHandler.getVersionFromExecutable('path');
       sinon.assert.calledTwice(execOcStub);
     });
 
@@ -448,7 +454,7 @@ describe('InstallHandler', () => {
         .returns(undefined)
         .onSecondCall()
         .returns(versionRes);
-      const res = InstallHandler.getOcVersion('path');
+      const res = InstallHandler.getVersionFromExecutable('path');
       expect(res).equals('v3.2.0');
     });
 
@@ -458,7 +464,7 @@ describe('InstallHandler', () => {
         .returns(undefined)
         .onSecondCall()
         .returns(undefined);
-      const res = InstallHandler.getOcVersion('path');
+      const res = InstallHandler.getVersionFromExecutable('path');
       expect(res).equals(undefined);
     });
 
@@ -469,14 +475,14 @@ describe('InstallHandler', () => {
         .returns(undefined)
         .onSecondCall()
         .returns(versionRes);
-      const res = InstallHandler.getOcVersion('path');
+      const res = InstallHandler.getVersionFromExecutable('path');
       expect(res).equals(undefined);
     });
 
     it('returns undefined if execOcSync returns a not empty stdout without a valid version in it', () => {
       versionRes.stdout = 'xxxxx xxxxx xxxxxx xxxxxx xxxxx';
       execOcStub.returns(versionRes);
-      const res = InstallHandler.getOcVersion('path');
+      const res = InstallHandler.getVersionFromExecutable('path');
       expect(res).equals(undefined);
     });
   });
