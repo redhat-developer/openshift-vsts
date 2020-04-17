@@ -3,7 +3,7 @@
   "name": "config-map",
   "friendlyName": "Update ConfigMap",
   "description": "Applies environment properties to specified OpenShift ConfigMap.",
-  "author": "Hardy Ferentschik",
+  "author": "Red Hat",
   "helpMarkDown": "See [getting started](https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md)",
   "category": "Utility",
   "visibility": [
@@ -40,8 +40,7 @@
       "required": true,
       "options": {
         "OpenShift Connection Service": "OpenShift Connection Service",
-        "File Configuration": "File Configuration",
-        "Inline Configuration": "Inline Configuration"
+        "Runtime Configuration": "Set Up Configuration on Runtime"
       },
       "groupName": "openshiftCluster",
       "helpMarkDown": "Select a service connection type."
@@ -50,20 +49,33 @@
       "name": "openshiftService",
       "type": "connectedService:openshift",
       "label": "OpenShift service connection",
-      "visibleRule": "connectionType = OpenShift Connection Service",
-      "helpMarkDown": "Select OpenShift service connection to use.",
       "groupName": "openshiftCluster",
-      "required": true
+      "helpMarkDown": "Select OpenShift service connection to use.",      
+      "required": true,
+      "visibleRule": "connectionType = OpenShift Connection Service"
+    },
+    {
+      "name": "configurationType",
+      "type": "radio",
+      "label": "Configuration type",
+      "defaultValue": "file",
+      "groupName": "commands",
+      "helpMarkDown": "Type of configuration for oc command. It can be a file path or an inline script.",
+      "options": {
+          "file": "File Path",
+          "inline": "Inline Configuration"
+      },
+      "visibleRule": "connectionType = Runtime Configuration"
     },
     {
       "name": "configurationPath",
       "type": "filePath",
-      "label": "File path",
+      "label": "File Path",
       "defaultValue": "",
       "required": true,
       "helpMarkDown": "Filename, directory, or URL to the kubeconfig file that will be used with the commands.",
       "groupName": "openshiftCluster",
-      "visibleRule": "connectionType = File Configuration"
+      "visibleRule": "configurationType = file"
     },
     {
       "name": "inlineConfig",
@@ -78,7 +90,7 @@
       "label": "Inline configuration",
       "helpMarkDown": "Inline kubeconfig for oc command",
       "groupName": "openshiftCluster",
-      "visibleRule": "connectionType = Inline Configuration"
+      "visibleRule": "configurationType = inline"
     },
     {
       "name": "version",

@@ -8,12 +8,9 @@ import * as OcAuth from '../src/oc-auth';
 import { RunnerHandler } from '../src/oc-exec';
 import {
   BASIC_AUTHENTICATION,
-  CONFIGURATION_PATH,
-  CONNECTION_TYPE_SELECTION, FILE_CONFIGURATION_OPTION,
-  INLINE_CONFIG, INLINE_CONFIGURATION_OPTION,
-  OPENSHIFT_SERVICE_NAME,
   OPENSHIFT_SERVICE_OPTION,
   TOKEN_AUTHENTICATION,
+  RUNTIME_CONFIGURATION_OPTION,
 } from '../src/constants';
 import * as Task from 'azure-pipelines-task-lib/task';
 import path = require('path');
@@ -66,8 +63,8 @@ describe('oc-auth', () => {
       sandbox.stub(Task, 'getEndpointAuthorization').withArgs("OCP Connection", false).returns(endpointAuth);
       sandbox.stub(Task, 'getEndpointUrl').withArgs("OCP Connection", false).returns('https://openshift.example.com');
       sandbox.stub(Task, 'getInput')
-        .withArgs(CONNECTION_TYPE_SELECTION).returns(OPENSHIFT_SERVICE_OPTION)
-        .withArgs(OPENSHIFT_SERVICE_NAME).returns('OCP Connection');
+        .withArgs('connectionType').returns(OPENSHIFT_SERVICE_OPTION)
+        .withArgs('openshiftService').returns('OCP Connection');
 
       return OcAuth.createKubeConfig('oc', 'Linux').then(
         (result: undefined) => {
@@ -90,11 +87,12 @@ describe('oc-auth', () => {
     it('writes kubeconfig from inline config', () => {
       const testWorkingDir = path.join(__dirname, '..', '..', 'out');
       process.env.HOME = testWorkingDir;
-      const FILE_CONTENTS = "DUMMY_CONTENT";
+      const fileContents = "DUMMY_CONTENT";
 
       sandbox.stub(Task, 'getInput')
-        .withArgs(CONNECTION_TYPE_SELECTION).returns(INLINE_CONFIGURATION_OPTION)
-        .withArgs(INLINE_CONFIG).returns(FILE_CONTENTS);
+        .withArgs('connectionType').returns(RUNTIME_CONFIGURATION_OPTION)
+        .withArgs('configurationType').returns('inline')
+        .withArgs('inlineConfig').returns(fileContents);
 
       return OcAuth.createKubeConfig('oc', 'Linux').then(
         (result: undefined) => {
@@ -106,7 +104,7 @@ describe('oc-auth', () => {
           if (kubeconfig === undefined) {
             expect.fail('PATH not set');
           } else {
-            expect(fs.readFileSync(kubeconfig).toString()).to.equal(FILE_CONTENTS)
+            expect(fs.readFileSync(kubeconfig).toString()).to.equal(fileContents)
           }
         },
       );
@@ -115,12 +113,14 @@ describe('oc-auth', () => {
     it('sets kubeconfig env variable when config path provided', () => {
       const testWorkingDir = path.join(__dirname, '..', '..', 'out');
       process.env.HOME = testWorkingDir;
-      const FILE_CONTENTS = "DUMMY_CONTENT";
+      const fileContents = "DUMMY_CONTENT";
 
       const testConfigPath = path.join(testWorkingDir, '.kube', 'config');
-      fs.writeFileSync(testConfigPath, FILE_CONTENTS);
+      fs.writeFileSync(testConfigPath, fileContents);
 
-      sandbox.stub(Task, 'getInput').returns(FILE_CONFIGURATION_OPTION);
+      sandbox.stub(Task, 'getInput').
+        withArgs('connectionType').returns(RUNTIME_CONFIGURATION_OPTION).
+        withArgs('configurationType').returns('configurationPath');
       sandbox.stub(Task, 'getPathInput').returns(testConfigPath);
 
       return OcAuth.createKubeConfig('oc', 'Linux').then(
@@ -131,7 +131,7 @@ describe('oc-auth', () => {
           if (kubeconfig === undefined) {
             expect.fail('PATH not set');
           } else {
-            expect(fs.readFileSync(kubeconfig).toString()).to.equal(FILE_CONTENTS)
+            expect(fs.readFileSync(kubeconfig).toString()).to.equal(fileContents)
           }
         },
       );
@@ -141,7 +141,7 @@ describe('oc-auth', () => {
       const testWorkingDir = path.join(__dirname, '..', '..', 'out', '.kube', 'config');
       process.env.HOME = testWorkingDir;
 
-      sandbox.stub(Task, 'getInput').returns(CONFIGURATION_PATH);
+      sandbox.stub(Task, 'getInput').returns('configurationPath');
       sandbox.stub(Task, 'getPathInput').returns(testWorkingDir);
 
       return expect(() => OcAuth.createKubeConfig('oc', 'Linux')).to.throw;
@@ -284,7 +284,7 @@ describe('oc-auth', () => {
       const endpoint: OcAuth.OpenShiftEndpoint = {
         serverUrl: 'server',
         parameters: JSON.parse(params),
-        scheme: BASIC_AUTHENTICATION,
+        scheme: BASIC_AUTHENTICATION
       };
       const res = OcAuth.getCertificateAuthorityFile(endpoint);
       expect(res).equals('');
@@ -295,7 +295,7 @@ describe('oc-auth', () => {
       const endpoint: OcAuth.OpenShiftEndpoint = {
         serverUrl: 'server',
         parameters: JSON.parse(params),
-        scheme: BASIC_AUTHENTICATION,
+        scheme: BASIC_AUTHENTICATION
       };
       const res = OcAuth.getCertificateAuthorityFile(endpoint);
       expect(res).equals('--certificate-authority="path"');
@@ -308,7 +308,7 @@ describe('oc-auth', () => {
       const endpoint: OcAuth.OpenShiftEndpoint = {
         serverUrl: 'server',
         parameters: JSON.parse(params),
-        scheme: BASIC_AUTHENTICATION,
+        scheme: BASIC_AUTHENTICATION
       };
       const res = OcAuth.skipTlsVerify(endpoint);
       expect(res).equals('');
@@ -319,7 +319,7 @@ describe('oc-auth', () => {
       const endpoint: OcAuth.OpenShiftEndpoint = {
         serverUrl: 'server',
         parameters: JSON.parse(params),
-        scheme: BASIC_AUTHENTICATION,
+        scheme: BASIC_AUTHENTICATION
       };
       const res = OcAuth.skipTlsVerify(endpoint);
       expect(res).equals('');
@@ -330,7 +330,7 @@ describe('oc-auth', () => {
       const endpoint: OcAuth.OpenShiftEndpoint = {
         serverUrl: 'server',
         parameters: JSON.parse(params),
-        scheme: BASIC_AUTHENTICATION,
+        scheme: BASIC_AUTHENTICATION
       };
       const res = OcAuth.skipTlsVerify(endpoint);
       expect(res).equals('--insecure-skip-tls-verify ');
