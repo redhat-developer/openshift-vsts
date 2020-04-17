@@ -17,7 +17,7 @@
     "build": "npm run lint && tsc -b . && npm run copy-utils-file",
     "build:watch": "tsc -b tsconfig.json -w",
     "docs": "markserv .",
-    "pretest": "npm run build",
+    "pretest": "npm run compile",
     "watch": "tsc -watch -p ./",
     "lint": "node_modules/.bin/eslint . --ext .ts --quiet",
     "test": "ts-mocha -p tsconfig.json test/*.test.ts --timeout 5000 ${MOCHA_TAG}",
