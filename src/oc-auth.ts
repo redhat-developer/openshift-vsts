@@ -6,13 +6,9 @@ import * as fs from 'fs';
 import { RunnerHandler } from './oc-exec';
 import {
   BASIC_AUTHENTICATION,
-  CONNECTION_TYPE_SELECTION,
-  FILE_CONFIGURATION_OPTION,
-  INLINE_CONFIGURATION_OPTION,
   NO_AUTHENTICATION,
-  OPENSHIFT_SERVICE_NAME,
-  OPENSHIFT_SERVICE_OPTION,
   TOKEN_AUTHENTICATION,
+  RUNTIME_CONFIGURATION_OPTION,
 } from './constants';
 
 import task = require('azure-pipelines-task-lib/task');
@@ -36,7 +32,7 @@ export interface OpenShiftEndpoint {
  * @return the OpenShift endpoint authorization as referenced by the task property 'openshiftService'.
  */
 export function getOpenShiftEndpoint(): OpenShiftEndpoint {
-  const clusterConnection = task.getInput(OPENSHIFT_SERVICE_NAME);
+  const clusterConnection = task.getInput('openshiftService');
 
   const auth = task.getEndpointAuthorization(clusterConnection, false);
   const serverUrl = task.getEndpointUrl(clusterConnection, false);
@@ -116,9 +112,9 @@ export function userHome(osType: string): string {
  * @param config The cluster auth config to write to disk
  * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
  */
-export function writeKubeConfigToFile(config: string, osType: string): void {
-  if (config === null || config === '') {
-    throw new Error('empty or null kubeconfig is not allowed');
+export function writeKubeConfigToFile(inlineConfig: string, osType: string): void {
+  if (!inlineConfig) {
+    throw new Error('Empty kubeconfig is not allowed');
   }
 
   const kubeConfigDir = path.join(userHome(osType), '.kube');
@@ -127,7 +123,7 @@ export function writeKubeConfigToFile(config: string, osType: string): void {
   }
 
   const kubeConfig = path.join(kubeConfigDir, 'config');
-  tl.writeFile(kubeConfig, config);
+  tl.writeFile(kubeConfig, inlineConfig);
 }
 
 /**
@@ -147,14 +143,8 @@ export function exportKubeConfig(osType: string): void {
  * @param ocPath fully qualified path to the oc binary.
  * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
  */
-export async function createKubeConfigFromServiceConnection(
-  ocPath: string,
-  osType: string
-): Promise<void> {
+export async function createKubeConfigFromServiceConnection(ocPath: string, osType: string): Promise<void> {
   const endpoint = getOpenShiftEndpoint();
-  if (endpoint === null) {
-    throw new Error('null endpoint is not allowed');
-  }
 
   // potential values for EndpointAuthorization:
   //
@@ -195,13 +185,27 @@ export async function createKubeConfigFromServiceConnection(
  *
  * @param configPath The OpenShift endpoint.
  */
-export function exportKubeConfigToPath(configPath) {
+export function exportKubeConfigToPath(configPath): void {
   try {
     if (fs.statSync(configPath).isFile()) {
       tl.setVariable('KUBECONFIG', configPath);
+    } else {
+      throw new Error(`Provided path ${configPath} is not a valid kubeconfig file.`);
     }
   } catch (ex) {
     throw new Error(`Provided kubeconfig path does not exist: ${configPath}`);
+  }
+}
+
+export function setConfigurationRuntime(osType: string): void {
+  const configurationType = tl.getInput("configurationType");
+  if (configurationType === 'inline') {
+    const inlineConfig = task.getInput('inlineConfig', false);
+    writeKubeConfigToFile(inlineConfig, osType);
+    exportKubeConfig(osType);
+  } else {
+    const configPath = task.getPathInput('configurationPath', false);
+    exportKubeConfigToPath(configPath);
   }
 }
 
@@ -211,27 +215,13 @@ export function exportKubeConfigToPath(configPath) {
  * @param ocPath fully qualified path to the oc binary.
  * @param osType the OS type. One of 'Linux', 'Darwin' or 'Windows_NT'.
  */
-export async function createKubeConfig(
-  ocPath: string,
-  osType: string,
-): Promise<void> {
-  const connectionType: string = task.getInput(CONNECTION_TYPE_SELECTION);
-  const configPath = task.getPathInput('configurationPath', false);
-  const inlineConfig = task.getInput('inlineConfig', false);
+export async function createKubeConfig(ocPath: string, osType: string): Promise<void> {
+  const connectionType: string = task.getInput('connectionType');
 
-  switch (connectionType) {
-    case OPENSHIFT_SERVICE_OPTION:
-      await createKubeConfigFromServiceConnection(ocPath, osType);
-      exportKubeConfig(osType);
-      break;
-    case FILE_CONFIGURATION_OPTION:
-      exportKubeConfigToPath(configPath);
-      break;
-    case INLINE_CONFIGURATION_OPTION:
-      writeKubeConfigToFile(inlineConfig, osType);
-      exportKubeConfig(osType);
-      break;
-    default:
-      break;
+  if (connectionType === RUNTIME_CONFIGURATION_OPTION) {
+    setConfigurationRuntime(osType);
+  } else {
+    await createKubeConfigFromServiceConnection(ocPath, osType);
+    exportKubeConfig(osType);
   }
 }
