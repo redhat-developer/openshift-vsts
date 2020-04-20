@@ -58,7 +58,7 @@
       "type": "radio",
       "label": "Configuration type",
       "defaultValue": "file",
-      "groupName": "commands",
+      "groupName": "openshiftCluster",
       "helpMarkDown": "Type of configuration for oc command. It can be a file path or an inline script.",
       "options": {
           "file": "File Path",

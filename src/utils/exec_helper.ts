@@ -4,6 +4,23 @@
  *-----------------------------------------------------------------------------------------------*/
 import validUrl = require('valid-url');
 
+interface ConditionValid {
+    readonly valid: true;
+    readonly resultKind: 'condition-ok';
+}
+
+interface ConditionSkipped {
+    readonly valid: true;
+    readonly resultKind: 'condition-skipped';
+}
+
+interface ConditionTimedOut {
+    readonly valid: false,
+    readonly reason: string
+}
+
+export type ConditionStatus = ConditionValid | ConditionSkipped | ConditionTimedOut;
+
 interface BinaryVersionValid {
     readonly valid: true;
     readonly type: 'url' | 'number';

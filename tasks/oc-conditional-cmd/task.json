@@ -1,0 +1,187 @@
+{
+    "id": "88e0bab6-9798-47cb-a37d-ef65f41992ae",
+    "name": "oc-conditional-cmd",
+    "friendlyName": "Execute conditional oc command",
+    "description": "OpenShift execute CLI command if the condition is met.",
+    "author": "Red Hat",
+    "helpMarkDown": "See [getting started](https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md)",
+    "category": "Utility",
+    "visibility": [
+      "Build",
+      "Release"
+    ],
+    "preview": true,
+    "demands": [],
+    "groups": [{
+        "name": "openshiftCluster",
+        "displayName": "OpenShift Cluster",
+        "isExpanded": true
+      },
+      {
+        "name": "commands",
+        "displayName": "Commands",
+        "isExpanded": true
+      }
+    ],
+    "version": {
+      "Major": 2,
+      "Minor": 0,
+      "Patch": 13
+    },
+    "minimumAgentVersion": "1.95.0",
+    "instanceNameFormat": "oc-conditional-cmd $(message)",
+    "inputs": [
+      {
+        "name": "connectionType",
+        "type": "pickList",
+        "label": "Service connection type",
+        "defaultValue": "OpenShift Connection Service",
+        "required": true,
+        "options": {
+          "OpenShift Connection Service": "OpenShift Connection Service",
+          "Runtime Configuration": "Set Up Configuration on Runtime"
+        },
+        "groupName": "openshiftCluster",
+        "helpMarkDown": "Select a service connection type."
+      },
+      {
+        "name": "openshiftService",
+        "type": "connectedService:openshift",
+        "label": "OpenShift service connection",
+        "groupName": "openshiftCluster",
+        "helpMarkDown": "Select OpenShift service connection to use.",      
+        "required": true,
+        "visibleRule": "connectionType = OpenShift Connection Service"
+      },
+      {
+        "name": "configurationType",
+        "type": "radio",
+        "label": "Configuration type",
+        "defaultValue": "file",
+        "groupName": "openshiftCluster",
+        "helpMarkDown": "Type of configuration for oc command. It can be a file path or an inline script.",
+        "options": {
+            "file": "File Path",
+            "inline": "Inline Configuration"
+        },
+        "visibleRule": "connectionType = Runtime Configuration"
+      },
+      {
+        "name": "configurationPath",
+        "type": "filePath",
+        "label": "File Path",
+        "defaultValue": "",
+        "required": true,
+        "helpMarkDown": "Filename, directory, or URL to the kubeconfig file that will be used with the commands.",
+        "groupName": "openshiftCluster",
+        "visibleRule": "configurationType = file"
+      },
+      {
+        "name": "inlineConfig",
+        "type": "multiLine",
+        "properties": {
+          "resizable": "true",
+          "rows": "10",
+          "maxLength": "5000"
+        },
+        "required": true,
+        "defaultValue": "",
+        "label": "Inline configuration",
+        "helpMarkDown": "Inline kubeconfig for oc command",
+        "groupName": "openshiftCluster",
+        "visibleRule": "configurationType = inline"
+      },
+      {
+        "name": "version",
+        "type": "string",
+        "label": "Version of oc to use",
+        "defaultValue": "",
+        "required": false,
+        "groupName": "commands",
+        "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
+      },
+      {
+        "name": "cmd",
+        "type": "string",
+        "label": "Command to run",
+        "defaultValue": "",
+        "required": true,
+        "groupName": "commands",
+        "helpMarkDown": "Specify the oc command to run."
+      },
+      {
+        "name": "ignoreFlag",
+        "type": "boolean",
+        "label": "Ignore non success return value",
+        "defaultValue": "false",
+        "required": false,
+        "groupName": "commands",
+        "helpMarkDown": "Specify if the non success return value of the oc command run has to be ignored. E.g if the command oc create/delete/... fail because the resource has already been created/deleted/.. the pipeline will continue its execution"
+      },
+      {
+        "name": "condition",
+        "type": "pickList",
+        "label": "Condition type",
+        "defaultValue": "exists",
+        "required": true,
+        "options": {
+          "exists": "Exists",
+          "not_exists": "Not Exists"
+        },
+        "groupName": "commands",
+        "helpMarkDown": "Select the condition to be verified on the resource."
+      },
+      {
+        "name": "resource",
+        "type": "string",
+        "label": "Resource on which to verify the condition",
+        "defaultValue": "",
+        "required": true,
+        "groupName": "commands",
+        "helpMarkDown": "Specify the resource on which to verify the condition."
+      },
+      {
+        "name": "timedout",
+        "type": "string",
+        "label": "Time (in milliseconds) after which to stop the execution",
+        "defaultValue": "",
+        "required": false,
+        "groupName": "commands",
+        "helpMarkDown": "Specify the time (in milliseconds) after which the extension should stop the execution."
+      },
+      {
+        "name": "noTimedOutError",
+        "type": "boolean",
+        "label": "Skip timed out error",
+        "defaultValue": "false",
+        "required": false,
+        "groupName": "commands",
+        "helpMarkDown": "If checked there will be no timedout error. If the timedout elaspes the extension will try to execute the command anyway."
+      },
+      {
+        "name": "uselocalOc",
+        "type": "boolean",
+        "label": "Use local oc executable",
+        "defaultValue": "false",
+        "required": false,
+        "groupName": "commands",
+        "helpMarkDown": "Check if oc is already installed in the machine and use that if available"
+      },
+      {
+        "name": "proxy",
+        "type": "string",
+        "label": "Use proxy to download oc executable",
+        "defaultValue": "",
+        "required": false,
+        "groupName": "commands",
+        "helpMarkDown": "make use of a proxy to download oc executable"
+      }
+    ],
+    "execution": {
+      "Node": {
+        "target": "lib/oc-conditional-exec-task.js",
+        "workingDirectory": "$(currentDirectory)"
+      }
+    }
+  }
+  
