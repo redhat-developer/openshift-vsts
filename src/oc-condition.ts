@@ -27,6 +27,7 @@ export class ConditionHandler {
             isValid = this.checkCondition(path, condition, resource);
 
             if (!isValid) {
+                // eslint-disable-next-line no-await-in-loop
                 await this.sleep(5000);
             } else {
                 clearTimeout(timerId);
@@ -44,7 +45,7 @@ export class ConditionHandler {
         return { valid: false, reason: 'The timedout elapsed before the condition was met'}
     }
 
-    static async sleep(ms) {
+    static async sleep(ms: number):Promise<NodeJS.Timeout> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
@@ -68,7 +69,7 @@ export class ConditionHandler {
         return this.resourceNotExist(execResult);
     }
 
-    static resourceDoExist(execResult: IExecSyncResult): boolean { 
+    static resourceDoExist(execResult: IExecSyncResult): boolean {
         if (execResult && execResult.stdout) {
             // the command succeeded, the resource exists
             return true;

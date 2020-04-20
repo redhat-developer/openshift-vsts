@@ -175,6 +175,17 @@
       }
     },
     {
+      "id": "oc-conditional-cmd-task",
+      "description": "Task to run user-defined oc command when a condition is met.",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "tasks/oc-conditional-cmd"
+      }
+    },
+    {
       "id": "config-map-task",
       "description": "Task to apply ConfigMap properties.",
       "type": "ms.vss-distributed-task.task",
@@ -203,6 +214,9 @@
   "files": [
     {
       "path": "tasks/oc-cmd"
+    },
+    {
+      "path": "tasks/oc-conditional-cmd"
     },
     {
       "path": "tasks/config-map"
