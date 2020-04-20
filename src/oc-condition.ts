@@ -61,7 +61,7 @@ export class ConditionHandler {
     }
 
     static resourceExists(ocBinary: string, resource: string, exists: boolean) : boolean {
-        const command = `get ${resource}`;
+        const command = `get ${resource} -o name`;
         const execResult: IExecSyncResult = RunnerHandler.execOcSync(ocBinary, command);
         if (exists) {
             return this.resourceDoExist(execResult);
@@ -70,7 +70,7 @@ export class ConditionHandler {
     }
 
     static resourceDoExist(execResult: IExecSyncResult): boolean {
-        if (execResult && execResult.stdout) {
+        if (execResult && execResult.stdout !== '') {
             // the command succeeded, the resource exists
             return true;
         }
@@ -78,8 +78,8 @@ export class ConditionHandler {
     }
 
     static resourceNotExist(execResult: IExecSyncResult): boolean {
-        if (execResult && execResult.stderr) {
-            // the server returned an error, the command failed and it means that the resource doen't exist
+        if (execResult && execResult.stdout === '') {
+            // the server returned an empty stdout and it means that the resource doen't exist
             return true;
         }
         return false;
