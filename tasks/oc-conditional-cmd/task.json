@@ -152,7 +152,7 @@
       {
         "name": "noTimedOutError",
         "type": "boolean",
-        "label": "Use local oc executable",
+        "label": "Skip timed out error",
         "defaultValue": "false",
         "required": false,
         "groupName": "commands",
