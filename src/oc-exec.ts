@@ -28,6 +28,9 @@ export class RunnerHandler {
       ignoreFlag
     );
 
+    // substitute internal commands
+    argLine = RunnerHandler.interpolateCommands(ocPath, argLine);
+
     // split cmd based on redirection operators
     const cmds: string[] = argLine.split(/(?=2(?=>))|(?=[>|])/);
     const trs: ToolRunner[] = RunnerHandler.initToolRunners(cmds, ocPath);
@@ -203,6 +206,53 @@ export class RunnerHandler {
       trs.push(RunnerHandler.prepareToolRunner(cmd, ocPath));
     }
     return trs;
+  }
+
+  /**
+   * Discover if args contains any internal commands (a command inside a command, e.g oc log $(oc get pods -l name=test)) and replaces
+   * their values with their results by executing them one by one.
+   *
+   * @param ocPath absolute path to the oc binary. If null is passed the binary is determined by running 'which oc'.
+   * @param argLine the command to run
+   */
+  static interpolateCommands(ocPath: string, argLine: string): string {
+    // check if there are internal commands to be sustituted with their result
+    const cmdsToSubstitute: RegExpMatchArray = RunnerHandler.matchInternalCommands(argLine);
+    if (cmdsToSubstitute.length === 0) {
+      return argLine;
+    }
+
+    for (const cmd of cmdsToSubstitute) {
+      const execCmdResult = RunnerHandler.execOcSync(ocPath, cmd);
+      if (execCmdResult && execCmdResult.stdout) {
+        argLine = argLine.replace(`$(${cmd})`, execCmdResult.stdout);
+      } else {
+        return undefined;
+      }
+    }
+
+    return argLine;
+  }
+
+  /**
+   * Manual match to avoid using lookbehind regex rule which is only supported from ecma2018+ and it will result in failures with older nodejs versions
+   * More info https://node.green/
+   *
+   * @param argLine command to run
+   */
+  static matchInternalCommands(argLine: string): string[] {
+    const internals: string[] = [];
+    let currIndex = 0;
+    while (currIndex !== -1) {
+      const startIndex = argLine.indexOf('$(', currIndex);
+      let endIndex = -1;
+      if (startIndex !== -1) {
+        endIndex = argLine.indexOf(')', startIndex);
+        internals.push(argLine.substring(startIndex + 2, endIndex));
+      }
+      currIndex = endIndex;
+    }
+    return internals;
   }
 
   static execOcSync(
