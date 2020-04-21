@@ -219,7 +219,7 @@ export class RunnerHandler {
    */
   static interpolateCommands(ocPath: string, argLine: string): string {
     // check if there are internal commands to be sustituted with their result
-    const cmdsToSubstitute: RegExpMatchArray = RunnerHandler.matchInternalCommands(argLine);
+    const cmdsToSubstitute: string[] = RunnerHandler.matchInternalCommands(argLine);
     if (cmdsToSubstitute.length === 0) {
       return argLine;
     }
