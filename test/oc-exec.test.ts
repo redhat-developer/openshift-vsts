@@ -266,10 +266,17 @@ describe('oc-exec', () => {
     });
 
     it('return undefined if execSync throws', () => {
-      stubs.tr.execSync = sinon.stub().throws();
+      const execResult = {
+        code: 1,
+        stderr: '',
+        stdout: '',
+        error: new Error(`Failed when executing args. Error: text`)
+      };
+      stubs.tr.execSync = sinon.stub().throws('text');
       sandbox.stub(tl, 'tool').returns(stubs.tr);
       const res = RunnerHandler.execOcSync('path', 'args');
-      expect(res).equals(undefined);
+      expect(res.code).equals(execResult.code);
+      expect(res.error.message.indexOf('Failed when executing args. Error: text')).equals(0);
     });
   });
 });
