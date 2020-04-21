@@ -276,6 +276,8 @@ describe('oc-exec', () => {
       sandbox.stub(tl, 'tool').returns(stubs.tr);
       const res = RunnerHandler.execOcSync('path', 'args');
       expect(res.code).equals(execResult.code);
+      expect(res.stderr).equals('');
+      expect(res.stdout).equals('');
       expect(res.error.message.indexOf('Failed when executing args. Error: text')).equals(0);
     });
   });
