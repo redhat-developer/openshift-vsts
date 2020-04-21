@@ -31,6 +31,7 @@ export class ConditionHandler {
 
             if (status.valid === false) {
                 if (status.resultKind === 'condition-failed') {
+                    clearTimeout(timerId);
                     return status;
                 }
                 // eslint-disable-next-line no-await-in-loop
@@ -64,7 +65,7 @@ export class ConditionHandler {
             case 'not_exists':
                 return this.resourceExists(ocBinary, resource, false);
             default:
-                return { valid: false, resultKind: 'condition-failed', reason: 'Condition not yet supported by the extension' }; // never called
+                return { valid: false, resultKind: 'condition-failed', reason: 'Condition type is unknown.' }; // never called
         }
     }
 

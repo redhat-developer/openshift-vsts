@@ -1,11 +1,11 @@
 {
   "manifestVersion": 1,
   "id": "openshift-vsts",
-  "publisher": "RedhatLuca",
-  "version": "0.0.114",
+  "publisher": "redhat",
+  "version": "1.5.0",
   "name": "OpenShift Extension",
   "description": "OpenShift tasks for Azure DevOps",
-  "public": false,
+  "public": true,
   "galleryFlags": [
     "Preview"
   ],
@@ -175,7 +175,7 @@
       }
     },
     {
-      "id": "oc-conditional-cmd-task",
+      "id": "oc-conditional-cmd",
       "description": "Task to run user-defined oc command when a condition is met.",
       "type": "ms.vss-distributed-task.task",
       "targets": [

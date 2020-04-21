@@ -1,6 +1,6 @@
 {
     "id": "88e0bab6-9798-47cb-a37d-ef65f41992ae",
-    "name": "oc-conditional-cmd",
+    "name": "OcConditionalCmd",
     "friendlyName": "Execute conditional oc command",
     "description": "OpenShift execute CLI command if the condition is met.",
     "author": "Red Hat",
