@@ -30,13 +30,15 @@ export class RunnerHandler {
 
     // substitute internal commands
     argLine = RunnerHandler.interpolateCommands(ocPath, argLine);
+    if (!argLine) {
+      return Promise.reject(new Error(`Failed to interpolate internal commands in ${argLine}`));
+    }
 
     // split cmd based on redirection operators
     const cmds: string[] = argLine.split(/(?=2(?=>))|(?=[>|])/);
     const trs: ToolRunner[] = RunnerHandler.initToolRunners(cmds, ocPath);
     if (trs === []) {
-      tl.debug(`Unable to create any ToolRunner by ${argLine}`);
-      return;
+      return Promise.reject(new Error(`Unable to create any ToolRunner by ${argLine}`));
     }
     const tr: ToolRunner = RunnerHandler.unifyToolRunners(cmds, trs, options);
     await tr.exec(options);
