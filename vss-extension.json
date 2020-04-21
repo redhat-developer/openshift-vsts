@@ -175,7 +175,7 @@
       }
     },
     {
-      "id": "oc-conditional-cmd",
+      "id": "oc-conditional-cmd-task",
       "description": "Task to run user-defined oc command when a condition is met.",
       "type": "ms.vss-distributed-task.task",
       "targets": [
