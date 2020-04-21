@@ -29,7 +29,7 @@
       "Patch": 13
     },
     "minimumAgentVersion": "1.95.0",
-    "instanceNameFormat": "oc-conditional-cmd $(message)",
+    "instanceNameFormat": "Oc Conditional Cmd",
     "inputs": [
       {
         "name": "connectionType",
