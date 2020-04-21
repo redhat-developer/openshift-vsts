@@ -2,9 +2,9 @@
  *  Copyright (c) Red Hat, Inc. All rights reserved.
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
-import { IExecSyncResult } from "azure-pipelines-task-lib/toolrunner";
-import { ConditionStatus } from "./utils/exec_helper";
-import { RunnerHandler } from "./oc-exec";
+import { IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner';
+import { ConditionStatus } from './utils/exec_helper';
+import { RunnerHandler } from './oc-exec';
 
 export class ConditionHandler {
 
