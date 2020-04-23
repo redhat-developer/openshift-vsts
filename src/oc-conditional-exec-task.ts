@@ -5,7 +5,7 @@
 import { RunnerHandler } from './oc-exec';
 import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
-import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getReason, ConditionStatus } from './utils/exec_helper';
+import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getReason, ConditionStatus, isFailed, isTimedOut } from './utils/exec_helper';
 import { ConditionHandler } from './oc-condition';
 
 import task = require('azure-pipelines-task-lib/task');
@@ -33,7 +33,7 @@ async function run(): Promise<void> {
   await auth.createKubeConfig(ocBinary.path, agentOS);
 
   const conditionStatus: ConditionStatus = await ConditionHandler.isConditionValid(ocBinary.path, condition, resource, timedout, noTimedOutError);
-  if (conditionStatus.valid === false) {
+  if (isFailed(conditionStatus) || isTimedOut(conditionStatus)) {
       return Promise.reject(new Error(conditionStatus.reason));
   }
   await RunnerHandler.execOc(ocBinary.path, argLine, ignoreFlag);

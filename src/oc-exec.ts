@@ -7,6 +7,7 @@ import {
   IExecOptions,
   IExecSyncResult
 } from 'azure-pipelines-task-lib/toolrunner';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import * as fs from 'fs';
 
 import split = require('argv-split');
@@ -75,8 +76,8 @@ export class RunnerHandler {
     return trResult;
   }
 
-  static createExecOptions(options?: IExecOptions, ignoreReturnCode?: boolean, failOnStdErr?: boolean): IExecOptions {
-    if (ignoreReturnCode === undefined && failOnStdErr === undefined) {
+  static createExecOptions(options?: IExecOptions, ignoreReturnCode?: boolean, failOnStdErr?: boolean, isSilent?: boolean): IExecOptions {
+    if (ignoreReturnCode === undefined && failOnStdErr === undefined && isSilent === undefined) {
       return options;
     }
 
@@ -84,7 +85,7 @@ export class RunnerHandler {
       options = {
         cwd: process.cwd(),
         env: ({ ...process.env}) as { [key: string]: string },
-        silent: false,
+        silent: isSilent !== undefined ? isSilent : false,
         failOnStdErr: failOnStdErr !== undefined ? failOnStdErr : false,
         ignoreReturnCode:
           ignoreReturnCode !== undefined ? ignoreReturnCode : false,
@@ -93,6 +94,7 @@ export class RunnerHandler {
         errStream: process.stderr as stream.Writable
       };
     } else {
+      options.silent = isSilent !== undefined ? isSilent : false;
       options.ignoreReturnCode =
         ignoreReturnCode !== undefined
           ? ignoreReturnCode
@@ -259,26 +261,40 @@ export class RunnerHandler {
 
   static execOcSync(
     ocPath: string | null,
-    argLine: string
-  ): IExecSyncResult | undefined {
+    argLine: string,
+    isSilent?: boolean
+  ): IExecSyncResult {
     if (ocPath === null) {
       ocPath = 'oc';
     }
 
+    const options: IExecOptions | undefined = RunnerHandler.createExecOptions(undefined, false, false, isSilent);
     const oc: ToolRunner = tl.tool(ocPath);
     for (const arg of RunnerHandler.prepareCmdArguments(argLine, true)) {
       oc.arg(arg);
     }
 
+    let execResult: IExecSyncResult;
+
     try {
-      const result: IExecSyncResult = oc.execSync();
-      tl.debug(`stdout ${result && result.stdout ? result.stdout : ''}`);
-      tl.debug(`stderr ${result && result.stderr ? result.stderr : ''}`);
-      return result;
-    } catch (ex) {
-      tl.debug(`error ex ${ex}`);
+      execResult = oc.execSync(options);
+      tl.debug(`stdout ${execResult && execResult.stdout ? execResult.stdout : ''}`);
+      tl.debug(`stderr ${execResult && execResult.stderr ? execResult.stderr : ''}`);
+    } catch (err) {
+      execResult = {
+        code: 1,
+        stderr: '',
+        stdout: '',
+        error: new Error(`Failed when executing ${argLine}. Error: ${err}`)
+      };
+      tl.debug(`error ex ${err}`);
     }
 
-    return undefined;
+    return execResult;
+  }
+
+  static spawnChild(ocPath: string, argLine: string): ChildProcessWithoutNullStreams {
+    const args: string[] = RunnerHandler.prepareCmdArguments(argLine, true);
+    return spawn(ocPath, args);
   }
 }

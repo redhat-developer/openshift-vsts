@@ -16,10 +16,30 @@ interface ConditionSkipped {
 
 interface ConditionTimedOut {
     readonly valid: false,
+    readonly resultKind: 'condition-timedout';
     readonly reason: string
 }
 
-export type ConditionStatus = ConditionValid | ConditionSkipped | ConditionTimedOut;
+interface ConditionFailed {
+    readonly valid: false,
+    readonly resultKind: 'condition-failed';
+    readonly reason: string
+}
+
+interface ConditionVerificationInProgress {
+    readonly valid: false;
+    readonly resultKind: 'verification-in-progress';
+}
+
+export type ConditionStatus = ConditionValid | ConditionSkipped | ConditionTimedOut | ConditionFailed | ConditionVerificationInProgress;
+
+export function isFailed(execResult: ConditionStatus): execResult is ConditionFailed {
+    return execResult.resultKind === 'condition-failed';
+}
+
+export function isTimedOut(execResult: ConditionStatus): execResult is ConditionTimedOut {
+    return execResult.resultKind === 'condition-timedout';
+}
 
 interface BinaryVersionValid {
     readonly valid: true;

@@ -322,12 +322,12 @@ export class InstallHandler {
    * @return the version of oc
    */
   static getOcVersion(ocPath: string): BinaryVersion {
-    let result: IExecSyncResult | undefined = RunnerHandler.execOcSync(ocPath, 'version --short=true --client=true');
+    let result: IExecSyncResult | undefined = RunnerHandler.execOcSync(ocPath, 'version --short=true --client=true', true);
 
     if (!result || result.stderr) {
       tl.debug(`error ${result && result.stderr ? result.stderr : ''}`);
       // if oc version failed we're dealing with oc < 4.1
-      result = RunnerHandler.execOcSync(ocPath, 'version');
+      result = RunnerHandler.execOcSync(ocPath, 'version', true);
     }
 
     if (!result || !result.stdout) {
