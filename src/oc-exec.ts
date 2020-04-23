@@ -7,6 +7,7 @@ import {
   IExecOptions,
   IExecSyncResult
 } from 'azure-pipelines-task-lib/toolrunner';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import * as fs from 'fs';
 
 import split = require('argv-split');
@@ -290,5 +291,10 @@ export class RunnerHandler {
     }
 
     return execResult;
+  }
+
+  static spawnChild(ocPath: string, argLine: string): ChildProcessWithoutNullStreams {
+    const args: string[] = RunnerHandler.prepareCmdArguments(argLine, true);
+    return spawn(ocPath, args);
   }
 }
