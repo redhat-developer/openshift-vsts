@@ -100,9 +100,9 @@ If you want to you keep using this service connection you need to select the 1.*
 ---
 
 <a id="setup-the-openshift-connection-runtime"></a>
-### Set up the OpenShift connection on runtime
+### Set up the OpenShift connection at runtime
 
-To set up an OpenShift connection on runtime, select the _Set Up Configuration on Runtime_ option in the _Service connection type_ .
+To set up an OpenShift connection at runtime, select the _Set Up Configuration on Runtime_ option in the _Service connection type_ .
 You should be displayed with two options: File Path and Inline Configuration.
 
 - File Path allows you to add a path where the agent will find the config file to use during the execution
@@ -246,7 +246,7 @@ The _Execute conditional oc command_ has ten configuration options.
   <dt>Condition type</dt>
   <dd>The condition type to be checked over the resource specified. The condition types supported in the current release are `Exists` and `Not_exists`.</dd>
   <dt>Resource on which to verify the condition</dt>
-  <dd>The extension expects a clear name of the resource/resources to be checked. E.g pods -l app=test, the extension, based on the condition type chosen, will check if there is atleast one pod (Exists) or no pods at all (No_exists) with that label.
+  <dd>The extension expects a clear name of the resource/resources to be checked (E.g pods -l app=test). In the case shown in the example the extension, based on the condition type chosen, will check if there is atleast one pod (Exists) or no pods at all (No_exists) with that label.
   <dt>Time (in milliseconds) after which to stop the execution</dt>
   <dd>The time the extension will wait before to stop checking the condition status. If the condition will not be met before the timeout elapses the task will errored. N.B: The default timeout is 5 minutes.
   <dt>Skip timed out error</dt>
@@ -307,7 +307,9 @@ For example, to reference a variable MY_VAR defined in the pipeline configuratio
 ## How the cache works in OpenShift VSTS extension
 
 OpenShift VSTS extension supports oc executable caching based by its version to avoid downloading the same bundle over and over when executing different pipelines.
+
 The cache is only enabled when the version is clearly specified in the task (e.g 4.1, 3.1.28..). If the version will be defined as an URL or left blank (when wanting to use the latest oc version available) the extension will try to download the oc version requested without checking the cache. 
+
 The oc executable will be cached inside the `_work/_tool/oc` folder.
 
 <a id="yaml-configuration"></a>
