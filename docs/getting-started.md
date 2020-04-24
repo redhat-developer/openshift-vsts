@@ -17,16 +17,21 @@ The following paragraphs guide you through the process of using this extension.
 
 <!-- /MarkdownTOC -->
 
-<a id="configuring-the-openshift-service-connection"></a>
-## Configuring the OpenShift service connection
+<a id="connect-to-your-openshift-cluster"></a>
+## Connect to your OpenShift cluster
 
 To use any of the pipeline tasks, you first need a way to connect to your cluster.
 In Azure DevOps, access to external and remote services is configured in [service connections](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=vsts).
-The OpenShift extension for Azure DevOps provides a custom OpenShift service connection type which allows you to connect to your cluster using various authentication forms.
+The OpenShift extension for Azure DevOps provides two ways to set up a connection: <a href="#configuring-the-openshift-service-connection">create a custom OpenShift service connection type <a> which allows you to connect to your cluster using various authentication forms or <a href="#setup-the-openshift-connection-runtime">by defining it at Task level</a> when creating your pipeline.
+
+![Service Connection Types](../images/service-connection-types.png)
+
+<a id="configuring-the-openshift-service-connection"></a>
+## Configuring the OpenShift service connection
 
 To configure an OpenShift connection, select the project settings (cogwheel icon).
 From there choose _Service connections_, followed by _New service connection_.
-Select the OpenShift service connection and use one of the following methods to cofigure authentication:
+Select the OpenShift service connection and use one of the following methods to configure authentication:
 
 <a id="basic-authentication"></a>
 ### Basic Authentication
@@ -94,12 +99,24 @@ If you want to you keep using this service connection you need to select the 1.*
 
 ---
 
+<a id="setup-the-openshift-connection-runtime"></a>
+## Set up the OpenShift connection on runtime
+
+To set up an OpenShift connection on runtime, select the _Set Up Configuration on Runtime_ option in the _Service connection type_ .
+You should be displayed with two options: File Path and Inline Configuration.
+
+- File Path allows you to add a path where the agent will find the config file to use during the execution
+![file path connection type](../images/file-path-connection-type.png)
+
+- Inline Configuration expects you to copy the content of your config. The extension will create a new config file with the content inserted
+![inline configuration connection type](../images/inline-config-connection-type.png)
+
 <a id="pipeline-tasks"></a>
 ## Pipeline Tasks 
 
 The following paragraphs describe each of the provided pipeline tasks and their use. 
 
-Based on the options used, a task could need CURL to download the oc bundle requested. 
+Based on the options used, a task could need cURL to download the oc bundle requested. 
 Each task assumes that cURL is already installed on the Agent that is running the build. 
 If cURL is not located on the Agent, an error will be thrown, and the task will fail.
 
@@ -143,22 +160,16 @@ Once added, you need to edit the following configuration options:
 
 In case you want to execute a single `oc` command you can use the _Execute OpenShift command_ task.
 
-To add this task, select the _+_ to add a task to your pipeline.
-You can filter the appearing task list by searching for _Execute oc command_.
-Add the _Execute oc command_ task to your pipeline using the _Add_ button.
-
-![Adding Execute oc task](../images/adding_oc_cmd_task.png)
-
-
-The _Execute oc command_ has five configuration options.
+To add this task, you can filter the appearing task list by searching for _Execute oc command_.
+The _Execute oc command_ has six configuration options.
 
 ![Configuration of Execute oc task](../images/cmd_exec_config.png)
 
 <dl>
-  <dt>OpenShift service connection</dt>
+  <dt>Service Connection Type</dt>
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-the-openshift-service-connection">Configuring the OpenShift service connection</a>.</dd>
   <dt>Version of oc to use</dt>
-  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used. You can also specify a direct URL to the oc release bundle.</dd>  
+  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used. You can also specify a direct URL to the oc release bundle. See <a href="#how-the-cache-works">_How the cache works_</a></dd>  
   <dt>Command to run</dt>
   <dd>The actual oc command to run starting with the oc sub-command, eg "rollout latest dc/my-app -n production".</dd>
   <dt>Ignore on success return value</dt>
@@ -226,7 +237,7 @@ The _Update ConfigMap_ task has six configuration options.
   <dt>OpenShift/Kubernetes service connection</dt>
   <dd>Required. The service connection to use to execute this command. See <a href="#configuring-the-openshift-service-connection">Configuring the OpenShift service connection</a>.</dd>
   <dt>Version of oc to use</dt>
-  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used. You can also specify a direct URL to the oc release bundle.</dd>  
+  <dd>Allows to specify the version of oc to use for command execution, eg v3.10.0. If left blank the latest stable version is used. You can also specify a direct URL to the oc release bundle. See <a href="#how-the-cache-works">_How the cache works_</a></dd>  
   <dt>Name of ConfigMap</dt>
   <dd>Required.The name of the ConfigMap to update.</dd>
   <dt>Namespace of ConfigMap</dt>
