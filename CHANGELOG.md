@@ -1,6 +1,18 @@
 # Change Log
 
-## 1.5.0 (February 17, 2019)
+## 1.6.0 (April 24, 2020)
+
+* [#151](https://github.com/redhat-developer/openshift-vsts/pull/153) Added cache support
+* [#152](https://github.com/redhat-developer/openshift-vsts/issues/152) Added new task to perform conditional commands
+* [#160](https://github.com/redhat-developer/openshift-vsts/pull/160) Added support for command interpolation
+* [#146](https://github.com/redhat-developer/openshift-vsts/issues/146) Added support to define connection config at runtime
+* [#165](https://github.com/redhat-developer/openshift-vsts/pull/165) Updated oc versions file
+* [#156](https://github.com/redhat-developer/openshift-vsts/pull/156) Refactor how errors are handled by extension
+* [#158](https://github.com/redhat-developer/openshift-vsts/pull/158) Switched from Azure pipelines to Github Actions
+
+Thanks to Rinor Maloku for his contribution
+
+## 1.5.0 (February 17, 2020)
 
 * [#135](https://github.com/redhat-developer/openshift-vsts/issues/135) Added proxy support
 * [#130](https://github.com/redhat-developer/openshift-vsts/issues/130) Added support for pipes and redirector operators
