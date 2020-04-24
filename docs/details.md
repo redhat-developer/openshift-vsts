@@ -1,6 +1,6 @@
 # OpenShift Extension for Azure DevOps
 
-[![Build Status](https://travis-ci.org/redhat-developer/openshift-vsts.svg?branch=master)](https://travis-ci.org/redhat-developer/openshift-vsts) [![Build Status](https://dev.azure.com/redhat-developer/openshift-vsts/_apis/build/status/redhat-developer.openshift-vsts?branchName=master)](https://dev.azure.com/redhat-developer/openshift-vsts/_build/latest?definitionId=2&branchName=master)
+[![Build Status](https://travis-ci.org/redhat-developer/openshift-vsts.svg?branch=master)](https://travis-ci.org/redhat-developer/openshift-vsts) ![OpenShift VSTS Build](https://github.com/redhat-developer/openshift-vsts/workflows/OpenShift%20VSTS%20CI/badge.svg?branch=master)
 
 This Azure DevOps extension offers tasks for integrating [OpenShift](https://github.com/openshift/origin) into your build and release pipelines, for example by executing user defined `oc` commands.
 
