@@ -1,6 +1,6 @@
 {
     "openshiftV3BaseUrl": "https://mirror.openshift.com/pub/openshift-v3/clients",
-    "openshiftV4BaseUrl": "https://mirror.openshift.com/pub/openshift-v4/clients/oc",
+    "openshiftV4BaseUrl": "https://mirror.openshift.com/pub/openshift-v4/clients/ocp",
     "oc3.3": "3.3.1.46.45",
     "oc3.4": "3.4.1.44.57",
     "oc3.5": "3.5.5",
@@ -9,5 +9,9 @@
     "oc3.8": "3.8.46",
     "oc3.9": "3.9.103",
     "oc3.10": "3.10.183",
-    "oc3.11": "3.11.154"
+    "oc3.11": "3.11.215",
+    "oc4.1": "stable-4.1",
+    "oc4.2": "stable-4.2",
+    "oc4.3": "stable-4.3",
+    "oc4.4": "stable-4.4"
 }
