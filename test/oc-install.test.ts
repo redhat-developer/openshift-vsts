@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import { IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner';
 import { InstallHandler } from '../src/oc-install';
 import { RunnerHandler } from '../src/oc-exec';
-import { LATEST, LINUX, MACOSX, OC_TAR_GZ,  OC_ZIP, WIN } from '../src/constants';
+import { LINUXV3, MACOSXV3, WINV3, LINUXV4, MACOSXV4, WINV4, OC_TAR_GZ, OC_ZIP, LATEST, ZIP, TAR_GZ } from '../src/constants';
 import { ToolRunnerStub } from './toolrunnerStub';
 import * as utils from '../src/utils/zip_helper';
 
@@ -71,13 +71,13 @@ describe('InstallHandler', () => {
 
   describe('#latestStable', () => {
     it('check if binary not found returned if osType input is not valid', () => {
-      sandbox.stub(InstallHandler, 'getOcBundleByOS').returns(undefined);
+      sandbox.stub(InstallHandler, 'getOcBundleByOSAndVersion').returns(undefined);
       const res = InstallHandler.latestStable('fakeOS');
       expect(res).deep.equals({ valid: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' });
     });
 
     it('check if url returned is valid based on OSType input', () => {
-      sandbox.stub(InstallHandler, 'getOcBundleByOS').returns('linux/oc.tar.gz');
+      sandbox.stub(InstallHandler, 'getOcBundleByOSAndVersion').returns('linux/oc.tar.gz');
       const res = InstallHandler.latestStable('linux');
       const ocUtils = InstallHandler.getOcUtils();
       expect(res).deep.equals({ 
@@ -109,7 +109,7 @@ describe('InstallHandler', () => {
       const version = '3.11.0';
       const ocUtils = InstallHandler.getOcUtils();
       const url = `${ocUtils.openshiftV3BaseUrl}/${version}/${bundle}`;
-      sandbox.stub(InstallHandler, 'getOcBundleByOS').returns(bundle);
+      sandbox.stub(InstallHandler, 'getOcBundleByOSAndVersion').returns(bundle);
       const res = InstallHandler.ocBundleURL(version, 'Linux');
       expect(res).equals(url);
     });
@@ -119,7 +119,7 @@ describe('InstallHandler', () => {
       const version = '4.11';
       const ocUtils = InstallHandler.getOcUtils();
       const url = `${ocUtils.openshiftV4BaseUrl}/${version}/${bundle}`;
-      sandbox.stub(InstallHandler, 'getOcBundleByOS').returns(bundle);
+      sandbox.stub(InstallHandler, 'getOcBundleByOSAndVersion').returns(bundle);
       const res = InstallHandler.ocBundleURL(version, 'Linux');
       expect(res).equals(url);
     });
@@ -132,7 +132,7 @@ describe('InstallHandler', () => {
 
     it('should return null if no oc bundle url is found', () => {
       const version = '4.11';
-      sandbox.stub(InstallHandler, 'getOcBundleByOS').returns(null);
+      sandbox.stub(InstallHandler, 'getOcBundleByOSAndVersion').returns(null);
       const res = InstallHandler.ocBundleURL(version, 'Linux');
       expect(res).to.be.undefined;
     });
@@ -278,23 +278,53 @@ describe('InstallHandler', () => {
   });
 
   describe('#getOcBundleByOS', () => {
-    it('return correct value if osType is linux', () => {
-      const res = InstallHandler.getOcBundleByOS('Linux');
-      expect(res).equals(`${LINUX}/${OC_TAR_GZ}`);
+    it('return correct value if osType is linux, major 4 and no version', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Linux', 4);
+      expect(res).equals(`${LINUXV4}.${TAR_GZ}`);
     });
 
-    it('return correct value if osType is windows', () => {
-      const res = InstallHandler.getOcBundleByOS('Windows_NT');
-      expect(res).equals(`${WIN}/${OC_ZIP}`);
+    it('return correct value if osType is linux, major 4 and version', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Linux', 4, '4.1');
+      expect(res).equals(`${LINUXV4}-4.1.${TAR_GZ}`);
     });
 
-    it('return correct value if osType is MACOSX', () => {
-      const res = InstallHandler.getOcBundleByOS('Darwin');
-      expect(res).equals(`${MACOSX}/${OC_TAR_GZ}`);
+    it('return correct value if osType is linux, major 3', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Linux', 3);
+      expect(res).equals(`${LINUXV3}/${OC_TAR_GZ}`);
+    });
+
+    it('return correct value if osType is windows, major 4 and no version', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Windows_NT', 4);
+      expect(res).equals(`${WINV4}.${ZIP}`);
+    });
+
+    it('return correct value if osType is windows, major 4 and version', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Windows_NT', 4,  '4.1');
+      expect(res).equals(`${WINV4}-4.1.${ZIP}`);
+    });
+
+    it('return correct value if osType is windows, major 3', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Windows_NT', 3);
+      expect(res).equals(`${WINV3}/${OC_ZIP}`);
+    });
+
+    it('return correct value if osType is MACOSX, major 4 and no version', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Darwin', 4);
+      expect(res).equals(`${MACOSXV4}.${TAR_GZ}`);
+    });
+
+    it('return correct value if osType is MACOSX, major 4 and version', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Darwin', 4, '4.1');
+      expect(res).equals(`${MACOSXV4}-4.1.${TAR_GZ}`);
+    });
+
+    it('return correct value if osType is MACOSX, major 3 and no version', () => {
+      const res = InstallHandler.getOcBundleByOSAndVersion('Darwin', 3);
+      expect(res).equals(`${MACOSXV3}/${OC_TAR_GZ}`);
     });
 
     it('return null if osType is neither linux nor macosx nor windows', () => {
-      const res = InstallHandler.getOcBundleByOS('fakeOS');
+      const res = InstallHandler.getOcBundleByOSAndVersion('fakeOS', 3);
       expect(res).to.be.undefined;
     });
   });

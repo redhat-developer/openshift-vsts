@@ -7,7 +7,7 @@ import { ToolRunner, IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as semver from 'semver';
 import { RunnerHandler } from './oc-exec';
-import { LINUX, OC_TAR_GZ, MACOSX, WIN, OC_ZIP, LATEST } from './constants';
+import { LINUXV3, MACOSXV3, WINV3, LINUXV4, MACOSXV4, WINV4, OC_TAR_GZ, OC_ZIP, LATEST, ZIP, TAR_GZ } from './constants';
 import { unzipArchive } from './utils/zip_helper';
 import { BinaryVersion, FindBinaryStatus } from './utils/exec_helper';
 
@@ -78,7 +78,7 @@ export class InstallHandler {
   static latestStable(osType: string): BinaryVersion {
     tl.debug('determining latest oc version');
 
-    const bundle = InstallHandler.getOcBundleByOS(osType);
+    const bundle = InstallHandler.getOcBundleByOSAndVersion(osType, 4);
     if (!bundle) {
       return { valid: false, reason: 'Unable to find Oc bundle url. OS Agent is not supported at this moment.' };
     }
@@ -148,7 +148,8 @@ export class InstallHandler {
       return undefined;
     }
 
-    const bundle = InstallHandler.getOcBundleByOS(osType);
+    version = version.includes('stable') ? undefined : version;
+    const bundle = InstallHandler.getOcBundleByOSAndVersion(osType, vMajor, version);
     if (!bundle) {
       tl.debug('Unable to find bundle url');
       return undefined;
@@ -160,17 +161,27 @@ export class InstallHandler {
     return url;
   }
 
-  static getOcBundleByOS(osType: string): string {
+  static getOcBundleByOSAndVersion(osType: string, vMajor: number, version?: string): string {
+    version = !version ? '' : `-${version}`;
     // determine the bundle path based on the OS type
-    switch (osType) {
-      case 'Linux': {
-        return `${LINUX}/${OC_TAR_GZ}`;
+    switch (`${osType}V${vMajor.toString()}`) {
+      case 'LinuxV4': {
+        return `${LINUXV4}${version}.${TAR_GZ}`;
       }
-      case 'Darwin': {
-        return `${MACOSX}/${OC_TAR_GZ}`;
+      case 'LinuxV3': {
+        return `${LINUXV3}/${OC_TAR_GZ}`;
       }
-      case 'Windows_NT': {
-        return `${WIN}/${OC_ZIP}`;
+      case 'DarwinV4': {
+        return `${MACOSXV4}${version}.${TAR_GZ}`;
+      }
+      case 'DarwinV3': {
+        return `${MACOSXV3}/${OC_TAR_GZ}`;
+      }
+      case 'Windows_NTV4': {
+        return `${WINV4}${version}.${ZIP}`;
+      }
+      case 'Windows_NTV3': {
+        return `${WINV3}/${OC_ZIP}`;
       }
       default: {
         return undefined;
