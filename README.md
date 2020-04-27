@@ -19,6 +19,9 @@ Below you can find a collection of resources to better undestand how the extensi
 * [Blog on developers.redhat.com](https://developers.redhat.com/blog/2019/12/05/introduction-to-the-red-hat-openshift-deployment-extension-for-microsoft-azure-devops/)
 * [Demo Video](https://www.youtube.com/watch?v=RBwpedmkvow)
 
+## Known Issue
+
+New version 2.0.13 changed all the tasks definitions. This might cause old pipelines, created using plugin 2.0.12 or older, to fail during execution. The issue can be easily solved by load, modify (any irrelevant change is good enough) and save the old pipeline so new definition is created and saved. [#170](https://github.com/redhat-developer/openshift-vsts/issues/170) Thanks to Ludovit Varga.
 
 ## How to contribute
 
