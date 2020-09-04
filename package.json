@@ -63,7 +63,7 @@
     "argv-split": "^2.0.1",
     "azure-pipelines-task-lib": "^2.9.3",
     "azure-pipelines-tool-lib": "^0.12.0",
-    "decompress": "^4.2.0",
+    "decompress": "^4.2.1",
     "decompress-targz": "^4.1.1",
     "node-fetch": "^2.6.0",
     "q": "^1.5.1",
