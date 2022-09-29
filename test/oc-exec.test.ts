@@ -30,7 +30,7 @@ describe('oc-exec', () => {
   describe('#execOc', () => {
     it('check createExecOptions is called with correct params', async () => {
       const optionsStub = sandbox.stub(RunnerHandler, 'createExecOptions');
-      sandbox.stub(RunnerHandler, 'initToolRunners');
+      sandbox.stub(RunnerHandler, 'initToolRunners').returns([stubs.tr]);
       sandbox.stub(RunnerHandler, 'unifyToolRunners').returns(stubs.tr);
       await RunnerHandler.execOc(null, 'cmd1', false);
       sinon.assert.calledWith(optionsStub, undefined, false);
@@ -38,7 +38,7 @@ describe('oc-exec', () => {
 
     it('check initToolRunners is called with correct commands splitted and correct path if set', async () => {
       sandbox.stub(RunnerHandler, 'createExecOptions');
-      const initStub = sandbox.stub(RunnerHandler, 'initToolRunners');
+      const initStub = sandbox.stub(RunnerHandler, 'initToolRunners').returns([stubs.tr]);
       sandbox.stub(RunnerHandler, 'unifyToolRunners').returns(stubs.tr);
       await RunnerHandler.execOc('path', 'cmd1 | cmd2', false);
       sinon.assert.calledWith(initStub, ['cmd1 ', '| cmd2'], 'path');
@@ -46,7 +46,7 @@ describe('oc-exec', () => {
 
     it('check initToolRunners is called with correct commands splitted and path passed is null', async () => {
       sandbox.stub(RunnerHandler, 'createExecOptions');
-      const initStub = sandbox.stub(RunnerHandler, 'initToolRunners');
+      const initStub = sandbox.stub(RunnerHandler, 'initToolRunners').returns([stubs.tr]);
       sandbox.stub(RunnerHandler, 'unifyToolRunners').returns(stubs.tr);
       await RunnerHandler.execOc(null, 'cmd1 >> cmd2', false);
       sinon.assert.calledWith(initStub, ['cmd1 ', '>', '> cmd2'], 'oc');
