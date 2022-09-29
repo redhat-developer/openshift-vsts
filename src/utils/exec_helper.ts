@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 import validUrl = require('valid-url');
+import task = require('azure-pipelines-task-lib/task');
 
 interface ConditionValid {
     readonly valid: true;
@@ -78,4 +79,13 @@ export function convertStringToBinaryVersion(version: string): BinaryVersion {
 
 export function getReason(version: BinaryNotFound): string {
     return version.reason ? version.reason : 'error';
+}
+
+export function getAgentOsName(os: task.Platform): string {
+    switch (os) {
+        case task.Platform.Windows: return "Windows_NT";
+        case task.Platform.Linux: return "Linux";
+        case task.Platform.MacOS: return "Darwin";
+        default: return "";
+    }
 }

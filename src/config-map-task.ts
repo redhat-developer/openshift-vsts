@@ -6,13 +6,13 @@ import { RunnerHandler } from './oc-exec';
 import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
 import { ConfigMap } from './config-map';
-import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getReason } from './utils/exec_helper';
+import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getAgentOsName, getReason } from './utils/exec_helper';
 
 import task = require('azure-pipelines-task-lib/task');
 
 async function run(): Promise<void> {
   const version = task.getInput('version');
-  const agentOS = task.osType();
+  const agentOS = getAgentOsName(task.getPlatform());;
   const useLocalOc: boolean = task.getBoolInput('useLocalOc');
   const proxy: string = task.getInput('proxy');
 
