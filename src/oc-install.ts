@@ -245,7 +245,9 @@ export class InstallHandler {
     }
 
     fs.chmodSync(ocBinary, '0755');
-    if (versionToCache) await toolLib.cacheFile(ocBinary, 'oc', 'oc', versionToCache);
+    if (versionToCache) {
+      await toolLib.cacheFile(ocBinary, InstallHandler.ocBinaryByOS(osType), 'oc', versionToCache);
+    }
     return { found: true, path: ocBinary };
   }
 
