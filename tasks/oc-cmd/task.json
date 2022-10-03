@@ -24,11 +24,11 @@
     }
   ],
   "version": {
-    "Major": 2,
+    "Major": 3,
     "Minor": 0,
-    "Patch": 13
+    "Patch": 1
   },
-  "minimumAgentVersion": "1.95.0",
+  "minimumAgentVersion": "2.144.0",
   "instanceNameFormat": "oc-cmd $(message)",
   "inputs": [
     {
@@ -138,7 +138,7 @@
     }
   ],
   "execution": {
-    "Node": {
+    "Node10": {
       "target": "lib/oc-exec-task.js",
       "workingDirectory": "$(currentDirectory)"
     }

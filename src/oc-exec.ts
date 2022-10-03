@@ -38,7 +38,7 @@ export class RunnerHandler {
     // split cmd based on redirection operators
     const cmds: string[] = argLine.split(/(?=2(?=>))|(?=[>|])/);
     const trs: ToolRunner[] = RunnerHandler.initToolRunners(cmds, ocPath);
-    if (trs === []) {
+    if (trs.length === 0) {
       return Promise.reject(new Error(`Unable to create any ToolRunner by ${argLine}`));
     }
     const tr: ToolRunner = RunnerHandler.unifyToolRunners(cmds, trs, options);

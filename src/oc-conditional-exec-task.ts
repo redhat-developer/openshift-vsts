@@ -5,7 +5,7 @@
 import { RunnerHandler } from './oc-exec';
 import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
-import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getReason, ConditionStatus, isFailed, isTimedOut } from './utils/exec_helper';
+import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getReason, ConditionStatus, isFailed, isTimedOut, getAgentOsName } from './utils/exec_helper';
 import { ConditionHandler } from './oc-condition';
 
 import task = require('azure-pipelines-task-lib/task');
@@ -22,7 +22,7 @@ async function run(): Promise<void> {
   const ignoreFlag: boolean = task.getBoolInput('ignoreFlag');
   const useLocalOc: boolean = task.getBoolInput('useLocalOc');
   const proxy: string = task.getInput('proxy');
-  const agentOS = task.osType();
+  const agentOS = getAgentOsName(task.getPlatform());;
 
   const binaryVersion: BinaryVersion = convertStringToBinaryVersion(version);
   const ocBinary: FindBinaryStatus = await InstallHandler.installOc(binaryVersion, agentOS, useLocalOc, proxy);

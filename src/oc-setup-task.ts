@@ -4,13 +4,13 @@
  *-----------------------------------------------------------------------------------------------*/
 import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
-import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getReason } from './utils/exec_helper';
+import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getAgentOsName, getReason } from './utils/exec_helper';
 
 import task = require('azure-pipelines-task-lib/task');
 
 async function run(): Promise<void> {
   const version: string = task.getInput('version');
-  const agentOS: string = task.osType();
+  const agentOS: string = getAgentOsName(task.getPlatform());
   const proxy: string = task.getInput('proxy');
 
   const binaryVersion: BinaryVersion = convertStringToBinaryVersion(version);

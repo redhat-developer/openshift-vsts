@@ -17,13 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '10', '8', '6' ]
+        node: [ '16', '14', '10' ]
     name: Node ${{ matrix.node }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Node.js environment
-        uses: actions/setup-node@v1.4.1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - run: npm run setup
@@ -35,9 +35,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Node.js environment
-        uses: actions/setup-node@v1.4.1
+        uses: actions/setup-node@v3
         with:
           node-version: '10.x'
       - run: npm run setup
@@ -49,9 +49,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Node.js environment
-        uses: actions/setup-node@v1.4.1
+        uses: actions/setup-node@v3
         with:
           node-version: '10.x'
       - run: npm run setup
