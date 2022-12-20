@@ -225,16 +225,9 @@ export class InstallHandler {
       await curl.exec();
     }
 
-    let archiveType = path.extname(archive);
-    let expandDir = archive.replace(archiveType, '');
-    // handle tar.gz explicitly
-    if (path.extname(expandDir) === '.tar') {
-      archiveType = '.tar.gz';
-      expandDir = expandDir.replace('.tar', '');
-    }
-
     tl.debug(`expanding ${archivePath} into ${downloadDir}`);
 
+    const archiveType = path.extname(archive);
     await unzipArchive(archiveType, archivePath, downloadDir);
 
     let ocBinary = InstallHandler.ocBinaryByOS(osType);
