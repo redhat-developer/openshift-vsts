@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 import decompress = require('decompress');
+import decompressTar = require('decompress-tar');
 import decompressTargz = require('decompress-targz');
 import Zip = require('adm-zip');
 
@@ -15,6 +16,13 @@ export async function unzipArchive(
     case '.zip': {
       const zip = new Zip(archivePath);
       zip.extractAllTo(downloadDir);
+      break;
+    }
+    case '.tar': {
+      await decompress(archivePath, downloadDir, {
+        filter: file => file.data.length > 0,
+        plugins: [decompressTar()]
+      });
       break;
     }
     case '.tgz':

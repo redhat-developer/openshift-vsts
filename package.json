@@ -64,6 +64,7 @@
     "azure-pipelines-task-lib": "^3.1.7",
     "azure-pipelines-tool-lib": "^1.3.2",
     "decompress": "^4.2.1",
+    "decompress-tar": "^4.1.1",
     "decompress-targz": "^4.1.1",
     "del-cli": "^5.0.0",
     "node-fetch": "^2.6.7",
