@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.0.0 (December 20, 2022)
+
+This release updates the minimum node version supported to 10. Old workflows might break up when switching to it
+* [#196](https://github.com/redhat-developer/openshift-vsts/pull/196) Make extension works with node 10 by default
+* [#202](https://github.com/redhat-developer/openshift-vsts/pull/202) Add support to unzip .tar archive
+* [#194](https://github.com/redhat-developer/openshift-vsts/pull/194) Wrong bundle name cached in windows
+* [#200](https://github.com/redhat-developer/openshift-vsts/pull/200) Remove travis CI
+
 ## 1.6.0 (April 24, 2020)
 
 * [#151](https://github.com/redhat-developer/openshift-vsts/pull/153) Added cache support
