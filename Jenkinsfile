@@ -35,7 +35,7 @@ node('rhel8'){
         stage('Snapshot') {
             def filesToPush = findFiles(glob: '**/*.vsix')
             def extensionJson = readJSON file: 'vss-extension.json'
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/openshift-vsts/openshift-vsts-${extensionJson.version}-${env.BUILD_NUMBER}.vsix"
+            sh "sftp -C ${UPLOAD_LOCATION}/snapshots/openshift-vsts/openshift-vsts-${extensionJson.version}-${env.BUILD_NUMBER}.vsix <<< \$'put -p \"${filesToPush[0].path}\"'"
         }
     }
     
@@ -54,7 +54,7 @@ node('rhel8'){
             stage "Promote the build to stable"
             def vsix = findFiles(glob: '**/*.vsix')
             def extensionJson = readJSON file: 'vss-extension.json'
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${vsix[0].path} ${UPLOAD_LOCATION}/stable/openshift-vsts/openshift-vsts-${extensionJson.version}-${env.BUILD_NUMBER}.vsix"
+            sh "sftp -C ${UPLOAD_LOCATION}/stable/openshift-vsts/openshift-vsts-${extensionJson.version}-${env.BUILD_NUMBER}.vsix <<< \$'put -p \"${vsix[0].path}\"'"
         }
     }
 }
