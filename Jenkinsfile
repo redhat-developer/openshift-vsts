@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-node('rhel7'){
+node('rhel8'){
     stage('Checkout repo') {
         deleteDir()
         git url: 'https://github.com/redhat-developer/openshift-vsts',
@@ -8,7 +8,7 @@ node('rhel7'){
     }
 
     stage('Install requirements') {
-        def nodeHome = tool 'nodejs-8.11.1'
+        def nodeHome = tool 'nodejs-lts'
         env.PATH="${env.PATH}:${nodeHome}/bin"
         sh "npm run setup"
     }
