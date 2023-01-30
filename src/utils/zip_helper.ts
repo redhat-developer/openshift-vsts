@@ -25,6 +25,7 @@ export async function unzipArchive(
       });
       break;
     }
+    case '.gz':
     case '.tgz':
     case '.tar.gz': {
       await decompress(archivePath, downloadDir, {
