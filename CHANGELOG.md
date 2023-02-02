@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.0.1 (February 2, 2023)
+
+* [#212](https://github.com/redhat-developer/openshift-vsts/pull/215) Add support to unzip .tar.gz archive
+
 ## 2.0.0 (December 20, 2022)
 
 This release updates the minimum node version supported to 10. Old workflows might break up when switching to it
