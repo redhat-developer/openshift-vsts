@@ -13,5 +13,20 @@
     "oc4.1": "stable-4.1",
     "oc4.2": "stable-4.2",
     "oc4.3": "stable-4.3",
-    "oc4.4": "stable-4.4"
+    "oc4.4": "stable-4.4",
+    "oc4.5": "stable-4.5",
+    "oc4.6": "stable-4.6",
+    "oc4.7": "stable-4.7",
+    "oc4.8": "stable-4.8",
+    "oc4.9": "stable-4.9",
+    "oc4.10": "stable-4.10",
+    "oc4.11": "stable-4.11",
+    "oc4.12": "stable-4.12",
+    "oc4.13": "stable-4.13",
+    "oc4.14": "stable-4.14",
+    "oc4.15": "stable-4.15",
+    "oc4.16": "stable-4.16",
+    "oc4.17": "stable-4.17",
+    "oc4.18": "stable-4.18",
+    "oc4.19": "stable-4.19"
 }

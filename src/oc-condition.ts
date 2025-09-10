@@ -68,7 +68,7 @@ export class ConditionHandler {
         return status;
     }
 
-    static async sleep(ms: number):Promise<NodeJS.Timeout> {
+    static async sleep(ms: number):Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 

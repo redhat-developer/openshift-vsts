@@ -24,7 +24,7 @@
       }
     ],
     "version": {
-      "Major": 3,
+      "Major": 4,
       "Minor": 0,
       "Patch": 2
     },
@@ -178,7 +178,7 @@
       }
     ],
     "execution": {
-      "Node10": {
+      "Node20_1": {
         "target": "lib/oc-conditional-exec-task.js",
         "workingDirectory": "$(currentDirectory)"
       }

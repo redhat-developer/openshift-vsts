@@ -25,7 +25,7 @@
     }
   ],
   "version": {
-    "Major": 3,
+    "Major": 4,
     "Minor": 0,
     "Patch": 2
   },
@@ -151,7 +151,7 @@
     }
   ],
   "execution": {
-    "Node10": {
+    "Node20_1": {
       "target": "lib/config-map-task.js",
       "workingDirectory": "$(currentDirectory)"
     }

@@ -2,13 +2,13 @@
  *  Copyright (c) Red Hat, Inc. All rights reserved.
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
+import task = require('azure-pipelines-task-lib/task');
 import { RunnerHandler } from './oc-exec';
 import { InstallHandler } from './oc-install';
 import * as auth from './oc-auth';
 import { ConfigMap } from './config-map';
 import { BinaryVersion, convertStringToBinaryVersion, FindBinaryStatus, getAgentOsName, getReason } from './utils/exec_helper';
 
-import task = require('azure-pipelines-task-lib/task');
 
 async function run(): Promise<void> {
   const version = task.getInput('version');

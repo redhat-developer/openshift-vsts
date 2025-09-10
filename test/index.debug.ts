@@ -3,9 +3,11 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 
-import * as glob from 'glob';
+
 import * as Mocha from 'mocha';
 import * as path from 'path';
+const glob = require('glob');
+
 
 process.on('unhandledRejection', err => {
   console.log('Unhandled rejection:', err);
@@ -16,11 +18,12 @@ export function run(): Promise<void> {
   // Create the mocha test
   const mocha = new Mocha({
     ui: 'tdd',
-    useColors: true,
+    color: true,
     timeout: 50000,
     slow: 50000
   });
-  mocha.useColors(true);
+  // mocha.color(true);
+
 
   const testsRoot = path.resolve(__dirname);
 

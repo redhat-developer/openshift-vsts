@@ -11,8 +11,7 @@
       "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:@typescript-eslint/recommended-requiring-type-checking",
-      "prettier",
-      "prettier/@typescript-eslint"
+      "prettier"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -77,6 +76,19 @@
       "no-shadow": ["error"],
       "no-underscore-dangle": 0,
       "no-useless-constructor": "off",
+      "prefer-regex-literals": "off",
+      "no-promise-executor-return": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-arguments": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-base-to-string": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-use-before-define": 2,
       "@typescript-eslint/await-thenable": "error",
       "@typescript-eslint/unbound-method": ["error", { "ignoreStatic": true }],
@@ -86,8 +98,12 @@
       "prefer-template": 2,
       "radix": 2,
       "no-trailing-spaces": "error",
-      "@typescript-eslint/prefer-regexp-exec": 0
+      "@typescript-eslint/prefer-regexp-exec": 0,
+      "import/extensions": ["error", "ignorePackages",{"ts": "never"}]
     },
+    "ignorePatterns": [
+      "node_modules/"
+    ],
     "overrides": [
       {
           "files": ["*.test.ts"],

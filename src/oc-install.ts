@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *-----------------------------------------------------------------------------------------------*/
 import * as fs from 'fs';
+import tl = require('azure-pipelines-task-lib/task');
+import path = require('path');
 import { ToolRunner, IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as semver from 'semver';
@@ -11,9 +13,7 @@ import { LINUXV3, MACOSXV3, WINV3, LINUXV4, MACOSXV4, WINV4, OC_TAR_GZ, OC_ZIP, 
 import { unzipArchive } from './utils/zip_helper';
 import { BinaryVersion, FindBinaryStatus } from './utils/exec_helper';
 
-import tl = require('azure-pipelines-task-lib/task');
-import path = require('path');
-import fetch = require('node-fetch');
+const nodeFetch = (...args: Parameters<typeof import('node-fetch').default>) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 export class InstallHandler {
   /**
@@ -269,7 +269,8 @@ export class InstallHandler {
     let findURLofLatest = !url;
     if (url) {
       // check if url is valid otherwise take the latest stable oc cli for this version
-      const response = await fetch(url, { method: 'HEAD' });
+      // const response = await fetch(url, { method: 'HEAD' });
+      const response = await nodeFetch(url, { method: 'HEAD' });
       findURLofLatest = !response.ok;
     }
     if (findURLofLatest) {
