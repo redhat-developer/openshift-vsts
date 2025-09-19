@@ -12,9 +12,10 @@ async function run(): Promise<void> {
   const version: string = task.getInput('version');
   const agentOS: string = getAgentOsName(task.getPlatform());
   const proxy: string = task.getInput('proxy');
+  const useLocalOc: boolean = task.getBoolInput('useLocalOc');
 
   const binaryVersion: BinaryVersion = convertStringToBinaryVersion(version);
-  const ocBinary: FindBinaryStatus = await InstallHandler.installOc(binaryVersion, agentOS, false, proxy);
+  const ocBinary: FindBinaryStatus = await InstallHandler.installOc(binaryVersion, agentOS, useLocalOc, proxy);
   if (ocBinary.found === false) {
     return Promise.reject(new Error(getReason(ocBinary)));
   }

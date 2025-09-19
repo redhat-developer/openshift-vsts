@@ -102,6 +102,15 @@
       "helpMarkDown": "Select the oc version to use e.g. 'v3.10.0' (leave blank for latest). You can also specify a direct URL to a oc release bundle."
     },
     {
+      "name": "uselocalOc",
+      "type": "boolean",
+      "label": "Use local oc executable",
+      "defaultValue": "false",
+      "required": false,
+      "groupName": "commands",
+      "helpMarkDown": "Check if oc is already installed in the machine and use that if available"
+    },
+    {
       "name": "proxy",
       "type": "string",
       "label": "Use proxy to download oc executable",

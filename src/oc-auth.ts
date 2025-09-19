@@ -158,6 +158,9 @@ export async function createKubeConfigFromServiceConnection(ocPath: string, osTy
   }
   switch (authType) {
     case BASIC_AUTHENTICATION: {
+      // Mask the password in the logs
+      tl.setSecret(endpoint.parameters.password);
+
       await RunnerHandler.execOc(
         ocPath,
         `login ${useCertificateOrSkipTls} -u ${endpoint.parameters.username} -p ${endpoint.parameters.password} ${endpoint.serverUrl}`
@@ -165,6 +168,8 @@ export async function createKubeConfigFromServiceConnection(ocPath: string, osTy
       break;
     }
     case TOKEN_AUTHENTICATION: {
+      // Mask the token in the logs
+      tl.setSecret(endpoint.parameters.apitoken);
       await RunnerHandler.execOc(
         ocPath,
         `login ${useCertificateOrSkipTls} --token ${endpoint.parameters.apitoken} ${endpoint.serverUrl}`
