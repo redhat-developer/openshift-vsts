@@ -2,8 +2,10 @@
 
 <!-- TOC depthFrom:2 -->
 
-- [Filing issues](#filing-issues)
-- [Contributing patches](#contributing-patches)
+- [Contribution guidelines](#contribution-guidelines)
+  - [Filing issues](#filing-issues)
+  - [Contributing patches](#contributing-patches)
+  - [Development](#development)
 
 <!-- /TOC -->
 
@@ -22,3 +24,9 @@ Thank you for your contributions! Please follow this process to submit a patch:
 - Refer to the [README](./README.md) for how to build and test the _openshift-vsts_.
 - Submit a pull request with the proposed changes.
   To make reviewing and integration as smooth as possible, please run the `npm test` target prior to submitting the pull request.
+
+## Development
+
+```bash
+npm i -g tfx-cli
+```

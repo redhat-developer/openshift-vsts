@@ -3,7 +3,7 @@
 node('rhel8'){
     stage('Checkout repo') {
         deleteDir()
-        git url: 'https://github.com/redhat-developer/openshift-vsts',
+        git url: 'https://github.com/carneirofc/openshift-vsts',
             branch: "${BRANCH}"
     }
 

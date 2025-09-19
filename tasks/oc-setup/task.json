@@ -4,7 +4,7 @@
   "friendlyName": "Install and setup oc",
   "description": "Installs oc and configures the PATH and KUBECONFIG environment variables.",
   "author": "Red Hat",
-  "helpMarkDown": "See [getting started](https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md)",
+  "helpMarkDown": "See [getting started](https://github.com/carneirofc/openshift-vsts/blob/master/docs/getting-started.md)",
   "category": "Utility",
   "visibility": [
     "Build",

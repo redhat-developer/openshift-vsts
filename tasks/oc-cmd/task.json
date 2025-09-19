@@ -4,7 +4,7 @@
   "friendlyName": "Execute oc command",
   "description": "OpenShift execute CLI command.",
   "author": "Red Hat",
-  "helpMarkDown": "See [getting started](https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md)",
+  "helpMarkDown": "See [getting started](https://github.com/carneirofc/openshift-vsts/blob/master/docs/getting-started.md)",
   "category": "Utility",
   "visibility": [
     "Build",

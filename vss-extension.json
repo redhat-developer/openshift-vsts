@@ -20,24 +20,24 @@
   ],
   "links": {
     "home": {
-      "uri": "https://github.com/redhat-developer/openshift-vsts"
+      "uri": "https://github.com/carneirofc/openshift-vsts"
     },
     "getstarted": {
-      "uri": "https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md"
+      "uri": "https://github.com/carneirofc/openshift-vsts/blob/master/docs/getting-started.md"
     },
     "support": {
-      "uri": "https://github.com/redhat-developer/openshift-vsts/issues"
+      "uri": "https://github.com/carneirofc/openshift-vsts/issues"
     },
     "issues": {
-      "uri": "https://github.com/redhat-developer/openshift-vsts/issues"
+      "uri": "https://github.com/carneirofc/openshift-vsts/issues"
     },
     "repository": {
-      "uri": "https://github.com/redhat-developer/openshift-vsts"
+      "uri": "https://github.com/carneirofc/openshift-vsts"
     }
   },
   "repository": {
     "type": "git",
-    "uri": "https://github.com/redhat-developer/openshift-vsts"
+    "uri": "https://github.com/carneirofc/openshift-vsts"
   },
   "content": {
     "details": {
@@ -160,7 +160,7 @@
             ]
           }
         ],
-        "helpMarkDown": "<a href=\"https://github.com/redhat-developer/openshift-vsts/blob/master/docs/getting-started.md\" target=\"_blank\"><b>Learn More</b></a>"
+        "helpMarkDown": "<a href=\"https://github.com/carneirofc/openshift-vsts/blob/master/docs/getting-started.md\" target=\"_blank\"><b>Learn More</b></a>"
       }
     },
     {

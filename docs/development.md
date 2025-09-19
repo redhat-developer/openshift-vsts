@@ -28,7 +28,7 @@
 ## npm build tasks
 
 The various build tasks are driven via `npm`.
-Check [_package.json_](https://github.com/redhat-developer/openshift-vsts/blob/master/package.json) for the defined run scripts.
+Check [_package.json_](https://github.com/carneirofc/openshift-vsts/blob/master/package.json) for the defined run scripts.
 To get a list of all available tasks run:
 
 `> npm run`
@@ -152,7 +152,7 @@ Just run:
 <a id="ci"></a>
 ## CI
 
-There is one CI system configured for this project and it uses [GitHub Actions](https://github.com/redhat-developer/openshift-vsts/actions).
+There is one CI system configured for this project and it uses [GitHub Actions](https://github.com/carneirofc/openshift-vsts/actions).
 
 <a id="references"></a>
 ## References

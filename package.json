@@ -19,7 +19,7 @@
     "docs": "markserv .",
     "pretest": "npm run compile",
     "watch": "tsc -watch -p ./",
-    "lint": "node_modules/.bin/eslint . --ext .ts --quiet",
+    "lint": "eslint . --ext .ts --quiet",
     "test": "ts-mocha -p tsconfig.json test/*.test.ts --timeout 5000 ${MOCHA_TAG}",
     "test:report": "npm run test -- --reporter mocha-simple-html-reporter --reporter-options output=out/test-report.html",
     "test:report:ci": "npm run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=out/test-report.xml",
@@ -27,7 +27,7 @@
     "prettier:check": "npm run prettier:base -- --list-different \"src/*.ts\" \"test/*.ts\"",
     "prettier:write": "npm run prettier:base -- --write \"**/**/*.ts\"",
     "copy-node-modules": "for i in `ls tasks` ; do copy-node-modules . tasks/$i; done",
-    "copy-utils-file": "cp src/oc-utils.json out/src/",
+    "copy-utils-file": "cpx src/oc-utils.json out/src/",
     "copy-task-utils": "for i in `ls tasks` ; do cp -r src/oc-utils.json tasks/$i/lib/; done",
     "copy-task-lib": "for i in `ls tasks` ; do cp -r out/src/. tasks/$i/lib/; done",
     "bump-task-version": "for i in `ls tasks` ; do TASK=$(cat tasks/$i/task.json | json -e 'this.version.Patch++'); echo \"$TASK\" > tasks/$i/task.json; done",
@@ -47,15 +47,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/redhat-developer/openshift-vsts.git"
+    "url": "https://github.com/carneirofc/openshift-vsts.git"
   },
   "keywords": [],
   "author": "Red Hat",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/redhat-developer/openshift-vsts/issues"
+    "url": "https://github.com/carneirofc/openshift-vsts/issues"
   },
-  "homepage": "https://github.com/redhat-developer/openshift-vsts#readme",
+  "homepage": "https://github.com/carneirofc/openshift-vsts#readme",
   "dependencies": {
     "@types/q": "^1.5.1",
     "@types/valid-url": "^1.0.2",
@@ -86,6 +86,7 @@
     "chai-fs": "^2.0.0",
     "commit-message-validator": "^0.1.6",
     "copy-node-modules": "^1.0.4",
+    "cpx": "^1.5.0",
     "eslint": "^6.7.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.7.0",
