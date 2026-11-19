@@ -138,6 +138,10 @@
     }
   ],
   "execution": {
+    "Node24": {
+      "target": "lib/oc-exec-task.js",
+      "workingDirectory": "$(currentDirectory)"
+    },
     "Node10": {
       "target": "lib/oc-exec-task.js",
       "workingDirectory": "$(currentDirectory)"
