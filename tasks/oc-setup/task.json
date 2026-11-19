@@ -112,6 +112,10 @@
     }
   ],
   "execution": {
+    "Node24": {
+      "target": "lib/oc-setup-task.js",
+      "workingDirectory": "$(currentDirectory)"
+    },
     "Node10": {
       "target": "lib/oc-setup-task.js",
       "workingDirectory": "$(currentDirectory)"

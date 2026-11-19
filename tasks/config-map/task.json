@@ -151,6 +151,10 @@
     }
   ],
   "execution": {
+    "Node24": {
+      "target": "lib/config-map-task.js",
+      "workingDirectory": "$(currentDirectory)"
+    },
     "Node10": {
       "target": "lib/config-map-task.js",
       "workingDirectory": "$(currentDirectory)"

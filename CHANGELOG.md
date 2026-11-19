@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.1.0 (unreleased)
+
+* [#230](https://github.com/redhat-developer/openshift-vsts/pull/230) Run tasks on the Node.js 24 runner (latest LTS bundled in the Azure Pipelines agent); Node.js 10/16 runners are removed from the agent on November 24, 2026. Node 10 is kept as a fallback handler for older agents. CI updated to Node 26/24 LTS.
+
 ## 2.0.1 (February 2, 2023)
 
 * [#212](https://github.com/redhat-developer/openshift-vsts/pull/215) Add support to unzip .tar.gz archive

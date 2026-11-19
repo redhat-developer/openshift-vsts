@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '16', '14', '10' ]
+        node: [ '26', '24' ]
     name: Node ${{ matrix.node }}
 
     steps:
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '10.x'
+          node-version: '26.x'
       - run: npm run setup
       - run: npm install
       - run: npm run build
@@ -53,7 +53,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '10.x'
+          node-version: '26.x'
       - run: npm run setup
       - run: npm install
       - run: npm run build
